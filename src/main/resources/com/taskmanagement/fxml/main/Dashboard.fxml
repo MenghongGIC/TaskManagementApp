@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.taskmanagement.controller.DashboardController"
+            style="-fx-background-color: #f5f7fa;">
+
+    <!-- Top Header Bar -->
+    <top>
+        <VBox style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+                <Label text="Task Management Dashboard"
+                       style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button text="👤 Profile"
+                        onAction="#handleViewProfile"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
+                <Button text="⚙️ Settings"
+                        onAction="#handleSettings"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
+                <Button text="🚪 Logout"
+                        onAction="#handleLogout"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Main Content Area -->
+    <center>
+        <VBox spacing="15" style="-fx-padding: 20;">
+            <!-- Control Panel -->
+            <HBox spacing="10" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-padding: 15; -fx-border-radius: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                <TextField fx:id="taskNameField"
+                           promptText="Task or Project name..."
+                           prefWidth="300"
+                           style="-fx-font-size: 12; -fx-padding: 8;" />
+                <ComboBox fx:id="priorityCombo"
+                          prefWidth="100"
+                          style="-fx-font-size: 12;">
+                </ComboBox>
+                <Button text="➕ Create Task"
+                        onAction="#handleCreateTask"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
+                <Button text="➕ Create Project"
+                        onAction="#handleCreateProject"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="statusLabel"
+                       style="-fx-font-size: 11; -fx-text-fill: #27ae60;" />
+            </HBox>
+
+            <!-- Kanban Board -->
+            <HBox spacing="15" VBox.vgrow="ALWAYS">
+                <!-- To Do Column -->
+                <VBox spacing="10" prefWidth="350"
+                      style="-fx-background-color: #ecf0f1; -fx-padding: 15; -fx-border-radius: 5;">
+                    <Label text="📋 TO DO"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                    <ScrollPane fx:id="todoScrollPane"
+                                VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent; -fx-padding: 5;">
+                        <VBox fx:id="todoPanel"
+                              spacing="10"
+                              style="-fx-background-color: transparent;"
+                              onDragOver="#handleDragOver"
+                              onDragDropped="#handleDragDropped" />
+                    </ScrollPane>
+                </VBox>
+
+                <!-- In Progress Column -->
+                <VBox spacing="10" prefWidth="350"
+                      style="-fx-background-color: #fef5e7; -fx-padding: 15; -fx-border-radius: 5;">
+                    <Label text="🔄 IN PROGRESS"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                    <ScrollPane fx:id="inProgressScrollPane"
+                                VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent; -fx-padding: 5;">
+                        <VBox fx:id="inProgressPanel"
+                              spacing="10"
+                              style="-fx-background-color: transparent;"
+                              onDragOver="#handleDragOver"
+                              onDragDropped="#handleDragDropped" />
+                    </ScrollPane>
+                </VBox>
+
+                <!-- Done Column -->
+                <VBox spacing="10" prefWidth="350"
+                      style="-fx-background-color: #e8f8f5; -fx-padding: 15; -fx-border-radius: 5;">
+                    <Label text="✅ DONE"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                    <ScrollPane fx:id="doneScrollPane"
+                                VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent; -fx-padding: 5;">
+                        <VBox fx:id="donePanel"
+                              spacing="10"
+                              style="-fx-background-color: transparent;"
+                              onDragOver="#handleDragOver"
+                              onDragDropped="#handleDragDropped" />
+                    </ScrollPane>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
