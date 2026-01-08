@@ -32,7 +32,6 @@ bin/
 .gradle/
 
 # VS Code
-.vscode/
 *.code-workspace
 
 # Eclipse
