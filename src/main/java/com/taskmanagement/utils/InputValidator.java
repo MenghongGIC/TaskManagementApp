@@ -17,9 +17,6 @@ public class InputValidator {
     private static final Pattern COLOR_PATTERN =
             Pattern.compile("^#[0-9A-Fa-f]{6}$");
 
-    /**
-     * Validates email format
-     */
     public static boolean isValidEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return false;
@@ -27,9 +24,6 @@ public class InputValidator {
         return EMAIL_PATTERN.matcher(email).matches();
     }
 
-    /**
-     * Validates username (3-20 alphanumeric, underscore, hyphen)
-     */
     public static boolean isValidUsername(String username) {
         if (username == null || username.trim().isEmpty()) {
             return false;
@@ -37,9 +31,6 @@ public class InputValidator {
         return USERNAME_PATTERN.matcher(username).matches();
     }
 
-    /**
-     * Validates password strength (minimum 8 characters recommended)
-     */
     public static boolean isValidPassword(String password) {
         if (password == null) {
             return false;
@@ -47,9 +38,6 @@ public class InputValidator {
         return password.length() >= 8;
     }
 
-    /**
-     * Validates hex color code format
-     */
     public static boolean isValidColor(String color) {
         if (color == null) {
             return false;
@@ -57,26 +45,16 @@ public class InputValidator {
         return COLOR_PATTERN.matcher(color).matches();
     }
 
-    /**
-     * Validates that a date is not in the past
-     */
     public static boolean isFutureOrToday(LocalDate date) {
         if (date == null) {
-            return true; // null dates are allowed
+            return true;
         }
         return !date.isBefore(LocalDate.now());
     }
-
-    /**
-     * Validates that a string is not empty
-     */
     public static boolean isNotEmpty(String str) {
         return str != null && !str.trim().isEmpty();
     }
 
-    /**
-     * Validates that a string length is within bounds
-     */
     public static boolean isLengthValid(String str, int minLength, int maxLength) {
         if (str == null) {
             return false;
@@ -85,9 +63,6 @@ public class InputValidator {
         return length >= minLength && length <= maxLength;
     }
 
-    /**
-     * Validates task title
-     */
     public static String validateTaskTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Task title is required");
@@ -98,9 +73,6 @@ public class InputValidator {
         return title.trim();
     }
 
-    /**
-     * Validates project name
-     */
     public static String validateProjectName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Project name is required");
@@ -110,10 +82,6 @@ public class InputValidator {
         }
         return name.trim();
     }
-
-    /**
-     * Validates description field (optional, but with max length)
-     */
     public static String validateDescription(String description) {
         if (description == null || description.trim().isEmpty()) {
             return null;
@@ -124,9 +92,6 @@ public class InputValidator {
         return description.trim();
     }
 
-    /**
-     * Validates team name
-     */
     public static String validateTeamName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Team name is required");
@@ -137,9 +102,6 @@ public class InputValidator {
         return name.trim();
     }
 
-    /**
-     * Validates comment message
-     */
     public static String validateComment(String message) {
         if (message == null || message.trim().isEmpty()) {
             throw new IllegalArgumentException("Comment cannot be empty");
@@ -150,9 +112,6 @@ public class InputValidator {
         return message.trim();
     }
 
-    /**
-     * Validates priority value
-     */
     public static void validatePriority(String priority) {
         if (priority == null) {
             return;
@@ -170,9 +129,6 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Validates status value
-     */
     public static void validateStatus(String status) {
         if (status == null) {
             return;
@@ -190,9 +146,6 @@ public class InputValidator {
         }
     }
 
-    /**
-     * Sanitize input to prevent issues
-     */
     public static String sanitize(String input) {
         if (input == null) {
             return null;

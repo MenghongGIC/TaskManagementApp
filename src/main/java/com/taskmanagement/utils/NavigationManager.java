@@ -45,38 +45,18 @@ public final class NavigationManager {
             e.printStackTrace(System.err);
         }
     }
-
-    /**
-     * Overloaded version - defaults to maximized
-     */
     public static void navigateTo(Stage stage, String fxmlPath, String windowTitle) {
         navigateTo(stage, fxmlPath, windowTitle, true);
     }
-
-    /**
-     * Go to Dashboard (after login)
-     */
     public static void goToDashboard(Stage stage) {
         navigateTo(stage, "/fxml/main/MainDashboard.fxml", "Task Manager - Dashboard", true);
     }
-
-    /**
-     * Go back to Login screen (after logout)
-     */
     public static void goToLogin(Stage stage) {
         navigateTo(stage, "/fxml/auth/AuthPanel.fxml", "Task Manager - Login", false);
     }
-
-    /**
-     * Go to Profile screen
-     */
     public static void goToProfile(Stage stage) {
         navigateTo(stage, "/fxml/user/ProfilePanel.fxml", "Task Manager - Profile", true);
     }
-
-    /**
-     * Utility: Get Stage from any Window (useful in event handlers)
-     */
     public static Stage getCurrentStage(javafx.stage.Window window) {
         return (window instanceof Stage) ? (Stage) window : null;
     }

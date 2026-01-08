@@ -18,9 +18,7 @@ public class ConfigLoader {
         loadProperties();
     }
 
-    /**
-     * Get the singleton instance
-     */
+    // get singleton instance
     public static ConfigLoader getInstance() {
         if (instance == null) {
             instance = new ConfigLoader();
@@ -28,9 +26,8 @@ public class ConfigLoader {
         return instance;
     }
 
-    /**
-     * Load properties from application.properties file
-     */
+   
+    // Load properties from application.properties file
     private void loadProperties() {
         try (InputStream input = getClass().getClassLoader()
                 .getResourceAsStream("application.properties")) {
@@ -48,9 +45,7 @@ public class ConfigLoader {
         }
     }
 
-    /**
-     * Load default values if properties file is not found
-     */
+    //Load default values if properties file is not found
     private void loadDefaults() {
         // Database defaults
         properties.setProperty("database.server", "localhost");
@@ -242,9 +237,7 @@ public class ConfigLoader {
         return Boolean.parseBoolean(value);
     }
 
-    /**
-     * Get all properties as a map
-     */
+   
     public Map<String, String> getAllProperties() {
         Map<String, String> map = new HashMap<>();
         for (String key : properties.stringPropertyNames()) {
@@ -252,24 +245,13 @@ public class ConfigLoader {
         }
         return map;
     }
-
-    /**
-     * Set a property value (runtime only)
-     */
     public void setProperty(String key, String value) {
         properties.setProperty(key, value);
     }
-
-    /**
-     * Check if a property exists
-     */
     public boolean hasProperty(String key) {
         return properties.containsKey(key);
     }
-
-    /**
-     * Print all properties (for debugging)
-     */
+    // For debugging: print all properties
     public void printAll() {
         System.out.println("=== Application Configuration ===");
         properties.forEach((key, value) ->

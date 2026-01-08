@@ -43,7 +43,7 @@ public class FxUtils {
             stage.show();
         }
     }
-    public static void loadMainDashboard(Stage stage){
-        switchScene(stage, "/com/taskmanagement/fxml/Primary.fxml", "Task Management Dashboard");
-    }
+    // public static void loadMainDashboard(Stage stage){
+    //     switchScene(stage, "/com/taskmanagement/fxml/Primary.fxml", "Task Management Dashboard");
+    // }
 }
