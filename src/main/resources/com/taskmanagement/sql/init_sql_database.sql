@@ -8,6 +8,7 @@ CREATE TABLE Users (
     password_hash NVARCHAR(255) NOT NULL,
     email NVARCHAR(100),
     role NVARCHAR(20) DEFAULT 'USER',
+    position NVARCHAR(100),
     created_at DATETIME2 DEFAULT GETDATE(),
     last_login DATETIME2 NULL
 );
@@ -52,7 +53,7 @@ CREATE TABLE Teams (
     CREATE TABLE Labels (
         id BIGINT IDENTITY(1,1) PRIMARY KEY,
         name NVARCHAR(50) NOT NULL UNIQUE,
-        color NVARCHAR(20) DEFAULT '#007BFF'  -- Hex color for UI
+        color NVARCHAR(20) DEFAULT '#007BFF'
     );
     GO
 
@@ -93,6 +94,20 @@ CREATE TABLE Teams (
         created_at DATETIME2 DEFAULT GETDATE(),
         FOREIGN KEY (task_id) REFERENCES Tasks(id) ON DELETE CASCADE,
         FOREIGN KEY (author_id) REFERENCES Users(id)
+    );
+    GO
+
+    -- ActivityLog table for audit trail
+    CREATE TABLE ActivityLog (
+        id BIGINT IDENTITY(1,1) PRIMARY KEY,
+        action NVARCHAR(50) NOT NULL,
+        entity_type NVARCHAR(50) NOT NULL,
+        entity_id BIGINT NOT NULL,
+        entity_name NVARCHAR(255),
+        actor_id BIGINT,
+        details NVARCHAR(MAX),
+        timestamp DATETIME2 DEFAULT GETDATE(),
+        FOREIGN KEY (actor_id) REFERENCES Users(id) ON DELETE SET NULL
     );
     GO
 

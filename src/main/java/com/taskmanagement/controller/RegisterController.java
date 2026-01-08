@@ -7,31 +7,26 @@ import com.taskmanagement.model.User;
 import com.taskmanagement.service.UserService;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class RegisterController {
 
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private TextField usernameField;
-
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private PasswordField confirmPasswordField;
-
-    @FXML
-    private Label errorLabel;
-
-    @FXML
-    private Label successLabel;
-
+    @FXML private TextField emailField;
+    @FXML private TextField usernameField;
+    @FXML private PasswordField passwordField;
+    @FXML private TextField passwordFieldVisible;
+    @FXML private CheckBox showPasswordCheckBox;
+    @FXML private PasswordField confirmPasswordField;
+    @FXML private TextField confirmPasswordFieldVisible;
+    @FXML private CheckBox showConfirmPasswordCheckBox;
+    @FXML private Label errorLabel;
+    @FXML private Label successLabel;
+    
     private final UserService userService = new UserService();
+
 
     @FXML
     public void initialize() {
@@ -43,48 +38,51 @@ public class RegisterController {
         }
     }
 
+    
     @FXML
     private void handleRegister() {
         clearMessages();
-
+        
         String email = emailField.getText().trim();
         String username = usernameField.getText().trim();
-        String password = passwordField.getText();
-        String confirmPassword = confirmPasswordField.getText();
-
+        // Get password from whichever field is visible
+        String password = passwordField.isVisible() ? passwordField.getText() : passwordFieldVisible.getText();
+        // Get confirm password from whichever field is visible
+        String confirmPassword = confirmPasswordField.isVisible() ? confirmPasswordField.getText() : confirmPasswordFieldVisible.getText();
+        
         // Validation
         if (email.isEmpty()) {
             showError("Email is required");
             return;
         }
-
+        
         if (username.isEmpty()) {
             showError("Username is required");
             return;
         }
-
+        
         if (password.isEmpty()) {
             showError("Password is required");
             return;
         }
-
+        
         if (password.length() < 8) {
             showError("Password must be at least 8 characters");
             return;
         }
-
+        
         if (!password.equals(confirmPassword)) {
             showError("Passwords do not match");
             confirmPasswordField.clear();
             return;
         }
-
+        
         // Email validation
         if (!isValidEmail(email)) {
             showError("Please enter a valid email address");
             return;
         }
-
+        
         try {
             User newUser = userService.register(username, email, password);
             showSuccess("Registration successful! User account created with role: " + newUser.getRole());
@@ -104,12 +102,12 @@ public class RegisterController {
             showError("Registration failed: " + e.getMessage());
         }
     }
-
+    
     @FXML
     private void handleBackToLogin() throws IOException {
         App.setRoot("auth/LoginView");
     }
-
+    
     private void showError(String message) {
         if (errorLabel != null) {
             errorLabel.setText(message);
@@ -119,7 +117,7 @@ public class RegisterController {
             successLabel.setVisible(false);
         }
     }
-
+    
     private void showSuccess(String message) {
         if (successLabel != null) {
             successLabel.setText(message);
@@ -129,7 +127,7 @@ public class RegisterController {
             errorLabel.setVisible(false);
         }
     }
-
+    
     private void clearMessages() {
         if (errorLabel != null) {
             errorLabel.setVisible(false);
@@ -138,14 +136,41 @@ public class RegisterController {
             successLabel.setVisible(false);
         }
     }
-
+    
     private void clearFields() {
         emailField.clear();
         usernameField.clear();
         passwordField.clear();
+        passwordFieldVisible.clear();
         confirmPasswordField.clear();
+        confirmPasswordFieldVisible.clear();
+    }
+    
+    @FXML
+    private void togglePasswordVisibility() {
+        if (showPasswordCheckBox.isSelected()) {
+            passwordFieldVisible.setText(passwordField.getText());
+            passwordField.setVisible(false);
+            passwordFieldVisible.setVisible(true);
+        } else {
+            passwordField.setText(passwordFieldVisible.getText());
+            passwordField.setVisible(true);
+            passwordFieldVisible.setVisible(false);
+        }
     }
 
+    @FXML
+    private void toggleConfirmPasswordVisibility() {
+        if (showConfirmPasswordCheckBox.isSelected()) {
+            confirmPasswordFieldVisible.setText(confirmPasswordField.getText());
+            confirmPasswordField.setVisible(false);
+            confirmPasswordFieldVisible.setVisible(true);
+        } else {
+            confirmPasswordField.setText(confirmPasswordFieldVisible.getText());
+            confirmPasswordField.setVisible(true);
+            confirmPasswordFieldVisible.setVisible(false);
+        }
+    }
     private boolean isValidEmail(String email) {
         return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }

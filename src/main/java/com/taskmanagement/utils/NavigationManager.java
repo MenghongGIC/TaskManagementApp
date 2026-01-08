@@ -7,16 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-/**
- * Simple and reliable navigation manager for switching between screens.
- * 
- * Features:
- * - Loads any FXML file
- * - Applies global CSS if available
- * - Sets window title and behavior
- * - Smooth transitions
- * - Convenience methods for common screens
- */
 public final class NavigationManager {
 
     private static final String CSS_PATH = "/css/style.css";

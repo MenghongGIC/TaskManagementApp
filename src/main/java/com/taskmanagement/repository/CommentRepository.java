@@ -48,10 +48,6 @@ public class CommentRepository extends BaseRepository {
         }
         return comment;
     }
-
-    /**
-     * Finds all comments for a given task, ordered by creation date (oldest first)
-     */
     public List<Comment> findByTaskId(Long taskId) {
         List<Comment> comments = new ArrayList<>();
         String sql = """
@@ -93,6 +89,83 @@ public class CommentRepository extends BaseRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Error deleting comment ID: " + commentId, e);
         }
+    }
+
+    public Comment findById(Long commentId) {
+        String sql = """
+            SELECT c.*, 
+                   u.id AS author_id, u.username AS author_name,
+                   t.id AS task_id
+            FROM Comments c
+            JOIN Users u ON c.author_id = u.id
+            JOIN Tasks t ON c.task_id = t.id
+            WHERE c.id = ?
+            """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, commentId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToComment(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding comment ID: " + commentId, e);
+        }
+        return null;
+    }
+
+    public Comment update(Comment comment) {
+        String sql = """
+            UPDATE Comments 
+            SET content = ?
+            WHERE id = ?
+            """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, comment.getMessage());
+            pstmt.setLong(2, comment.getId());
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating comment ID: " + comment.getId(), e);
+        }
+        return comment;
+    }
+
+    public List<Comment> findRecent(int limit) {
+        List<Comment> comments = new ArrayList<>();
+        String sql = """
+            SELECT c.*, 
+                   u.id AS author_id, u.username AS author_name,
+                   t.id AS task_id
+            FROM Comments c
+            JOIN Users u ON c.author_id = u.id
+            JOIN Tasks t ON c.task_id = t.id
+            ORDER BY c.created_at DESC
+            LIMIT ?
+            """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    comments.add(mapRowToComment(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error loading recent comments", e);
+        }
+        return comments;
     }
 
     public void deleteByTaskId(Long taskId) {

@@ -41,15 +41,13 @@ public class UserController {
 
     @FXML
     public void initialize() {
-        // If user is logged in, load profile panel
+        //to check if user is logged in and load profile
         if (CurrentUser.isLoggedIn()) {
             loadProfile();
         }
     }
 
-    // ----------------------
-    // LOGIN METHODS
-    // ----------------------
+    //login
     @FXML
     public void handleLogin() {
         try {
@@ -66,10 +64,7 @@ public class UserController {
             loginErrorLabel.setText(e.getMessage());
         }
     }
-
-    // ----------------------
-    // REGISTER METHODS
-    // ----------------------
+    //register
     @FXML
     public void handleRegister() {
         try {
@@ -91,10 +86,7 @@ public class UserController {
             registerErrorLabel.setText(e.getMessage());
         }
     }
-
-    // ----------------------
-    // PROFILE METHODS
-    // ----------------------
+    //profile
     private void loadProfile() {
         User user = CurrentUser.getInstance();
         if (user != null) {
@@ -103,7 +95,7 @@ public class UserController {
             profileRoleLabel.setText(user.getRoleDisplayName());
         }
     }
-
+    //save profile
     @FXML
     public void handleProfileSave() {
         try {
@@ -115,7 +107,7 @@ public class UserController {
             profileMessageLabel.setText("Error: " + e.getMessage());
         }
     }
-
+    //logout
     @FXML
     public void handleProfileLogout() {
         userService.logout();
@@ -123,13 +115,9 @@ public class UserController {
         NavigationManager.goToLogin(stage);
     }
 
-    // ----------------------
-    // OPTIONAL SERVICE METHODS
-    // ----------------------
     public boolean isUsernameTaken(String username) {
         return userService.isUsernameTaken(username);
     }
-
     public User getCurrentUser() {
         return userService.getCurrentUser();
     }

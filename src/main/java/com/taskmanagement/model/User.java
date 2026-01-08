@@ -8,22 +8,24 @@ public class User {
     private String username;
     private String email;
     private String passwordHash;        
-    private Role role = Role.USER;  // Default role for new registered users
+    private Role role = Role.USER;
     private LocalDateTime createdAt;
     private LocalDateTime lastLogin;
+    private String position; // Position/role/skill (e.g., 'Backend Developer', 'Designer')
 
-    // Constructors
     public User() {}
+
     public User(String username, String passwordHash, Role role) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.role = role != null ? role : Role.USER;
     }
+
     public User(String username, String email, String passwordHash, Role role) {
         this(username, passwordHash, role);
         this.email = email;
     }
-    // Full constructor (used when loading from DB)
+
     public User(Long id, String username, String email, String passwordHash, Role role,
                 LocalDateTime createdAt, LocalDateTime lastLogin) {
         this.id = id;
@@ -59,6 +61,9 @@ public class User {
 
     public void setLastLogin(LocalDateTime lastLogin){this.lastLogin = lastLogin;}
 
+    public String getPosition() { return position; }
+    public void setPosition(String position) { this.position = position; }
+
     // Convenience methods
     public String getRoleDisplayName() {
         return role != null ? role.getDisplayName() : "Unknown";
@@ -68,7 +73,7 @@ public class User {
     public boolean isAdmin() {return role == Role.ADMIN;}
     public boolean isUser() {return role == Role.USER;}
 
-    // Permission checks delegated to Role enum (clean and centralized!)
+    // Permission checks delegated to Role enum
     public boolean canViewOwnTasks()         { return role.ViewOwnTasks(); }
     public boolean canCompleteOwnTasks()     { return role.CompleteOwnTasks(); }
     public boolean canViewAllTasks()         { return role.ViewAllTasks(); }

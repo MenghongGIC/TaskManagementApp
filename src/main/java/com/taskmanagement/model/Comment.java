@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import com.taskmanagement.utils.DateUtils;
-
+import com.taskmanagement.utils.CurrentUser;
 public class Comment {
     private Long id;
     private Task task;           // Full Task object (better than just taskId)
@@ -78,8 +78,6 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-    // === UI-Friendly Formatting Methods (using your excellent DateUtils) ===
-
     public String getFormattedDate() {
         return DateUtils.formatDateTime(createdAt);
     }
@@ -99,9 +97,7 @@ public class Comment {
     }
 
     public boolean isAuthoredByCurrentUser() {
-        return author != null &&
-               com.taskmanagement.utils.CurrentUser.isLoggedIn() &&
-               author.getId().equals(com.taskmanagement.utils.CurrentUser.getId());
+        return author != null && CurrentUser.isLoggedIn() && author.getId().equals(CurrentUser.getId());
     }
 
     // === toString for debugging / lists ===

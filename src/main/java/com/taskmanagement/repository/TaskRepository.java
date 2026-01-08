@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.taskmanagement.model.Comment;
 import com.taskmanagement.model.Project;
 import com.taskmanagement.model.Task;
 import com.taskmanagement.model.User;
@@ -73,9 +74,12 @@ public class TaskRepository extends BaseRepository {
             while (rs.next()) {
                 tasks.add(mapRowToTask(rs));
             }
-            // Load comments and labels for each task
+            // Load comments and labels for each task using proper methods
             for (Task task : tasks) {
-                task.getComments().addAll(commentRepository.findByTaskId(task.getId()));
+                List<Comment> comments = commentRepository.findByTaskId(task.getId());
+                for (Comment comment : comments) {
+                    task.addComment(comment);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error loading all tasks", e);
@@ -108,7 +112,10 @@ public class TaskRepository extends BaseRepository {
             }
 
             for (Task task : tasks) {
-                task.getComments().addAll(commentRepository.findByTaskId(task.getId()));
+                List<Comment> comments = commentRepository.findByTaskId(task.getId());
+                for (Comment comment : comments) {
+                    task.addComment(comment);
+                }
             }
 
         } catch (SQLException e) {
@@ -136,7 +143,10 @@ public class TaskRepository extends BaseRepository {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Task task = mapRowToTask(rs);
-                    task.getComments().addAll(commentRepository.findByTaskId(id));
+                    List<Comment> comments = commentRepository.findByTaskId(id);
+                    for (Comment comment : comments) {
+                        task.addComment(comment);
+                    }
                     return task;
                 }
             }
@@ -158,6 +168,42 @@ public class TaskRepository extends BaseRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Error deleting task ID: " + id, e);
         }
+    }
+
+    public Task update(Task task) {
+        // Validate task has an ID before update
+        if (task == null || task.getId() == null) {
+            throw new IllegalArgumentException("Cannot update task: ID is missing");
+        }
+        
+        String sql = """
+            UPDATE Tasks 
+            SET title = ?, description = ?, status = ?, priority = ?, due_date = ?,
+                project_id = ?, assignee_id = ?
+            WHERE id = ?
+            """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, task.getTitle());
+            pstmt.setString(2, task.getDescription());
+            pstmt.setString(3, task.getStatus());
+            pstmt.setString(4, task.getPriority());
+
+            LocalDate dueDate = task.getDueDate();
+            pstmt.setDate(5, dueDate != null ? Date.valueOf(dueDate) : null);
+
+            pstmt.setObject(6, task.getProject() != null ? task.getProject().getId() : null);
+            pstmt.setObject(7, task.getAssignee() != null ? task.getAssignee().getId() : null);
+            pstmt.setObject(8, task.getId());  // Use setObject to handle null safely
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating task: " + task.getTitle(), e);
+        }
+        return task;
     }
 
     public Task mapRowToTask(ResultSet rs) throws SQLException {

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
+import com.taskmanagement.utils.CurrentUser;
 public class Team {
     private Long id;
     private String name;
@@ -51,8 +51,8 @@ public class Team {
     }
 
     public boolean isMemberCurrentUser() {
-        return com.taskmanagement.utils.CurrentUser.isLoggedIn() &&
-               members.contains(com.taskmanagement.utils.CurrentUser.getInstance());
+        return CurrentUser.isLoggedIn() &&
+               members.contains(CurrentUser.getInstance());
     }
 
     public int getMemberCount() { return members.size(); }

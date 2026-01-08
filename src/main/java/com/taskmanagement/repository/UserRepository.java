@@ -162,6 +162,14 @@ public class UserRepository {
         user.setEmail(rs.getString("email"));
         user.setPasswordHash(rs.getString("password_hash"));
         
+        // Try to read position field - it may not exist in older databases
+        try {
+            user.setPosition(rs.getString("position"));
+        } catch (SQLException e) {
+            // Column doesn't exist, skip it
+            user.setPosition(null);
+        }
+        
         String roleStr = rs.getString("role");
         user.setRole(roleStr != null ? Role.valueOf(roleStr.toUpperCase()) : Role.USER);
 
