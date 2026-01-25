@@ -22,11 +22,8 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Task Management System");
         stage.setResizable(true);
-        
-
         stage.setMinWidth(800);
         stage.setMinHeight(600);
-        
         stage.setMaxWidth(1400);
         stage.setMaxHeight(1000);
         

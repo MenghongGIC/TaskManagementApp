@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-// ====================================================================
-// Dashboard View - Project Selection, View Toggles, Search/Filters, Task Views
-// ====================================================================
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
@@ -15,19 +12,15 @@
       style="-fx-background-color: #f8f9fa;"
       spacing="0">
     
-    // ============ Top Control Section ============
     <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
         
-        // ---------- Dashboard Title ----------
         <Label text="Dashboard " style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
         
-        // ---------- Project Selection Row ----------
         <HBox spacing="15" alignment="CENTER_LEFT">
             <Label text="Project:" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
             <ComboBox fx:id="projectComboBox" promptText="Choose a project..." prefWidth="250" style="-fx-font-size: 11px;"/>
         </HBox>
         
-        // ---------- View Toggle Row ----------
         <HBox spacing="8" alignment="CENTER_LEFT">
             <Label text="View:" style="-fx-font-size: 12px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;"/>
             <Button fx:id="tableViewBtn" text="Table View" onAction="#showTableView" 
@@ -39,7 +32,6 @@
             
             <Region HBox.hgrow="ALWAYS"/>
             
-            // ---------- Action Buttons (Create & Refresh) ----------
             <Button text="Create Task" onAction="#showCreateTaskDialog" 
                    style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 4;"/>
             
@@ -47,9 +39,7 @@
                    style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 4;"/>
         </HBox>
         
-        // ---------- Search and Filter Row ----------
         <HBox spacing="10" alignment="CENTER_LEFT">
-            // Search field with integrated buttons
             <HBox spacing="0" alignment="CENTER" style="-fx-border-color: #ecf0f1; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-color: #ffffff;" HBox.hgrow="ALWAYS" maxWidth="400">
                 <TextField fx:id="searchField" promptText="Search tasks..." 
                           style="-fx-padding: 10; -fx-font-size: 11px; -fx-border-color: transparent; -fx-background-color: transparent;" 
@@ -60,7 +50,6 @@
                        style="-fx-padding: 5 10; -fx-font-size: 12px; -fx-background-color: transparent; -fx-text-fill: #3498db; -fx-cursor: hand; -fx-border-color: transparent;"/>
             </HBox>
             
-            // Status and Priority filters
             <ComboBox fx:id="statusComboBox" promptText="Status" 
                      style="-fx-font-size: 11px;" prefWidth="120"/>
             
@@ -68,7 +57,6 @@
                      style="-fx-font-size: 11px;" prefWidth="120"/>
         </HBox>
         
-        // ---------- Status Information Labels ----------
         <HBox spacing="15" alignment="CENTER_LEFT">
             <Label fx:id="statusLabel" text="Select a project to view tasks" 
                   style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
@@ -77,18 +65,14 @@
         </HBox>
     </VBox>
     
-    // ============ Center Task Views Container ============
     <StackPane fx:id="viewStack" style="-fx-background-color: #ffffff; -fx-padding: 15;" VBox.vgrow="ALWAYS">
         
-        // ---------- View 0: Table View ----------
         <VBox style="-fx-border-color: #3498db; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-color: #ffffff;" VBox.vgrow="ALWAYS">
             <TableView fx:id="tasksTableView" style="-fx-font-size: 11px;" VBox.vgrow="ALWAYS"/>
         </VBox>
         
-        // ---------- View 1: Kanban Board View ----------
         <VBox spacing="10" style="-fx-padding: 20; -fx-fill-width: true;" VBox.vgrow="ALWAYS">
             <HBox spacing="15" VBox.vgrow="ALWAYS" style="-fx-fill-height: true; -fx-min-height: 600;">
-                // Kanban Column: To Do
                 <VBox spacing="10" HBox.hgrow="ALWAYS"
                      style="-fx-border-color: #3498db; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #ebf5fb; -fx-padding: 15; -fx-pref-width: 350; -fx-max-height: 550; -fx-min-height: 550;">
                     <Label text="To Do" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1a5276; -fx-padding: 5 0 0 0;"/>
@@ -97,7 +81,6 @@
                     </ScrollPane>
                 </VBox>
                 
-                // Kanban Column: In Progress
                 <VBox spacing="10" HBox.hgrow="ALWAYS"
                      style="-fx-border-color: #f39c12; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #fef5e7; -fx-padding: 15; -fx-pref-width: 350; -fx-max-height: 550; -fx-min-height: 550;">
                     <Label text="In Progress" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #7d4f00; -fx-padding: 5 0 0 0;"/>
@@ -106,7 +89,6 @@
                     </ScrollPane>
                 </VBox>
                 
-                // Kanban Column: Done
                 <VBox spacing="10" HBox.hgrow="ALWAYS"
                      style="-fx-border-color: #27ae60; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #eafaf1; -fx-padding: 15; -fx-pref-width: 350; -fx-max-height: 550; -fx-min-height: 550;">
                     <Label text="Done" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #186a3b; -fx-padding: 5 0 0 0;"/>
@@ -117,15 +99,12 @@
             </HBox>
         </VBox>
         
-        // ---------- View 2: List View ----------
         <ScrollPane fitToWidth="true" style="-fx-padding: 0;">
             <VBox fx:id="taskListContainer" spacing="10" style="-fx-padding: 10; -fx-border-color: #3498db; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-color: #ffffff;">
-                // List items will be added dynamically by controller
             </VBox>
         </ScrollPane>
     </StackPane>
     
-    // ============ Bottom Status Bar ============
     <HBox spacing="15" style="-fx-padding: 12 20; -fx-background-color: #ecf0f1; -fx-border-color: #d5dbdb; -fx-border-width: 1 0 0 0;">
         <Label text="Ready" style="-fx-font-size: 10px; -fx-text-fill: #27ae60;"/>
         <Label text="Tip: Drag tasks in Kanban board to change status" style="-fx-font-size: 10px; -fx-text-fill: #7f8c8d;"/>

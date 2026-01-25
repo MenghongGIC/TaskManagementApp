@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-// ====================================================================
-// Login View - User Authentication Interface
-// ====================================================================
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -22,7 +19,6 @@
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.taskmanagement.controller.LoginController">
 
-    // ============ Main Content Container ============
     <VBox alignment="TOP_CENTER" 
           spacing="20.0"
           prefWidth="400"
@@ -38,18 +34,15 @@
         </padding>
 
         <children>
-            // ============ Header Section ============
             <Label text="Task Management System" 
                    styleClass="login-title" />
 
             <Label text="Sign in to continue" 
                    styleClass="login-subtitle" />
 
-            // ============ Login Form Card ============
             <VBox spacing="15" 
                   styleClass="login-form-card">
                 <children>
-                    // ---------- Username Field ----------
                     <VBox spacing="6">
                         <Label text="Username" 
                                styleClass="form-label" />
@@ -58,16 +51,13 @@
                                    styleClass="form-input" />
                     </VBox>
 
-                    // ---------- Password Field with Toggle ----------
                     <VBox spacing="6">
                         <Label text="Password" 
                                styleClass="form-label" />
                         <StackPane prefHeight="42">
-                            // Hidden password field (default)
                             <PasswordField fx:id="passwordField" 
                                           promptText="Enter your password" 
                                           styleClass="form-password" />
-                            // Visible password field (when toggled)
                             <TextField fx:id="passwordFieldVisible" 
                                       promptText="Enter your password" 
                                       visible="false" 
@@ -75,20 +65,17 @@
                         </StackPane>
                     </VBox>
 
-                    // ---------- Show Password Toggle ----------
                     <CheckBox fx:id="showPasswordCheckBox" 
                               mnemonicParsing="false" 
                               onAction="#togglePasswordVisibility" 
                               text="Show password" 
                               styleClass="form-checkbox" />
 
-                    // ---------- Error Display ----------
                     <Label fx:id="errorLabel" 
                            styleClass="error-label"
                            visible="false"
                            wrapText="true" />
 
-                    // ---------- Login Action Button ----------
                     <HBox alignment="CENTER">
                         <Button text="Login"
                                 onAction="#handleLogin"
@@ -97,7 +84,6 @@
                                 styleClass="login-button" />
                     </HBox>
                     
-                    // ---------- Register Link ----------
                     <HBox alignment="CENTER" spacing="5">
                         <Label text="Don't have an account?" 
                                styleClass="register-text" />

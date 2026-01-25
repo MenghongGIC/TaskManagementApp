@@ -360,6 +360,7 @@ public class TaskController {
         return combo;
     }
 
+    @SuppressWarnings("unchecked")
     private Task extractTaskFromForm(GridPane grid, Task existingTask) {
         Object[] fields = (Object[]) grid.getUserData();
         TextField titleField = (TextField) fields[0];

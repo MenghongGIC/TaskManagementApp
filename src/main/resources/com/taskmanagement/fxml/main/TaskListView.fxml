@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-// ====================================================================
-// Task List View - Simple Task List Display with Refresh Controls
-// ====================================================================
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -15,26 +12,21 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.taskmanagement.controller.DashboardController">
-    // ============ Top Control Bar ============
     <top>
         <HBox style="-fx-padding: 10; -fx-spacing: 10; -fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
-            // Page title
             <Label text="Task List View" style="-fx-font-size: 14; -fx-font-weight: bold;" />
             <Region HBox.hgrow="ALWAYS" />
-            // Action buttons
             <Button text="Refresh" onAction="#refreshTaskList" style="-fx-padding: 5 10; -fx-font-size: 11;" />
             <Button text="Add Task" onAction="#handleAddTask" style="-fx-padding: 5 10; -fx-font-size: 11;" />
         </HBox>
     </top>
 
-    // ============ Center Task List Container ============
     <center>
         <ScrollPane fitToWidth="true" style="-fx-padding: 10;">
             <VBox fx:id="taskListContainer" spacing="8" style="-fx-padding: 10;" />
         </ScrollPane>
     </center>
 
-    // ============ Bottom Status Bar ============
     <bottom>
         <HBox style="-fx-padding: 10; -fx-background-color: #f9f9f9; -fx-border-color: #ddd; -fx-border-width: 1 0 0 0;" alignment="CENTER_LEFT">
             <Label fx:id="taskListStatusLabel" text="Loading tasks..." />

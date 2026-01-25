@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-// ====================================================================
-// Project List View - Project List with Search and Details Panel
-// ====================================================================
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
@@ -13,14 +10,11 @@
             fx:controller="com.taskmanagement.controller.ProjectController"
             style="-fx-background-color: #f8f9fa;">
 
-    // ============ Top Control Section ============
     <top>
         <VBox style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;" spacing="10">
             
-            // ---------- Page Title ----------
             <Label text="Projects" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
             
-            // ---------- Search and Action Controls ----------
             <HBox spacing="10">
                 <TextField fx:id="searchField" promptText="🔍 Search projects by name..." style="-fx-padding: 10; -fx-border-radius: 5; -fx-font-size: 11px;" HBox.hgrow="ALWAYS"/>
                 <Button text="Clear" onAction="#clearSearch" style="-fx-padding: 10 15; -fx-font-size: 11px; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5;"/>
@@ -28,34 +22,25 @@
                 <Button text="Refresh" onAction="#handleRefresh" style="-fx-padding: 10 20; -fx-font-size: 11px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;"/>
             </HBox>
             
-            // ---------- Status Information Label ----------
             <Label fx:id="statusLabel" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px;" text="Loading projects..."/>
         </VBox>
     </top>
 
-    // ============ Center Content with Split View ============
     <center>
         <SplitPane dividerPositions="0.35" style="-fx-padding: 0;">
             
-            // ---------- Left Panel: Project List ----------
             <VBox spacing="0" style="-fx-border-color: #ecf0f1; -fx-border-width: 0 1 0 0;">
                 <TableView fx:id="projectsTable" style="-fx-font-size: 11px;" VBox.vgrow="ALWAYS">
                     <columns>
-                        // Project ID column
                         <TableColumn fx:id="idColumn" text="ID" prefWidth="50" sortable="true"/>
-                        // Project name column
                         <TableColumn fx:id="nameColumn" text="Project Name" prefWidth="150" sortable="true"/>
-                        // Project description column
                         <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="150" sortable="false"/>
-                        // Task count column
                         <TableColumn fx:id="tasksCountColumn" text="Tasks" prefWidth="60" sortable="true"/>
-                        // Action buttons column (edit/delete)
                         <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="80" sortable="false"/>
                     </columns>
                 </TableView>
             </VBox>
 
-            // ---------- Right Panel: Project Details ----------
             <VBox fx:id="detailsPanel" spacing="0" style="-fx-background-color: #ffffff;">
                 <Label text="Select a project to view details" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #95a5a6; -fx-padding: 50;" alignment="CENTER" VBox.vgrow="ALWAYS"/>
             </VBox>

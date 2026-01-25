@@ -23,7 +23,6 @@ import com.taskmanagement.utils.UIUtils;
 
 public class ProjectController implements TaskAwareController {
     // FXML Paths
-    private static final String CREATE_PROJECT_VIEW = "/com/taskmanagement/fxml/dialog/CreateProjectView.fxml";
     private static final String PROJECT_DETAIL_VIEW = "/com/taskmanagement/fxml/main/ProjectDetailView.fxml";
     
     // Dialog Titles
@@ -60,11 +59,9 @@ public class ProjectController implements TaskAwareController {
     private ProjectService projectService;
     private ObservableList<Project> projectsList;
     private FilteredList<Project> filteredList;
-    private MainLayoutController mainLayoutController;
 
     @Override
     public void setMainLayoutController(MainLayoutController controller) {
-        this.mainLayoutController = controller;
     }
 
     @FXML

@@ -43,7 +43,6 @@ public class MainLayoutController {
     @FXML private Label userInfoLabel;
     @FXML private Label breadcrumbLabel;
     @FXML private Button dashboardBtn, projectsBtn, adminBtn;
-    private Button currentActiveButton;
     
     @FXML
     public void initialize() {
@@ -134,7 +133,6 @@ public class MainLayoutController {
         projectsBtn.setStyle(INACTIVE_BTN_STYLE);
         adminBtn.setStyle(INACTIVE_BTN_STYLE);
         activeButton.setStyle(ACTIVE_BTN_STYLE);
-        currentActiveButton = activeButton;
     }
     
     @FXML

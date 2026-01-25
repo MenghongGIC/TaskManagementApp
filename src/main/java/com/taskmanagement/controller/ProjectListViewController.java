@@ -177,10 +177,6 @@ public class ProjectListViewController {
         UIUtils.showSuccess(title, message);
     }
     
-    private void showWarningAlert(String title, String message) {
-        UIUtils.showWarning(title, message);
-    }
-    
     private Optional<ButtonType> showConfirmation(String title, String content) {
         return Optional.of(UIUtils.showCustomConfirmation(title, null, content) ? ButtonType.OK : ButtonType.CANCEL);
     }

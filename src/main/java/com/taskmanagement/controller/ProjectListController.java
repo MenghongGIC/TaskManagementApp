@@ -19,9 +19,6 @@ public class ProjectListController {
     // Error Messages
     private static final String ERROR_LOADING_PROJECTS = "Error loading projects: ";
     
-    // Messages
-    private static final String MSG_EMPTY_FILTER = "Showing all projects";
-    
     @FXML private TextField searchField; 
     @FXML private TableView<Project> projectsTable;
     @FXML private TableColumn<Project, String> nameColumn;

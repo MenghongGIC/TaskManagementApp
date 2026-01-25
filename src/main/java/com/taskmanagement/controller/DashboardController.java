@@ -208,7 +208,16 @@ public class DashboardController {
         dueCol.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
         dueCol.setPrefWidth(120);
         
-        tasksTableView.getColumns().addAll(idCol, titleCol, statusCol, priorityCol, assigneeCol, dueCol);
+        @SuppressWarnings("unchecked")
+        TableColumn<Task, ?>[] columns = new TableColumn[]{
+            (TableColumn<Task, ?>) (Object) idCol, 
+            (TableColumn<Task, ?>) (Object) titleCol, 
+            (TableColumn<Task, ?>) (Object) statusCol, 
+            (TableColumn<Task, ?>) (Object) priorityCol, 
+            (TableColumn<Task, ?>) (Object) assigneeCol, 
+            (TableColumn<Task, ?>) (Object) dueCol
+        };
+        tasksTableView.getColumns().addAll(columns);
         
         tasksTableView.setRowFactory(tv -> {
             javafx.scene.control.TableRow<Task> row = new javafx.scene.control.TableRow<Task>() {

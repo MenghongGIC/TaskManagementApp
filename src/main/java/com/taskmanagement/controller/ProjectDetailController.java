@@ -401,10 +401,6 @@ public class ProjectDetailController {
         UIUtils.showError(title, e.getMessage());
     }
     
-    private void showErrorAlert(String title, String message) {
-        UIUtils.showError(title, message);
-    }
-    
     private Optional<ButtonType> showConfirmation(String title, String content) {
         return Optional.of(UIUtils.showCustomConfirmation(title, null, content) ? ButtonType.OK : ButtonType.CANCEL);
     }

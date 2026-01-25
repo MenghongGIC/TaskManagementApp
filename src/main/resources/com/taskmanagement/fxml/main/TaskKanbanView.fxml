@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-// ====================================================================
-// Task Kanban View - Kanban Board with Task Column Organization
-// ====================================================================
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -15,34 +12,27 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.taskmanagement.controller.DashboardController">
-    // ============ Top Control Bar ============
     <top>
         <HBox style="-fx-padding: 10; -fx-spacing: 10; -fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
-            // Page title with icon
             <Label text="📋 Kanban Board" style="-fx-font-size: 14; -fx-font-weight: bold;" />
             <Region HBox.hgrow="ALWAYS" />
-            // Action buttons for refresh and add task
             <Button text="🔄 Refresh" onAction="#refreshKanban" style="-fx-padding: 5 10; -fx-font-size: 11;" />
             <Button text="➕ Add Task" onAction="#handleAddTask" style="-fx-padding: 5 10; -fx-font-size: 11;" />
         </HBox>
     </top>
 
-    // ============ Center Kanban Board with Columns ============
     <center>
         <HBox spacing="10" style="-fx-padding: 10; -fx-background-color: #efefef;">
-            // Column 1: To Do
             <VBox style="-fx-border-color: #ddd; -fx-border-width: 1; -fx-background-color: #fff; -fx-padding: 10; -fx-spacing: 5;" HBox.hgrow="ALWAYS">
                 <Label text="To Do" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ff6b6b;" />
                 <FlowPane fx:id="todoColumn" style="-fx-vgap: 5; -fx-hgap: 5; -fx-padding: 5;" VBox.vgrow="ALWAYS" />
             </VBox>
 
-            // Column 2: In Progress
             <VBox style="-fx-border-color: #ddd; -fx-border-width: 1; -fx-background-color: #fff; -fx-padding: 10; -fx-spacing: 5;" HBox.hgrow="ALWAYS">
                 <Label text="⚡ In Progress" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #ffd93d;" />
                 <FlowPane fx:id="inProgressColumn" style="-fx-vgap: 5; -fx-hgap: 5; -fx-padding: 5;" VBox.vgrow="ALWAYS" />
             </VBox>
 
-            // Column 3: Done
             <VBox style="-fx-border-color: #ddd; -fx-border-width: 1; -fx-background-color: #fff; -fx-padding: 10; -fx-spacing: 5;" HBox.hgrow="ALWAYS">
                 <Label text="Done" style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #6bcf7f;" />
                 <FlowPane fx:id="doneColumn" style="-fx-vgap: 5; -fx-hgap: 5; -fx-padding: 5;" VBox.vgrow="ALWAYS" />
@@ -50,7 +40,6 @@
         </HBox>
     </center>
 
-    // ============ Bottom Status Bar ============
     <bottom>
         <HBox style="-fx-padding: 10; -fx-background-color: #f9f9f9; -fx-border-color: #ddd; -fx-border-width: 1 0 0 0;" alignment="CENTER_LEFT">
             <Label fx:id="kanbanStatusLabel" text="Loading tasks..." />

@@ -285,7 +285,6 @@ public class AdminController {
         return field;
     }
 
-    @SuppressWarnings("unchecked")
     private void addFormFields(GridPane grid, Object... fieldPairs) {
         for (int i = 0; i < fieldPairs.length; i += 2) {
             grid.add(new Label((String) fieldPairs[i] + ":"), 0, i / 2);
@@ -347,6 +346,7 @@ public class AdminController {
         return grid;
     }
     
+    @SuppressWarnings("unchecked")
     private void handleEditUserResult(User user, GridPane grid) {
         Object[] fields = (Object[]) grid.getUserData();
         TextField emailField = (TextField) fields[0];

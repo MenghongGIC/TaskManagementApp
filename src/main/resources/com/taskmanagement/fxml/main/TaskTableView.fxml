@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-// ====================================================================
-// Task Table View - Table-Based Task Display with Search
-// ====================================================================
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -15,15 +12,12 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.taskmanagement.controller.DashboardController">
-    // ============ Top Control Section ============
     <top>
         <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #f8f9fa;">
-            // Page title
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label text="Task Table View" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS" />
             </HBox>
-            // Action controls and search bar
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Button text="Refresh" onAction="#refreshTaskTable" style="-fx-padding: 8 15; -fx-font-size: 11px;"/>
                 <Button text="Add Task" onAction="#handleAddTask" style="-fx-padding: 8 15; -fx-font-size: 11px;"/>
@@ -33,12 +27,10 @@
         </VBox>
     </top>
 
-    // ============ Center Table View ============
     <center>
         <TableView fx:id="tasksTableView" />
     </center>
     
-    // ============ Bottom Status Bar ============
     <bottom>
         <HBox style="-fx-padding: 10; -fx-background-color: #ecf0f1;" alignment="CENTER_LEFT">
             <Label fx:id="taskTableStatusLabel" text="Loading..." style="-fx-font-size: 11px;"/>

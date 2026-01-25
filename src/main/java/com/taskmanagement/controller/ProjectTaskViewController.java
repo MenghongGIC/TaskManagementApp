@@ -90,12 +90,10 @@ public class ProjectTaskViewController implements TaskAwareController {
     
     private ProjectService projectService;
     private TaskRepository taskRepository;
-    private MainLayoutController mainLayoutController;
     private Task draggedTask = null;
 
     @Override
     public void setMainLayoutController(MainLayoutController controller) {
-        this.mainLayoutController = controller;
     }
 
     @FXML
