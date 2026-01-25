@@ -52,7 +52,7 @@
                 <ComboBox fx:id="roleFilterCombo" style="-fx-padding: 10; -fx-border-radius: 5; -fx-font-size: 11px;" prefWidth="120"/>
                 <Button fx:id="searchButton" text="Search" style="-fx-padding: 10 20; -fx-font-size: 11px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;"/>
                 <Button fx:id="refreshButton" text="Refresh" style="-fx-padding: 10 20; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;"/>
-                <Button fx:id="addUserButton" text="Add User" style="-fx-padding: 10 20; -fx-font-size: 11px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5;"/>
+                <Button fx:id="addUserButton" text="Add User" onAction="#handleAddUser" style="-fx-padding: 10 20; -fx-font-size: 11px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5;"/>
             </HBox>
             
             <!-- Users Table -->
