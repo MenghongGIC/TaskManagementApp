@@ -66,8 +66,7 @@ public class ProjectListViewController {
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         taskCountColumn.setCellValueFactory(cellData -> {
-            int count = cellData.getValue().getTasks() != null ? 
-                       cellData.getValue().getTasks().size() : 0;
+            int count = cellData.getValue().getTaskCount();
             return new javafx.beans.property.SimpleIntegerProperty(count).asObject();
         });
         setupActionsColumn();

@@ -95,6 +95,8 @@ public class AdminController {
     }
 
     private void addActionsColumn() {
+        actionsColumn.setPrefWidth(280);
+        actionsColumn.setMinWidth(280);
         actionsColumn.setCellFactory(param -> new TableCell<User, Void>() {
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -110,19 +112,24 @@ public class AdminController {
     }
 
     private HBox createActionButtons(User user) {
-        HBox actionBox = new HBox(5);
+        HBox actionBox = new HBox(8);
         actionBox.setPadding(new Insets(5));
+        actionBox.setStyle("-fx-alignment: center; -fx-spacing: 8;");
+        actionBox.setPrefWidth(260);
         
         Button tasksBtn = new Button("Tasks");
         tasksBtn.setStyle(BTN_TASKS);
+        tasksBtn.setMinWidth(70);
         tasksBtn.setOnAction(e -> showUserTasksDialog(user));
         
         Button editBtn = new Button("Edit");
         editBtn.setStyle(BTN_EDIT);
+        editBtn.setMinWidth(60);
         editBtn.setOnAction(e -> showEditUserDialog(user));
         
         Button deleteBtn = new Button("Delete");
         deleteBtn.setStyle(BTN_DELETE);
+        deleteBtn.setMinWidth(70);
         deleteBtn.setOnAction(e -> deleteUser(user));
         
         if (user.getId().equals(CurrentUser.getId())) {
@@ -410,7 +417,12 @@ public class AdminController {
             javafx.fxml.FXMLLoader loader = createTasksDialogLoader();
             BorderPane dialogRoot = loader.load();
             UserTasksDialogController controller = loader.getController();
-            Stage dialogStage = createTasksDialogStage(user);
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("User Tasks - " + user.getUsername());
+            javafx.scene.Scene scene = new javafx.scene.Scene(dialogRoot, 900, 600);
+            dialogStage.setScene(scene);
+            dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(usersTable.getScene().getWindow());
             controller.setDialogStage(dialogStage);
             controller.loadUserTasks(user);
             dialogStage.show();
@@ -423,14 +435,5 @@ public class AdminController {
         return new javafx.fxml.FXMLLoader(
             com.taskmanagement.App.class.getResource("fxml/dialog/UserTasksDialog.fxml")
         );
-    }
-
-    private Stage createTasksDialogStage(User user) {
-        Stage stage = new Stage();
-        stage.setTitle("Tasks - " + user.getUsername());
-        stage.setScene(new javafx.scene.Scene(new BorderPane(), 900, 600));
-        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-        stage.initOwner(usersTable.getScene().getWindow());
-        return stage;
     }
 }

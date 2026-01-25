@@ -190,10 +190,48 @@ public class DashboardController {
         TableColumn<Task, String> statusCol = new TableColumn<>("Status");
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
         statusCol.setPrefWidth(100);
+        statusCol.setCellFactory(column -> new TableCell<Task, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    String style = switch (item) {
+                        case "To Do" -> "-fx-background-color: #ffcccc; -fx-text-fill: #c41c1c; -fx-font-weight: bold; -fx-padding: 5;";
+                        case "In Progress" -> "-fx-background-color: #fff4cc; -fx-text-fill: #ff9800; -fx-font-weight: bold; -fx-padding: 5;";
+                        case "Completed" -> "-fx-background-color: #ccffcc; -fx-text-fill: #2ecc71; -fx-font-weight: bold; -fx-padding: 5;";
+                        default -> "-fx-padding: 5;";
+                    };
+                    setStyle(style);
+                }
+            }
+        });
         
         TableColumn<Task, String> priorityCol = new TableColumn<>("Priority");
         priorityCol.setCellValueFactory(new PropertyValueFactory<>("priority"));
         priorityCol.setPrefWidth(100);
+        priorityCol.setCellFactory(column -> new TableCell<Task, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    String style = switch (item) {
+                        case "High" -> "-fx-background-color: #ffcccc; -fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-padding: 5;";
+                        case "Medium" -> "-fx-background-color: #fff9cc; -fx-text-fill: #f39c12; -fx-font-weight: bold; -fx-padding: 5;";
+                        case "Low" -> "-fx-background-color: #e8f8f5; -fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-padding: 5;";
+                        default -> "-fx-padding: 5;";
+                    };
+                    setStyle(style);
+                }
+            }
+        });
         
         TableColumn<Task, String> assigneeCol = new TableColumn<>("Assignee");
         assigneeCol.setCellValueFactory(cellData -> 

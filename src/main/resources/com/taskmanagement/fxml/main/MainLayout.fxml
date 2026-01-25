@@ -53,7 +53,7 @@
             
             <Label text="Admin" 
                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #bdc3c7;"/>
-            <Button text="Admin Panel" fx:id="adminBtn" onAction="#switchToAdminPanel" 
+            <Button text="User Table" fx:id="adminBtn" onAction="#switchToAdminPanel" 
                    style="-fx-padding: 12 15; -fx-font-size: 12px; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" 
                    maxWidth="Infinity" prefWidth="180" wrapText="true"/>
             

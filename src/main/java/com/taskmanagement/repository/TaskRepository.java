@@ -60,6 +60,9 @@ public class TaskRepository extends BaseRepository {
     // Select tasks by creator with related project, assignee, and creator info
     private static final String SQL_SELECT_BY_CREATOR = BASE_SELECT + "WHERE t.created_by = ? ORDER BY t.created_at DESC";
     
+    // Select tasks by project ID with related project, assignee, and creator info
+    private static final String SQL_SELECT_BY_PROJECT_ID = BASE_SELECT + "WHERE t.project_id = ? ORDER BY t.created_at DESC";
+    
     // Column Names
     private static final String COL_ID = "id";
     private static final String COL_TITLE = "title";
@@ -140,7 +143,7 @@ public class TaskRepository extends BaseRepository {
         List<Task> tasks = new ArrayList<>();
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_BY_ID)) {
+             PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_BY_PROJECT_ID)) {
 
             pstmt.setLong(1, projectId);
             try (ResultSet rs = pstmt.executeQuery()) {
