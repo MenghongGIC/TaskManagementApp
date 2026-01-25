@@ -33,11 +33,9 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.beans.property.SimpleStringProperty;
@@ -147,43 +145,34 @@ public class DashboardController {
             if (tasksTableView != null) {
                 setupTableColumns();
                 isTableViewActive = true; // Start with table view active
-                System.out.println("✅ Table view setup complete");
             }
             
             // CRITICAL: Initialize StackPane view visibility
             // Ensure table view is visible by default
             if (viewStack != null) {
-                System.out.println("   Initializing StackPane visibility...");
-                System.out.println("   StackPane has " + viewStack.getChildren().size() + " children");
                 if (viewStack.getChildren().size() > 0) {
                     // Show table view (index 0)
                     viewStack.getChildren().get(0).setVisible(true);
-                    System.out.println("   ✅ Child 0 (Table) set to VISIBLE");
                 }
                 if (viewStack.getChildren().size() > 1) {
                     // Hide kanban view (index 1)
                     viewStack.getChildren().get(1).setVisible(false);
-                    System.out.println("   ✅ Child 1 (Kanban) set to invisible");
                 }
                 if (viewStack.getChildren().size() > 2) {
                     // Hide list view (index 2)
                     viewStack.getChildren().get(2).setVisible(false);
-                    System.out.println("   ✅ Child 2 (List) set to invisible");
                 }
             }
         } catch (Exception e) {
             System.err.println("Error initializing DashboardController: " + e.getMessage());
-            e.printStackTrace();
         }
     }
     
     private void setupTableColumns() {
         if (tasksTableView == null) {
-            System.err.println("❌ setupTableColumns: tasksTableView is NULL!");
             return;
         }
         
-        System.out.println("⚙️ Setting up table columns...");
         tasksTableView.getColumns().clear();
         
         TableColumn<Task, Long> idCol = new TableColumn<>("ID");
@@ -237,22 +226,14 @@ public class DashboardController {
             });
             return row;
         });
-        
-        System.out.println("✅ Table columns setup complete: " + tasksTableView.getColumns().size() + " columns added");
     }
     
     private void updateTableViewDisplay() {
         if (tasksTableView == null) {
-            System.err.println("❌ Table view is null!");
             return;
         }
         
         // Check visibility of table and its parent
-        System.out.println("📊 Updating table view display...");
-        System.out.println("   Table visible: " + tasksTableView.isVisible());
-        System.out.println("   Table parent visible: " + (tasksTableView.getParent() != null ? tasksTableView.getParent().isVisible() : "No parent"));
-        System.out.println("   Table columns: " + tasksTableView.getColumns().size());
-        System.out.println("   Total tasks in allTasks: " + allTasks.size());
         
         String selectedProjectName = "All Projects";
         Object selectedProjectObj = projectComboBox != null ? projectComboBox.getValue() : null;
@@ -292,16 +273,8 @@ public class DashboardController {
             })
             .collect(Collectors.toList());
         
-        System.out.println("   Filtered tasks: " + filteredTasks.size());
-        for (Task task : filteredTasks) {
-            System.out.println("     - " + task.getTitle() + " (" + task.getStatus() + ")");
-        }
-        
         ObservableList<Task> tableItems = FXCollections.observableArrayList(filteredTasks);
-        System.out.println("   Calling tasksTableView.setItems(" + tableItems.size() + " items)...");
         tasksTableView.setItems(tableItems);
-        System.out.println("   Table now has " + tasksTableView.getItems().size() + " items");
-        System.out.println("   ✅ Table items set: " + tableItems.size());
         
         if (taskCountLabel != null) {
             taskCountLabel.setText(filteredTasks.size() + " tasks");
