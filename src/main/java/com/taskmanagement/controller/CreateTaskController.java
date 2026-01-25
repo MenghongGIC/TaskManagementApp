@@ -11,14 +11,10 @@ import com.taskmanagement.model.User;
 import com.taskmanagement.service.TaskService;
 import com.taskmanagement.service.UserService;
 import com.taskmanagement.utils.CurrentUser;
-import com.taskmanagement.utils.ConfirmationDialog;
+import com.taskmanagement.utils.UIUtils;
 
 import java.time.LocalDate;
 import java.util.List;
-
-/**
- * Controller for creating a new task with user assignment
- */
 public class CreateTaskController {
     
     @FXML private TextField titleField;
@@ -35,7 +31,7 @@ public class CreateTaskController {
     private UserService userService;
     private Stage dialogStage;
     private Project currentProject;
-    private Runnable onTaskCreated; // Callback to refresh parent
+    private Runnable onTaskCreated;
     
     @FXML
     public void initialize() {
@@ -64,12 +60,9 @@ public class CreateTaskController {
         validationLabel.setText("");
     }
     
-    /**
-     * Setup the assignee ComboBox to display users
-     */
     private void setupAssigneeCombo() {
         try {
-            System.out.println("📥 Loading users for assignee dropdown");
+            System.out.println("Loading users for assignee dropdown");
             List<User> users = userService.getAllUsers();
             assigneeCombo.getItems().addAll(users);
             
@@ -104,38 +97,18 @@ public class CreateTaskController {
             e.printStackTrace();
         }
     }
-    
-    /**
-     * Set the project for this task
-     */
     public void setProject(Project project) {
         this.currentProject = project;
     }
-    
-    /**
-     * Set the dialog stage for closing
-     */
     public void setDialogStage(Stage stage) {
         this.dialogStage = stage;
     }
-    
-    /**
-     * Set callback to refresh parent when task is created
-     */
     public void setOnTaskCreated(Runnable callback) {
         this.onTaskCreated = callback;
     }
-    
-    /**
-     * Set the current project
-     */
     public void setCurrentProject(Project project) {
         this.currentProject = project;
     }
-    
-    /**
-     * Validate form inputs
-     */
     private boolean validateForm() {
         validationLabel.setText("");
         
@@ -178,10 +151,6 @@ public class CreateTaskController {
         
         return true;
     }
-    
-    /**
-     * Handle save button click
-     */
     @FXML
     private void handleSave() {
         if (!validateForm()) {
@@ -196,9 +165,9 @@ public class CreateTaskController {
             LocalDate dueDate = dueDatePicker.getValue();
             User assignee = assigneeCombo.getValue();
             
-            System.out.println("💾 Creating task: " + title);
-            System.out.println("   Project: " + currentProject.getName());
-            System.out.println("   Assignee: " + (assignee != null ? assignee.getUsername() : "Unassigned"));
+            System.out.println("Creating task: " + title);
+            System.out.println("Project: " + currentProject.getName());
+            System.out.println("Assignee: " + (assignee != null ? assignee.getUsername() : "Unassigned"));
             
             // Create task via service
             Task newTask = taskService.createTask(
@@ -224,8 +193,8 @@ public class CreateTaskController {
                 taskService.updateTask(newTask);
             }
             
-            System.out.println("✅ Task created: " + newTask.getTitle());
-            showAlert("Success", "✅ Task '" + title + "' created successfully!", Alert.AlertType.INFORMATION);
+            System.out.println("Task created: " + newTask.getTitle());
+            UIUtils.showSuccess("Success", "Task '" + title + "' created successfully!");
             
             // Execute callback to refresh parent view
             if (onTaskCreated != null) {
@@ -236,15 +205,12 @@ public class CreateTaskController {
             dialogStage.close();
             
         } catch (Exception e) {
-            System.err.println("❌ Error creating task: " + e.getMessage());
+            System.err.println("Error creating task: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Error", "Failed to create task: " + e.getMessage(), Alert.AlertType.ERROR);
+            UIUtils.showError("Error", "Failed to create task: " + e.getMessage());
         }
     }
     
-    /**
-     * Handle cancel button click
-     */
     @FXML
     private void handleCancel() {
         // Check if there's unsaved data
@@ -252,24 +218,14 @@ public class CreateTaskController {
         String description = descriptionField.getText().trim();
         
         if (!title.isEmpty() || !description.isEmpty()) {
-            if (ConfirmationDialog.showUnsavedChangesConfirmation()) {
-                System.out.println("❌ Create task cancelled");
+            if (UIUtils.showUnsavedChangesConfirmation()) {
+                System.out.println("Create task cancelled");
                 dialogStage.close();
             }
         } else {
-            System.out.println("❌ Create task cancelled");
+            System.out.println("Create task cancelled");
             dialogStage.close();
         }
     }
     
-    /**
-     * Show alert dialog
-     */
-    private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 }

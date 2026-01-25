@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import com.taskmanagement.utils.CurrentUser;
+import com.taskmanagement.utils.ColorValidator;
+import com.taskmanagement.utils.PermissionChecker;
 
 public class Project {
     private Long id;
@@ -26,8 +27,6 @@ public class Project {
         this.name = name;
         this.createdBy = createdBy;
     }
-
-    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -60,23 +59,15 @@ public class Project {
     public int getTaskCount() { return tasks.size(); }
 
     public String getColorOrDefault() {
-        if (color == null || !color.matches("^#[0-9A-Fa-f]{6}$")) {
-            return "#6C757D";
-        }
-        return color.toUpperCase();
+        return ColorValidator.getProjectColorOrDefault(color);
     }
 
     public boolean canEdit() {
-        if (!CurrentUser.isLoggedIn()) return false;
-        if (CurrentUser.isAdmin()) return true;
-        if (createdBy != null && createdBy.getId().equals(CurrentUser.getId())) return true;
-        return false;
+        return PermissionChecker.canEditProject(this);
     }
+    
     public boolean canDelete() {
-        if (!CurrentUser.isLoggedIn()) return false;
-        if (CurrentUser.isAdmin()) return true;
-        if (createdBy != null && createdBy.getId().equals(CurrentUser.getId())) return true;
-        return false;
+        return PermissionChecker.canDeleteProject(this);
     }
 
 

@@ -3,15 +3,18 @@ package com.taskmanagement.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-
-import com.taskmanagement.model.Project;
 import com.taskmanagement.service.ProjectService;
-import com.taskmanagement.utils.ConfirmationDialog;
+import com.taskmanagement.utils.UIUtils;
 
-/**
- * Controller for creating a new project
- */
 public class CreateProjectController {
+    
+    private static final String DEFAULT_COLOR = "#3498db";
+    private static final String COLOR_REGEX = "^#[0-9a-fA-F]{6}$";
+    private static final String ERROR_STYLE = "-fx-border-color: #e74c3c; -fx-border-width: 2;";
+    private static final String NORMAL_STYLE = "";
+    
+    private static final String MSG_NAME_REQUIRED = "Project name is required";
+    private static final String MSG_COLOR_INVALID = "Invalid color format";
     
     @FXML private TextField nameField;
     @FXML private TextArea descriptionField;
@@ -22,77 +25,88 @@ public class CreateProjectController {
     
     private ProjectService projectService;
     private Stage dialogStage;
-    private Runnable onProjectCreated; // Callback to refresh parent
+    private Runnable onProjectCreated;
     
     @FXML
     public void initialize() {
         projectService = new ProjectService();
-        
-        // Setup buttons
-        saveBtn.setOnAction(e -> handleSave());
-        cancelBtn.setOnAction(e -> handleCancel());
-        
-        // Set default color
-        colorField.setText("#3498db");
-        
-        // Clear validation label
-        validationLabel.setText("");
+        setupButtons();
+        setupDefaults();
     }
     
-    /**
-     * Set the dialog stage for closing
-     */
+    private void setupButtons() {
+        saveBtn.setOnAction(e -> handleSave());
+        cancelBtn.setOnAction(e -> handleCancel());
+    }
+    
+    private void setupDefaults() {
+        colorField.setText(DEFAULT_COLOR);
+        clearValidation();
+    }
+    
     public void setDialogStage(Stage stage) {
         this.dialogStage = stage;
     }
-    
-    /**
-     * Set callback to refresh parent when project is created
-     */
+
     public void setOnProjectCreated(Runnable callback) {
         this.onProjectCreated = callback;
     }
     
-    /**
-     * Validate form inputs
-     */
-    private boolean validateForm() {
+    private void clearValidation() {
         validationLabel.setText("");
+    }
+    
+    private void setValidationError(String message) {
+        validationLabel.setText("⚠️ " + message);
+    }
+    
+    private boolean validateForm() {
+        clearValidation();
         
         String name = nameField.getText().trim();
         String color = colorField.getText().trim();
         
-        // Name validation
-        if (name.isEmpty()) {
-            validationLabel.setText("⚠️ Project name is required");
-            nameField.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2;");
+        if (!validateName(name)) {
             return false;
-        } else {
-            nameField.setStyle("");
         }
         
-        // Color validation (optional but must be valid if provided)
-        if (!color.isEmpty() && !isValidHexColor(color)) {
-            validationLabel.setText("⚠️ Invalid color format. Use #RRGGBB (e.g., #3498db)");
-            colorField.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2;");
+        if (!validateColor(color)) {
             return false;
-        } else {
-            colorField.setStyle("");
         }
         
         return true;
     }
     
-    /**
-     * Validate hex color format
-     */
-    private boolean isValidHexColor(String color) {
-        return color.matches("^#[0-9a-fA-F]{6}$");
+    private boolean validateName(String name) {
+        if (name.isEmpty()) {
+            setValidationError(MSG_NAME_REQUIRED);
+            setFieldError(nameField);
+            return false;
+        }
+        clearFieldError(nameField);
+        return true;
     }
     
-    /**
-     * Handle save button click
-     */
+    private boolean validateColor(String color) {
+        if (color.isEmpty()) {
+            return true; // Optional field
+        }
+        if (!isValidHexColor(color)) {
+            setValidationError(MSG_COLOR_INVALID);
+            setFieldError(colorField);
+            return false;
+        }
+        clearFieldError(colorField);
+        return true;
+    }
+    
+    private void setFieldError(TextField field) {
+        field.setStyle(ERROR_STYLE);
+    }
+    
+    private void clearFieldError(TextField field) {
+        field.setStyle(NORMAL_STYLE);
+    }
     @FXML
     private void handleSave() {
         if (!validateForm()) {
@@ -102,67 +116,47 @@ public class CreateProjectController {
         try {
             String name = nameField.getText().trim();
             String description = descriptionField.getText().trim();
-            String color = colorField.getText().trim();
+            String color = getColor();
             
-            if (color.isEmpty()) {
-                color = "#3498db"; // Default color
-            }
-            
-            System.out.println("💾 Creating project: " + name);
-            
-            // Create project via service
-            Project newProject = projectService.createProject(
+            projectService.createProject(
                 name,
                 description.isEmpty() ? null : description,
                 color
             );
             
-            System.out.println("✅ Project created: " + newProject.getName());
-            showAlert("Success", "✅ Project '" + name + "' created successfully!", Alert.AlertType.INFORMATION);
-            
-            // Execute callback to refresh parent view
+            UIUtils.showSuccess("Success", "Project '" + name + "' created successfully!");
             if (onProjectCreated != null) {
                 onProjectCreated.run();
             }
-            
-            // Close dialog
             dialogStage.close();
             
         } catch (Exception e) {
-            System.err.println("❌ Error creating project: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Error", "Failed to create project: " + e.getMessage(), Alert.AlertType.ERROR);
+            UIUtils.showError("Error", "Failed to create project: " + e.getMessage());
         }
     }
     
-    /**
-     * Handle cancel button click
-     */
+    private String getColor() {
+        String color = colorField.getText().trim();
+        return color.isEmpty() ? DEFAULT_COLOR : color;
+    }
     @FXML
     private void handleCancel() {
-        // Check if there's unsaved data
-        String name = nameField.getText().trim();
-        String description = descriptionField.getText().trim();
-        
-        if (!name.isEmpty() || !description.isEmpty()) {
-            if (ConfirmationDialog.showUnsavedChangesConfirmation()) {
-                System.out.println("❌ Create project cancelled");
+        if (hasUnsavedChanges()) {
+            if (UIUtils.showUnsavedChangesConfirmation()) {
                 dialogStage.close();
             }
         } else {
-            System.out.println("❌ Create project cancelled");
             dialogStage.close();
         }
     }
     
-    /**
-     * Show alert dialog
-     */
-    private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private boolean hasUnsavedChanges() {
+        String name = nameField.getText().trim();
+        String description = descriptionField.getText().trim();
+        return !name.isEmpty() || !description.isEmpty();
+    }
+    
+    private boolean isValidHexColor(String color) {
+        return color.matches(COLOR_REGEX);
     }
 }

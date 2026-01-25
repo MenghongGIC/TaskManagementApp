@@ -2,17 +2,14 @@ package com.taskmanagement.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-//Represents activity log entry for tracking task, project, and user changes
-
 public class ActivityLog {
     private Long id;
-    private String action; // e.g., "TASK_CREATED", "TASK_UPDATED", "TASK_ASSIGNED", "COMMENT_ADDED"
-    private String entityType; // "TASK", "PROJECT", "COMMENT", "USER"
+    private String action;
+    private String entityType;
     private Long entityId;
     private String entityName;
-    private User user; // User who performed the action
-    private String details; // Additional details about the change
+    private User user; 
+    private String details;
     private LocalDateTime timestamp;
 
     public ActivityLog() {
@@ -33,7 +30,6 @@ public class ActivityLog {
         this.details = details;
     }
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

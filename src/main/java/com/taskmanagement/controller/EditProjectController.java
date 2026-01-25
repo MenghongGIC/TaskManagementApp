@@ -9,16 +9,29 @@ import javafx.stage.Stage;
 
 import com.taskmanagement.model.Project;
 import com.taskmanagement.service.ProjectService;
+import com.taskmanagement.utils.UIUtils;
 import java.util.Optional;
 
 public class EditProjectController {
     
+    // Style Constants
+    private static final String ERROR_STYLE = "-fx-border-color: #e74c3c; -fx-border-width: 2;";
+    private static final String DEFAULT_COLOR = "#3498db";
+    private static final String ERROR_TEXT_COLOR = "-fx-text-fill: #e74c3c;";
+    private static final String SUCCESS_TEXT_COLOR = "-fx-text-fill: #3498db;";
+    private static final String HEX_COLOR_REGEX = "^#[0-9a-fA-F]{6}$";
+    
+    // Input Fields
     @FXML private TextField nameField;
     @FXML private TextArea descriptionField;
     @FXML private TextField colorField;
+    
+    // Display Elements
     @FXML private Rectangle colorPreview;
     @FXML private Label headerLabel;
     @FXML private Label validationLabel;
+    
+    // Control Buttons
     @FXML private Button saveBtn;
     @FXML private Button cancelBtn;
     @FXML private Button undoBtn;
@@ -33,6 +46,8 @@ public class EditProjectController {
     private String originalName;
     private String originalDescription;
     private String originalColor;
+
+    
     
     public EditProjectController() {
         this.projectService = new ProjectService();
@@ -58,9 +73,8 @@ public class EditProjectController {
         
         
         descriptionField.setWrapText(true);
-        
         validationLabel.setText("");
-        validationLabel.setStyle("-fx-text-fill: #e74c3c;");
+        validationLabel.setStyle(ERROR_TEXT_COLOR);
     }
     
     
@@ -84,7 +98,7 @@ public class EditProjectController {
         populateFields();
         updateColorPreview(colorField.getText());
         
-        System.out.println("📝 Editing project: " + project.getName());
+        System.out.println("Editing project: " + project.getName());
     }
     
     
@@ -102,194 +116,173 @@ public class EditProjectController {
             headerLabel.setText("Edit Project: " + originalProject.getName());
             nameField.setText(workingProject.getName());
             descriptionField.setText(workingProject.getDescription() != null ? workingProject.getDescription() : "");
-            colorField.setText(workingProject.getColor() != null ? workingProject.getColor() : "#3498db");
+            colorField.setText(workingProject.getColor() != null ? workingProject.getColor() : DEFAULT_COLOR);
         });
     }
     
     
 
     private void updateColorPreview(String hexColor) {
-        if (hexColor == null || hexColor.isEmpty()) {
-            hexColor = "#3498db"; 
-        }
-        
+        String validColor = (hexColor == null || hexColor.isEmpty()) ? DEFAULT_COLOR : hexColor;
         try {
-            Color color = Color.web(hexColor);
             if (colorPreview != null) {
-                colorPreview.setFill(color);
+                colorPreview.setFill(Color.web(validColor));
             }
         } catch (IllegalArgumentException e) {
-            
-            System.out.println("ℹ️ Invalid color format: " + hexColor);
+            System.out.println("Invalid color format: " + validColor);
         }
     }
     
     
 
     private boolean validateForm() {
-        String name = nameField.getText().trim();
-        String color = colorField.getText().trim();
-        
-        
+        resetFieldStyles();
         validationLabel.setText("");
         
-        
+        String name = nameField.getText().trim();
         if (name.isEmpty()) {
-            validationLabel.setText("⚠️ Project name is required");
-            nameField.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2;");
+            showValidationError(nameField, "Project name is required");
             return false;
-        } else {
-            nameField.setStyle("");
         }
         
-        
+        String color = colorField.getText().trim();
         if (!color.isEmpty() && !isValidHexColor(color)) {
-            validationLabel.setText("⚠️ Invalid color format. Use #RRGGBB (e.g., #3498db)");
-            colorField.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2;");
+            showValidationError(colorField, "Invalid color format.");
             return false;
-        } else {
-            colorField.setStyle("");
         }
         
         return true;
     }
     
-    
-
-    private boolean isValidHexColor(String color) {
-        if (color == null || color.isEmpty()) {
-            return true; 
-        }
-        return color.matches("^#[0-9a-fA-F]{6}$");
+    private void showValidationError(TextField field, String message) {
+        field.setStyle(ERROR_STYLE);
+        validationLabel.setText(message);
+        validationLabel.setStyle(ERROR_TEXT_COLOR);
     }
     
+    private void resetFieldStyles() {
+        nameField.setStyle("");
+        colorField.setStyle("");
+    }
     
-
+    private boolean isValidHexColor(String color) {
+        return color != null && !color.isEmpty() && color.matches(HEX_COLOR_REGEX);
+    }
+    private static class FormData {
+        String name;
+        String description;
+        String color;
+        FormData(String name, String description, String color) {
+            this.name = name;
+            this.description = description;
+            this.color = color;
+        }
+    }
     @FXML
     private void handleSave() {
         if (!validateForm()) {
             return;
         }
         
-        String name = nameField.getText().trim();
-        String description = descriptionField.getText().trim();
-        String color = colorField.getText().trim();
-        
-        if (color.isEmpty()) {
-            color = "#3498db"; 
-        }
-        
-        
-        boolean nameChanged = !name.equals(originalName);
-        boolean descChanged = !description.equals(originalDescription != null ? originalDescription : "");
-        boolean colorChanged = !color.equals(originalColor != null ? originalColor : "#3498db");
-        
-        if (!nameChanged && !descChanged && !colorChanged) {
-            System.out.println("ℹ️ No changes detected");
+        FormData formData = extractFormData();
+        if (!hasActualChanges(formData)) {
+            System.out.println("No changes detected");
             stage.close();
             return;
         }
         
         try {
-            System.out.println("💾 Saving project: " + name);
-            System.out.println("   Changes: Name=" + nameChanged + ", Desc=" + descChanged + ", Color=" + colorChanged);
-            
-            
-            workingProject.setName(name);
-            workingProject.setDescription(description);
-            workingProject.setColor(color);
-            
-            
-            projectService.updateProject(workingProject);
-            
-            
-            originalProject.setName(name);
-            originalProject.setDescription(description);
-            originalProject.setColor(color);
-            
-            System.out.println("✅ Project saved successfully");
-            showAlert("Success", "✅ Project '" + name + "' updated successfully!", Alert.AlertType.INFORMATION);
-            
+            updateProjectWithFormData(formData);
+            System.out.println("Project saved successfully");
+            showAlert("Success", "Project '" + formData.name + "' updated successfully!", Alert.AlertType.INFORMATION);
             
             if (onSaveCallback != null) {
                 onSaveCallback.run();
             }
-            
-            
             stage.close();
-            
         } catch (Exception e) {
-            System.err.println("❌ Error saving project: " + e.getMessage());
+            System.err.println("Error saving project: " + e.getMessage());
             e.printStackTrace();
             showAlert("Error", "Failed to save project: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
     
-    
-
     @FXML
     private void handleCancel() {
-        System.out.println("❌ Edit cancelled");
-        
-        
-        if (hasChanges()) {
-            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmAlert.setTitle("Discard Changes");
-            confirmAlert.setHeaderText("You have unsaved changes");
-            confirmAlert.setContentText("Do you want to discard your changes and close?");
-            
-            Optional<ButtonType> result = confirmAlert.showAndWait();
-            if (result.isEmpty() || result.get() != ButtonType.OK) {
-                System.out.println("↺ Keeping dialog open");
-                return; 
-            }
+        System.out.println("Edit cancelled");
+        if (hasChanges() && !showConfirmDiscardDialog()) {
+            System.out.println("↺ Keeping dialog open");
+            return;
         }
-        
         stage.close();
     }
     
-    
-
+    private boolean showConfirmDiscardDialog() {
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Discard Changes");
+        confirmAlert.setHeaderText("You have unsaved changes");
+        confirmAlert.setContentText("Do you want to discard your changes and close?");
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
     @FXML
     private void handleUndo() {
         System.out.println("↶ Undoing changes");
-        
-        
         nameField.setText(originalName);
         descriptionField.setText(originalDescription != null ? originalDescription : "");
-        colorField.setText(originalColor != null ? originalColor : "#3498db");
-        
+        colorField.setText(originalColor != null ? originalColor : DEFAULT_COLOR);
         validationLabel.setText("↶ Changes reverted to original");
-        validationLabel.setStyle("-fx-text-fill: #3498db;");
-        
-        
-        nameField.setStyle("");
-        colorField.setStyle("");
+        validationLabel.setStyle(SUCCESS_TEXT_COLOR);
+        resetFieldStyles();
     }
     
     
 
-    private boolean hasChanges() {
-        String currentName = nameField.getText().trim();
-        String currentDesc = descriptionField.getText().trim();
-        String currentColor = colorField.getText().trim();
+    private FormData extractFormData() {
+        String name = nameField.getText().trim();
+        String description = descriptionField.getText().trim();
+        String color = colorField.getText().trim().isEmpty() ? DEFAULT_COLOR : colorField.getText().trim();
+        return new FormData(name, description, color);
+    }
+    
+    private boolean hasActualChanges(FormData formData) {
+        String origDesc = originalDescription != null ? originalDescription : "";
+        String origColor = originalColor != null ? originalColor : DEFAULT_COLOR;
         
-        if (currentColor.isEmpty()) {
-            currentColor = "#3498db";
+        boolean nameChanged = !formData.name.equals(originalName);
+        boolean descChanged = !formData.description.equals(origDesc);
+        boolean colorChanged = !formData.color.equals(origColor);
+        
+        if (nameChanged || descChanged || colorChanged) {
+            System.out.println("Changes: Name=" + nameChanged + ", Desc=" + descChanged + ", Color=" + colorChanged);
+            return true;
         }
-        
-        return !currentName.equals(originalName) ||
-               !currentDesc.equals(originalDescription != null ? originalDescription : "") ||
-               !currentColor.equals(originalColor != null ? originalColor : "#3498db");
+        return false;
     }
     
+    private void updateProjectWithFormData(FormData formData) {
+        System.out.println("Saving project: " + formData.name);
+        workingProject.setName(formData.name);
+        workingProject.setDescription(formData.description);
+        workingProject.setColor(formData.color);
+        
+        projectService.updateProject(workingProject);
+        
+        originalProject.setName(formData.name);
+        originalProject.setDescription(formData.description);
+        originalProject.setColor(formData.color);
+    }
     
-
+    private boolean hasChanges() {
+        return hasActualChanges(extractFormData());
+    }
+    
     private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        switch (type) {
+            case ERROR -> UIUtils.showError(title, message);
+            case INFORMATION -> UIUtils.showSuccess(title, message);
+            case WARNING -> UIUtils.showWarning(title, message);
+            default -> UIUtils.showConfirmation(title, message);
+        }
     }
 }

@@ -1,7 +1,4 @@
 package com.taskmanagement.model;
-
-
-
 public enum Priority {
     CRITICAL("Critical", "critical"),      
     HIGH("High", "high"),                  
@@ -24,15 +21,9 @@ public enum Priority {
     public String getCssClass() {
         return cssClass;
     }
-    
-    
-
     public String getStyleClass() {
         return "priority-" + cssClass;
     }
-    
-    
-
     public static Priority fromString(String value) {
         if (value == null || value.isEmpty()) {
             return NONE;

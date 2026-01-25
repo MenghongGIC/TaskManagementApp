@@ -3,75 +3,83 @@ package com.taskmanagement.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
 public class DBConnection {
-
-    // Eagerly initialized singleton instance
+    
+    // Singleton instance
     private static final DBConnection INSTANCE = new DBConnection();
-
-    // Constants for database connection
+    
+    // Connection configuration
     private static final String URL = "jdbc:sqlserver://localhost:1433;"
             + "databaseName=TaskManagementDB;"
             + "encrypt=true;"
             + "trustServerCertificate=true;"
             + "loginTimeout=30;";
+    
+    private static final int VALIDATION_TIMEOUT_SECONDS = 5;
     private static final String USERNAME = "sa";
     private static final String PASSWORD = "Hong2412#tictic";
+    
+    private static final String ERR_CONNECT_FAILED = "Failed to connect to SQL Server:";
+    private static final String ERR_INVALID_CONNECTION = "Connection lost or invalid. Reconnecting...";
+    private static final String ERR_CHECK_VALIDITY = "Error checking connection validity. Attempting reconnect...";
+    private static final String ERR_CLOSE_CONNECTION = "Error closing connection: ";
+    private static final String MSG_CONNECTED = "Connected to Microsoft SQL Server successfully!";
+    private static final String MSG_CLOSED = "Database connection closed.";
+    private static final String MSG_SHUTDOWN = "DBConnection shutdown complete.";
 
     private Connection connection;
+    
     private DBConnection() {
         connect();
     }
 
-    
     private void connect() {
         try {
-            if (connection == null || connection.isClosed() || !connection.isValid(5)) {
+            if (isConnectionInvalid()) {
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-                System.out.println("Connected to Microsoft SQL Server successfully!");
+                System.out.println(MSG_CONNECTED);
             }
         } catch (SQLException e) {
-            System.err.println("Failed to connect to SQL Server:");
+            System.err.println(ERR_CONNECT_FAILED);
             e.printStackTrace(System.err);
             throw new RuntimeException("Database connection failed", e);
         }
     }
-
-    public static DBConnection getInstance() {
-        return INSTANCE;
+    private boolean isConnectionInvalid() throws SQLException {
+        return connection == null || connection.isClosed() || !connection.isValid(VALIDATION_TIMEOUT_SECONDS);
     }
 
     public Connection getConnection() {
         try {
-            if (connection == null || connection.isClosed() || !connection.isValid(5)) {
-                System.out.println("Connection lost or invalid. Reconnecting...");
+            if (isConnectionInvalid()) {
+                System.out.println(ERR_INVALID_CONNECTION);
                 connect();
             }
         } catch (SQLException e) {
-            System.err.println("Error checking connection validity. Attempting reconnect...");
+            System.err.println(ERR_CHECK_VALIDITY);
             connect();
         }
         return connection;
     }
-
+    public static DBConnection getInstance() {
+        return INSTANCE;
+    }
     public void close() {
         if (connection != null) {
             try {
                 if (!connection.isClosed()) {
                     connection.close();
-                    System.out.println("Database connection closed.");
+                    System.out.println(MSG_CLOSED);
                 }
             } catch (SQLException e) {
-                System.err.println("Error closing connection: " + e.getMessage());
+                System.err.println(ERR_CLOSE_CONNECTION + e.getMessage());
             } finally {
                 connection = null;
             }
         }
     }
-
-    // Shutdown method to clean up singleton
     public static void shutdown() {
         INSTANCE.close();
-        System.out.println("DBConnection shutdown complete.");
+        System.out.println(MSG_SHUTDOWN);
     }
 }

@@ -6,6 +6,7 @@ import com.taskmanagement.service.TaskService;
 import com.taskmanagement.service.UserService;
 import com.taskmanagement.utils.CurrentUser;
 import com.taskmanagement.utils.DateUtils;
+import com.taskmanagement.utils.UIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
@@ -13,9 +14,29 @@ import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Optional;
 
 public class TaskDetailController {
+    
+    // Status & Priority Options
+    private static final String[] STATUS_OPTIONS = {"To Do", "In Progress", "Done"};
+    private static final String[] PRIORITY_OPTIONS = {"Critical", "High", "Medium", "Low", "None"};
+    
+    // Messages
+    private static final String MSG_INITIALIZED = "TaskDetailController initialized";
+    private static final String MSG_SAVING = "Saving task changes";
+    private static final String MSG_SAVED = "Task saved successfully";
+    private static final String MSG_DELETING = "Deleting task: ";
+    private static final String MSG_DELETED = "Task deleted successfully";
+    
+    // Error Titles & Messages
+    private static final String TITLE_VALIDATION_ERROR = "Validation Error";
+    private static final String MSG_TITLE_EMPTY = "Task title cannot be empty!";
+    private static final String TITLE_ERROR = "Error";
+    private static final String TITLE_SUCCESS = "Success";
+    private static final String MSG_SAVE_FAILED = "Failed to save task";
+    private static final String MSG_DELETE_FAILED = "Failed to delete task";
+    private static final String TITLE_DELETE = "Delete Task";
+    private static final String MSG_DELETE_CONFIRM = "Are you sure you want to delete '%s'? This action cannot be undone.";
     
     @FXML private Label taskIdLabel;
     @FXML private TextField titleField;
@@ -39,7 +60,6 @@ public class TaskDetailController {
     private Task originalTask;
     private TaskService taskService;
     private UserService userService;
-    private boolean isEditMode = false;
     private Runnable onSaveCallback;
     private Runnable onDeleteCallback;
     private Stage stage;
@@ -51,27 +71,24 @@ public class TaskDetailController {
     
     @FXML
     public void initialize() {
-        System.out.println("🔧 TaskDetailController initialized");
+        System.out.println(MSG_INITIALIZED);
         
-        // Setup status dropdown
-        ObservableList<String> statuses = FXCollections.observableArrayList("To Do", "In Progress", "Done");
-        statusCombo.setItems(statuses);
-        
-        // Setup priority dropdown
-        ObservableList<String> priorities = FXCollections.observableArrayList("Critical", "High", "Medium", "Low", "None");
-        priorityCombo.setItems(priorities);
-        
-        // Load users for assignee and createdBy dropdowns
+        setupComboBoxes();
         loadUsers();
-        
-        // Button actions
+        setupButtonHandlers();
+        setViewMode();
+    }
+    
+    private void setupComboBoxes() {
+        statusCombo.setItems(FXCollections.observableArrayList(STATUS_OPTIONS));
+        priorityCombo.setItems(FXCollections.observableArrayList(PRIORITY_OPTIONS));
+    }
+    
+    private void setupButtonHandlers() {
         if (editBtn != null) editBtn.setOnAction(e -> handleEdit());
         if (saveBtn != null) saveBtn.setOnAction(e -> handleSave());
         if (cancelBtn != null) cancelBtn.setOnAction(e -> handleCancel());
         if (deleteBtn != null) deleteBtn.setOnAction(e -> handleDelete());
-        
-        // Start in view mode
-        setViewMode();
     }
     
     private void loadUsers() {
@@ -80,12 +97,11 @@ public class TaskDetailController {
             ObservableList<User> userList = FXCollections.observableArrayList(users);
             assigneeCombo.setItems(userList);
             createdByCombo.setItems(FXCollections.observableArrayList(users));
-            
-            // Custom cell factory to show usernames
+
             setupUserComboBoxes(assigneeCombo);
             setupUserComboBoxes(createdByCombo);
         } catch (Exception e) {
-            System.err.println("❌ Error loading users: " + e.getMessage());
+            System.err.println(" Error loading users: " + e.getMessage());
         }
     }
     
@@ -111,8 +127,7 @@ public class TaskDetailController {
         this.task = task;
         this.stage = stage;
         this.originalTask = new Task();
-        
-        // Copy original values for undo/cancel
+
         originalTask.setId(task.getId());
         originalTask.setTitle(task.getTitle());
         originalTask.setDescription(task.getDescription());
@@ -130,9 +145,8 @@ public class TaskDetailController {
     private void populateTaskDetails() {
         if (task == null) return;
         
-        System.out.println("📋 Displaying task details for: " + task.getTitle());
+        System.out.println("Displaying task details for: " + task.getTitle());
         
-        // Set title and ID
         taskIdLabel.setText("Task #" + task.getId());
         titleField.setText(task.getTitle());
         descriptionArea.setText(task.getDescription() != null ? task.getDescription() : "");
@@ -140,7 +154,6 @@ public class TaskDetailController {
         priorityCombo.setValue(task.getPriority() != null ? task.getPriority() : "Medium");
         dueDatePicker.setValue(task.getDueDate());
         
-        // Set assignee
         if (task.getAssignee() != null) {
             assigneeCombo.setValue(task.getAssignee());
             assigneeInfoLabel.setText("");
@@ -148,23 +161,17 @@ public class TaskDetailController {
             assigneeCombo.setValue(null);
             assigneeInfoLabel.setText("(Unassigned)");
         }
-        
-        // Set created by - only show in edit mode for admins
         if (task.getCreatedBy() != null) {
             createdByCombo.setValue(task.getCreatedBy());
             createdByLabel.setText(task.getCreatedBy().getUsername());
         } else {
             createdByLabel.setText("Unknown");
         }
-        
-        // Set project
         if (task.getProject() != null) {
             projectLabel.setText(task.getProject().getName());
         } else {
             projectLabel.setText("No Project");
         }
-        
-        // Format created date properly
         if (task.getCreatedAt() != null) {
             createdAtLabel.setText(DateUtils.formatDateTime(task.getCreatedAt()));
         } else {
@@ -173,99 +180,76 @@ public class TaskDetailController {
     }
     
     private void setViewMode() {
-        isEditMode = false;
-        titleField.setEditable(false);
-        descriptionArea.setEditable(false);
-        statusCombo.setDisable(true);
-        priorityCombo.setDisable(true);
-        dueDatePicker.setDisable(true);
-        assigneeCombo.setDisable(true);
-        createdByCombo.setDisable(true);
-        createdByCombo.setVisible(false);
-        createdByLabel.setVisible(true);
-        
-        // Button visibility for view mode
-        if (editBtn != null) editBtn.setVisible(true);
-        if (saveBtn != null) saveBtn.setVisible(false);
-        if (cancelBtn != null) cancelBtn.setVisible(false);
+        setMode(false);
     }
     
     private void setEditMode() {
-        isEditMode = true;
-        titleField.setEditable(true);
-        descriptionArea.setEditable(true);
-        statusCombo.setDisable(false);
-        priorityCombo.setDisable(false);
-        dueDatePicker.setDisable(false);
-        assigneeCombo.setDisable(false);
-        
-        // Only admins can change who created the task
+        setMode(true);
+    }
+    
+    private void setMode(boolean editMode) {
+        titleField.setEditable(editMode);
+        descriptionArea.setEditable(editMode);
+        statusCombo.setDisable(!editMode);
+        priorityCombo.setDisable(!editMode);
+        dueDatePicker.setDisable(!editMode);
+        assigneeCombo.setDisable(!editMode);
+
         boolean isAdmin = CurrentUser.isAdmin();
-        createdByCombo.setDisable(!isAdmin);
-        createdByCombo.setVisible(isAdmin);
-        createdByLabel.setVisible(!isAdmin);
-        
-        // Button visibility for edit mode
-        if (editBtn != null) editBtn.setVisible(false);
-        if (saveBtn != null) saveBtn.setVisible(true);
-        if (cancelBtn != null) cancelBtn.setVisible(true);
-        
-        // Focus on title field
-        titleField.requestFocus();
+        createdByCombo.setDisable(!editMode || !isAdmin);
+        createdByCombo.setVisible(editMode && isAdmin);
+        createdByLabel.setVisible(!editMode || !isAdmin);
+
+        if (editBtn != null) editBtn.setVisible(!editMode);
+        if (saveBtn != null) saveBtn.setVisible(editMode);
+        if (cancelBtn != null) cancelBtn.setVisible(editMode);
+        if (editMode) {
+            titleField.requestFocus();
+        }
     }
     
     @FXML
     private void handleEdit() {
-        System.out.println("✏️ Entering edit mode");
+        System.out.println(MSG_SAVING);
         setEditMode();
     }
     
     @FXML
     private void handleSave() {
-        System.out.println("💾 Saving task changes");
-        
-        // Validate input
+        System.out.println("Saving task changes");
         if (titleField.getText().isEmpty()) {
-            showAlert("Validation Error", "Task title cannot be empty!", Alert.AlertType.ERROR);
+            UIUtils.showError(TITLE_VALIDATION_ERROR, MSG_TITLE_EMPTY);
             return;
         }
-        
-        // Update task with new values
         task.setTitle(titleField.getText());
         task.setDescription(descriptionArea.getText());
         task.setStatus(statusCombo.getValue());
         task.setPriority(priorityCombo.getValue());
         task.setDueDate(dueDatePicker.getValue());
         task.setAssignee(assigneeCombo.getValue());
-        
-        // Only admins can change created by
+
         if (CurrentUser.isAdmin() && createdByCombo.getValue() != null) {
             task.setCreatedBy(createdByCombo.getValue());
         }
         
         try {
-            // Save to database
             taskService.updateTask(task);
-            System.out.println("✅ Task saved successfully");
-            showAlert("Success", "Task updated successfully!", Alert.AlertType.INFORMATION);
-            
+            System.out.println(MSG_SAVED);
+            UIUtils.showSuccess(TITLE_SUCCESS, MSG_SAVED);
             setViewMode();
-            
-            // Call callback if set
             if (onSaveCallback != null) {
                 onSaveCallback.run();
             }
         } catch (Exception e) {
-            System.err.println("❌ Error saving task: " + e.getMessage());
-            showAlert("Error", "Failed to save task: " + e.getMessage(), Alert.AlertType.ERROR);
+            System.err.println(MSG_SAVE_FAILED + e.getMessage());
+            UIUtils.showError(TITLE_ERROR, MSG_SAVE_FAILED);
         }
     }
     
     @FXML
     private void handleCancel() {
-        System.out.println("❌ Canceling edit mode");
-        
-        // Restore original values
+        System.out.println("Canceling edit mode");
+
         task.setTitle(originalTask.getTitle());
         task.setDescription(originalTask.getDescription());
         task.setStatus(originalTask.getStatus());
@@ -279,30 +263,24 @@ public class TaskDetailController {
     
     @FXML
     private void handleDelete() {
-        System.out.println("🗑️ Deleting task: " + task.getTitle());
+        System.out.println(MSG_DELETING + task.getTitle());
         
-        Optional<ButtonType> result = showConfirmation("Delete Task",
-            "Are you sure you want to delete '" + task.getTitle() + "'? This action cannot be undone.");
-        
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        String confirmMessage = String.format(MSG_DELETE_CONFIRM, task.getTitle());
+        if (UIUtils.showCustomConfirmation(TITLE_DELETE, null, confirmMessage)) {
             try {
                 taskService.deleteTask(task.getId());
-                System.out.println("✅ Task deleted successfully");
-                showAlert("Success", "Task deleted successfully!", Alert.AlertType.INFORMATION);
-                
-                // Call callback if set
+                System.out.println(MSG_DELETED);
+                UIUtils.showSuccess(TITLE_SUCCESS, MSG_DELETED);
                 if (onDeleteCallback != null) {
                     onDeleteCallback.run();
                 }
-                
-                // Close the window if it's a modal
                 if (stage != null) {
                     stage.close();
                 }
                 
             } catch (Exception e) {
-                System.err.println("❌ Error deleting task: " + e.getMessage());
-                showAlert("Error", "Failed to delete task: " + e.getMessage(), Alert.AlertType.ERROR);
+                System.err.println(MSG_DELETE_FAILED + e.getMessage());
+                UIUtils.showError(TITLE_ERROR, MSG_DELETE_FAILED);
             }
         }
     }
@@ -313,21 +291,5 @@ public class TaskDetailController {
     
     public void setOnDeleteCallback(Runnable callback) {
         this.onDeleteCallback = callback;
-    }
-    
-    private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-    
-    private Optional<ButtonType> showConfirmation(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        return alert.showAndWait();
     }
 }

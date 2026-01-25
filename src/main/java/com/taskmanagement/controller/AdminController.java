@@ -7,6 +7,7 @@ import com.taskmanagement.service.TaskService;
 import com.taskmanagement.repository.UserRepository;
 import com.taskmanagement.utils.CurrentUser;
 import com.taskmanagement.utils.NavigationManager;
+import com.taskmanagement.utils.UIUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,22 +32,22 @@ public class AdminController {
     private final UserService userService = new UserService();
     private final UserRepository userRepository = new UserRepository();
     private final TaskService taskService = new TaskService();
-    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    // --- Header / Stats Panel ---
-    @FXML private Label totalUsersLabel;
-    @FXML private Label adminCountLabel;
-    @FXML private Label userCountLabel;
-    @FXML private Label blockedCountLabel;
+    private static final String BTN_TASKS = "-fx-padding: 5 10; -fx-font-size: 11; -fx-background-color: #3498db; -fx-text-fill: white;";
+    private static final String BTN_EDIT = "-fx-padding: 5 10; -fx-font-size: 11;";
+    private static final String BTN_DELETE = "-fx-padding: 5 10; -fx-font-size: 11; -fx-text-fill: red;";
+    private static final String GRID_PADDING = "20";
+    private static final String GRID_GAP = "10";
+    private static final String STATS_HEADER = "0";
 
-    // --- Search and Filter ---
+    @FXML private Label totalUsersLabel, adminCountLabel, userCountLabel, blockedCountLabel, messageLabel;
+
     @FXML private TextField searchField;
     @FXML private ComboBox<String> roleFilterCombo;
-    @FXML private Button searchButton;
-    @FXML private Button refreshButton;
-    @FXML private Button addUserButton;
+    
+    @FXML private Button searchButton, logoutButton, refreshButton, addUserButton;
 
-    // --- Users Table ---
     @FXML private TableView<User> usersTable;
     @FXML private TableColumn<User, Long> idColumn;
     @FXML private TableColumn<User, String> usernameColumn;
@@ -56,37 +57,34 @@ public class AdminController {
     @FXML private TableColumn<User, String> createdColumn;
     @FXML private TableColumn<User, Void> actionsColumn;
 
-    // --- Bottom Controls ---
-    @FXML private Label messageLabel;
-    @FXML private Button logoutButton;
-
     private ObservableList<User> usersList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         if (!CurrentUser.isAdmin()) {
-            showError("Access Denied: Admin privileges required");
+            UIUtils.showError("Access Denied", "Admin privileges required");
             return;
         }
-
-        initializeTable();
-        initializeFilters();
+        setupTable();
+        setupFilters();
         loadAllUsers();
         displayStats();
     }
 
-    private void initializeTable() {
+    private void setupTable() {
+        setupTableColumns();
+        addActionsColumn();
+        usersTable.setItems(usersList);
+    }
+
+    private void setupTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-
-        statusColumn.setCellValueFactory(cellData -> {
-            User user = cellData.getValue();
-            String status = "ACTIVE";
-            return new javafx.beans.property.SimpleStringProperty(status);
-        });
-
+        statusColumn.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty("ACTIVE")
+        );
         createdColumn.setCellValueFactory(cellData -> {
             User user = cellData.getValue();
             String dateStr = user.getCreatedAt() != null 
@@ -94,10 +92,6 @@ public class AdminController {
                 : "N/A";
             return new javafx.beans.property.SimpleStringProperty(dateStr);
         });
-
-        addActionsColumn();
-
-        usersTable.setItems(usersList);
     }
 
     private void addActionsColumn() {
@@ -109,76 +103,83 @@ public class AdminController {
                     setGraphic(null);
                 } else {
                     User user = getTableRow().getItem();
-                    HBox actionBox = new HBox(5);
-                    actionBox.setPadding(new Insets(5));
-
-                    Button tasksBtn = new Button("Tasks");
-                    tasksBtn.setStyle("-fx-padding: 5 10; -fx-font-size: 11; -fx-background-color: #3498db; -fx-text-fill: white;");
-                    tasksBtn.setOnAction(e -> showUserTasksDialog(user));
-
-                    Button editBtn = new Button("Edit");
-                    editBtn.setStyle("-fx-padding: 5 10; -fx-font-size: 11;");
-                    editBtn.setOnAction(e -> showEditUserDialog(user));
-
-                    Button deleteBtn = new Button("Delete");
-                    deleteBtn.setStyle("-fx-padding: 5 10; -fx-font-size: 11; -fx-text-fill: red;");
-                    deleteBtn.setOnAction(e -> deleteUser(user));
-
-                    if (user.getId().equals(CurrentUser.getId())) {
-                        deleteBtn.setDisable(true);
-                    }
-
-                    actionBox.getChildren().addAll(tasksBtn, editBtn, deleteBtn);
-                    setGraphic(actionBox);
+                    setGraphic(createActionButtons(user));
                 }
             }
         });
     }
 
-    private void initializeFilters() {
+    private HBox createActionButtons(User user) {
+        HBox actionBox = new HBox(5);
+        actionBox.setPadding(new Insets(5));
+        
+        Button tasksBtn = new Button("Tasks");
+        tasksBtn.setStyle(BTN_TASKS);
+        tasksBtn.setOnAction(e -> showUserTasksDialog(user));
+        
+        Button editBtn = new Button("Edit");
+        editBtn.setStyle(BTN_EDIT);
+        editBtn.setOnAction(e -> showEditUserDialog(user));
+        
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.setStyle(BTN_DELETE);
+        deleteBtn.setOnAction(e -> deleteUser(user));
+        
+        if (user.getId().equals(CurrentUser.getId())) {
+            deleteBtn.setDisable(true);
+        }
+        
+        actionBox.getChildren().addAll(tasksBtn, editBtn, deleteBtn);
+        return actionBox;
+    }
+
+    private void setupFilters() {
         roleFilterCombo.setItems(FXCollections.observableArrayList("All", "ADMIN", "USER"));
         roleFilterCombo.setValue("All");
-        
         roleFilterCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.equals(oldVal)) {
                 handleRoleFilter();
             }
         });
-        
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal.trim().isEmpty()) {
-                handleSearch();
-            } else if (oldVal != null && !oldVal.trim().isEmpty()) {
-                loadAllUsers();
-            }
-        });
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> handleSearchUpdate(oldVal, newVal));
+    }
+
+    private void handleSearchUpdate(String oldVal, String newVal) {
+        if (!newVal.trim().isEmpty()) {
+            handleSearch();
+        } else if (oldVal != null && !oldVal.trim().isEmpty()) {
+            loadAllUsers();
+        }
     }
 
     private void loadAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
             usersList.setAll(users);
-            showSuccess("Loaded " + users.size() + " users");
+            setSuccess("Loaded " + users.size() + " users");
         } catch (Exception e) {
-            showError("Error loading users: " + e.getMessage());
+            setError("Error loading users: " + e.getMessage());
         }
     }
 
     private void displayStats() {
         try {
             List<User> allUsers = userService.getAllUsers();
-            int adminCount = (int) allUsers.stream().filter(u -> u.isAdmin()).count();
-            int userCount = (int) allUsers.stream().filter(u -> u.isUser()).count();
-            
-            Platform.runLater(() -> {
-                totalUsersLabel.setText(String.valueOf(allUsers.size()));
-                adminCountLabel.setText(String.valueOf(adminCount));
-                userCountLabel.setText(String.valueOf(userCount));
-                blockedCountLabel.setText("0");
-            });
+            int adminCount = (int) allUsers.stream().filter(User::isAdmin).count();
+            int userCount = (int) allUsers.stream().filter(User::isUser).count();
+            updateStatsLabels(allUsers.size(), adminCount, userCount);
         } catch (Exception e) {
-            showError("Error loading statistics: " + e.getMessage());
+            setError("Error loading statistics: " + e.getMessage());
         }
+    }
+
+    private void updateStatsLabels(int total, int admins, int users) {
+        Platform.runLater(() -> {
+            totalUsersLabel.setText(String.valueOf(total));
+            adminCountLabel.setText(String.valueOf(admins));
+            userCountLabel.setText(String.valueOf(users));
+            blockedCountLabel.setText(STATS_HEADER);
+        });
     }
 
     @FXML
@@ -188,22 +189,20 @@ public class AdminController {
             loadAllUsers();
             return;
         }
-
         try {
-            System.out.println("🔍 Searching for: " + query);
-            List<User> allUsers = userService.getAllUsers();
-            String queryLower = query.toLowerCase();
-            List<User> results = allUsers.stream()
-                .filter(u -> u.getUsername().toLowerCase().contains(queryLower) || 
-                           u.getEmail().toLowerCase().contains(queryLower))
+            List<User> results = userService.getAllUsers().stream()
+                .filter(u -> matches(u, query.toLowerCase()))
                 .toList();
             usersList.setAll(results);
-            showSuccess("✓ Found " + results.size() + " user(s) matching '" + query + "'");
+            setSuccess("Found " + results.size() + " user(s) matching '" + query + "'");
         } catch (Exception e) {
-            System.err.println("Search error: " + e.getMessage());
-            e.printStackTrace();
-            showError("❌ Search error: " + e.getMessage());
+            setError("Search error: " + e.getMessage());
         }
+    }
+
+    private boolean matches(User user, String query) {
+        return user.getUsername().toLowerCase().contains(query) || 
+               user.getEmail().toLowerCase().contains(query);
     }
 
     @FXML
@@ -213,20 +212,15 @@ public class AdminController {
             loadAllUsers();
             return;
         }
-
         try {
-            System.out.println("🔽 Filtering by role: " + selectedRole);
             Role role = Role.valueOf(selectedRole);
-            List<User> allUsers = userService.getAllUsers();
-            List<User> filtered = allUsers.stream()
+            List<User> filtered = userService.getAllUsers().stream()
                 .filter(u -> u.getRole() == role)
                 .toList();
             usersList.setAll(filtered);
-            showSuccess("✓ Found " + filtered.size() + " " + selectedRole + " user(s)");
+            setSuccess("Found " + filtered.size() + " " + selectedRole + " user(s)");
         } catch (Exception e) {
-            System.err.println("Filter error: " + e.getMessage());
-            e.printStackTrace();
-            showError("❌ Filter error: " + e.getMessage());
+            setError("Filter error: " + e.getMessage());
             loadAllUsers();
         }
     }
@@ -234,22 +228,22 @@ public class AdminController {
     @FXML
     private void handleRefresh() {
         try {
-            System.out.println("🔄 Refreshing data...");
-            searchField.clear();
-            roleFilterCombo.setValue("All");
+            clearFilters();
             loadAllUsers();
             displayStats();
-            showSuccess("✓ Data refreshed successfully");
+            setSuccess("Data refreshed successfully");
         } catch (Exception e) {
-            System.err.println("Refresh error: " + e.getMessage());
-            e.printStackTrace();
-            showError("❌ Refresh error: " + e.getMessage());
+            setError("Refresh error: " + e.getMessage());
         }
+    }
+
+    private void clearFilters() {
+        searchField.clear();
+        roleFilterCombo.setValue("All");
     }
 
     @FXML
     private void handleAddUser() {
-        System.out.println("➕ Opening Add User dialog");
         showAddUserDialog();
     }
 
@@ -257,199 +251,186 @@ public class AdminController {
         Dialog<User> dialog = new Dialog<>();
         dialog.setTitle("Add New User");
         dialog.setHeaderText("Create a new user account");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Username");
-        TextField emailField = new TextField();
-        emailField.setPromptText("Email");
+        GridPane grid = createAddUserGrid();
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.showAndWait().ifPresent(user -> handleAddUserResult(grid));
+    }
+    
+    private GridPane createAddUserGrid() {
+        GridPane grid = createBaseGrid();
+        TextField usernameField = createTextField("Username");
+        TextField emailField = createTextField("Email");
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
         ComboBox<Role> roleCombo = new ComboBox<>();
         roleCombo.setItems(FXCollections.observableArrayList(Role.ADMIN, Role.USER));
         roleCombo.setValue(Role.USER);
+        addFormFields(grid, "Username", usernameField, "Email", emailField, "Password", passwordField, "Role", roleCombo);
+        grid.setUserData(new Object[]{usernameField, emailField, passwordField, roleCombo});
+        return grid;
+    }
 
-        grid.add(new Label("Username:"), 0, 0);
-        grid.add(usernameField, 1, 0);
-        grid.add(new Label("Email:"), 0, 1);
-        grid.add(emailField, 1, 1);
-        grid.add(new Label("Password:"), 0, 2);
-        grid.add(passwordField, 1, 2);
-        grid.add(new Label("Role:"), 0, 3);
-        grid.add(roleCombo, 1, 3);
+    private GridPane createBaseGrid() {
+        GridPane grid = new GridPane();
+        grid.setHgap(Integer.parseInt(GRID_GAP));
+        grid.setVgap(Integer.parseInt(GRID_GAP));
+        grid.setPadding(new Insets(Integer.parseInt(GRID_PADDING)));
+        return grid;
+    }
 
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+    private TextField createTextField(String prompt) {
+        TextField field = new TextField();
+        field.setPromptText(prompt);
+        return field;
+    }
 
-        Optional<User> result = dialog.showAndWait();
-        result.ifPresent(user -> {
-            try {
-                String username = usernameField.getText().trim();
-                String email = emailField.getText().trim();
-                String password = passwordField.getText();
-
-                // Validation
-                if (username.isEmpty()) {
-                    showError("❌ Username cannot be empty");
-                    return;
-                }
-                if (email.isEmpty()) {
-                    showError("❌ Email cannot be empty");
-                    return;
-                }
-                if (password.isEmpty()) {
-                    showError("❌ Password cannot be empty");
-                    return;
-                }
-
-                User newUser = new User();
-                newUser.setUsername(username);
-                newUser.setEmail(email);
-                newUser.setPasswordHash(password);
-                newUser.setRole(roleCombo.getValue());
-                newUser.setCreatedAt(LocalDateTime.now());
-
-                System.out.println("➕ Creating new user: " + username);
-                userService.register(username, email, password);
-                loadAllUsers();
-                displayStats();
-                showSuccess("✓ User '" + username + "' created successfully");
-            } catch (Exception e) {
-                System.err.println("Error creating user: " + e.getMessage());
-                e.printStackTrace();
-                showError("❌ Error creating user: " + e.getMessage());
+    @SuppressWarnings("unchecked")
+    private void addFormFields(GridPane grid, Object... fieldPairs) {
+        for (int i = 0; i < fieldPairs.length; i += 2) {
+            grid.add(new Label((String) fieldPairs[i] + ":"), 0, i / 2);
+            grid.add((javafx.scene.Node) fieldPairs[i + 1], 1, i / 2);
+        }
+    }
+    
+    private void handleAddUserResult(GridPane grid) {
+        Object[] fields = (Object[]) grid.getUserData();
+        TextField usernameField = (TextField) fields[0];
+        TextField emailField = (TextField) fields[1];
+        PasswordField passwordField = (PasswordField) fields[2];
+        try {
+            String username = usernameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = passwordField.getText();
+            if (!validateAddUserForm(username, email, password)) {
+                return;
             }
-        });
+            userService.register(username, email, password);
+            refreshUserData();
+            setSuccess("User '" + username + "' created successfully");
+        } catch (Exception e) {
+            setError("Error creating user: " + e.getMessage());
+        }
+    }
+
+    private boolean validateAddUserForm(String username, String email, String password) {
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            setError("All fields are required");
+            return false;
+        }
+        return true;
     }
 
     private void showEditUserDialog(User user) {
         Dialog<User> dialog = new Dialog<>();
         dialog.setTitle("Edit User");
         dialog.setHeaderText("Edit user: " + user.getUsername());
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
+        
+        GridPane grid = createEditUserGrid(user);
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        
+        dialog.showAndWait().ifPresent(selectedUser -> handleEditUserResult(user, grid));
+    }
+    
+    private GridPane createEditUserGrid(User user) {
+        GridPane grid = createBaseGrid();
         TextField usernameField = new TextField(user.getUsername());
-        usernameField.setDisable(true); // Username cannot be changed
-        TextField emailField = new TextField(user.getEmail() != null ? user.getEmail() : "");
-        TextField positionField = new TextField(user.getPosition() != null ? user.getPosition() : "");
+        usernameField.setDisable(true);
+        TextField emailField = createTextField(user.getEmail() != null ? user.getEmail() : "");
+        TextField positionField = createTextField(user.getPosition() != null ? user.getPosition() : "");
         ComboBox<Role> roleCombo = new ComboBox<>();
         roleCombo.setItems(FXCollections.observableArrayList(Role.ADMIN, Role.USER));
         roleCombo.setValue(user.getRole());
+        addFormFields(grid, "Username", usernameField, "Email", emailField, "Position", positionField, "Role", roleCombo);
+        grid.setUserData(new Object[]{emailField, positionField, roleCombo});
+        return grid;
+    }
+    
+    private void handleEditUserResult(User user, GridPane grid) {
+        Object[] fields = (Object[]) grid.getUserData();
+        TextField emailField = (TextField) fields[0];
+        TextField positionField = (TextField) fields[1];
+        ComboBox<Role> roleCombo = (ComboBox<Role>) fields[2];
+        try {
+            user.setEmail(emailField.getText());
+            user.setPosition(positionField.getText());
+            user.setRole(roleCombo.getValue());
+            userService.updateProfile(user);
+            refreshUserData();
+            setSuccess("User updated successfully");
+        } catch (Exception e) {
+            setError("Error updating user: " + e.getMessage());
+        }
+    }
 
-        grid.add(new Label("Username:"), 0, 0);
-        grid.add(usernameField, 1, 0);
-        grid.add(new Label("Email:"), 0, 1);
-        grid.add(emailField, 1, 1);
-        grid.add(new Label("Position:"), 0, 2);
-        grid.add(positionField, 1, 2);
-        grid.add(new Label("Role:"), 0, 3);
-        grid.add(roleCombo, 1, 3);
-
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        Optional<User> result = dialog.showAndWait();
-        result.ifPresent(selectedUser -> {
-            try {
-                user.setEmail(emailField.getText());
-                user.setPosition(positionField.getText());
-                user.setRole(roleCombo.getValue());
-
-                userService.updateProfile(user);
-                loadAllUsers();
-                displayStats();
-                showSuccess("User updated successfully");
-            } catch (Exception e) {
-                showError("Error updating user: " + e.getMessage());
-            }
-        });
+    private void refreshUserData() {
+        loadAllUsers();
+        displayStats();
     }
 
     private void deleteUser(User user) {
         if (user.getId().equals(CurrentUser.getId())) {
-            showError("Cannot delete your own account");
+            setError("Cannot delete your own account");
             return;
         }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Deletion");
-        alert.setHeaderText("Delete User");
-        alert.setContentText("Are you sure you want to delete user '" + user.getUsername() + "'? This action cannot be undone.");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (UIUtils.showDeleteConfirmation(user.getUsername())) {
             try {
                 userRepository.delete(user.getId());
-                loadAllUsers();
-                displayStats();
-                showSuccess("User deleted successfully");
+                refreshUserData();
+                setSuccess("User deleted successfully");
             } catch (Exception e) {
-                showError("Error deleting user: " + e.getMessage());
+                setError("Error deleting user: " + e.getMessage());
             }
         }
     }
 
     @FXML
     private void handleLogout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Logout");
-        alert.setHeaderText("Confirm Logout");
-        alert.setContentText("Are you sure you want to logout?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (UIUtils.showCustomConfirmation("Logout", "Confirm Logout", "Are you sure you want to logout?")) {
             try {
                 CurrentUser.set(null);
                 com.taskmanagement.App.setRoot("auth/LoginView");
             } catch (Exception e) {
-                showError("Logout error: " + e.getMessage());
+                setError("Logout error: " + e.getMessage());
             }
         }
     }
 
-    private void showSuccess(String message) {
-        messageLabel.setText(message);
-        messageLabel.setStyle("-fx-text-fill: green;");
+    private void setSuccess(String message) {
+        UIUtils.setSuccessStyle(messageLabel, message);
     }
 
-    private void showError(String message) {
-        messageLabel.setText(message);
-        messageLabel.setStyle("-fx-text-fill: red;");
+    private void setError(String message) {
+        UIUtils.setErrorStyle(messageLabel, message);
     }
     
-    /**
-     * Show user tasks in a popup dialog
-     */
     private void showUserTasksDialog(User user) {
         try {
-            System.out.println("📋 Opening user tasks dialog for: " + user.getUsername());
-            
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(com.taskmanagement.App.class.getResource("fxml/dialog/UserTasksDialog.fxml"));
+            javafx.fxml.FXMLLoader loader = createTasksDialogLoader();
             BorderPane dialogRoot = loader.load();
             UserTasksDialogController controller = loader.getController();
-            
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Tasks - " + user.getUsername());
-            dialogStage.setScene(new javafx.scene.Scene(dialogRoot, 900, 600));
-            dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            dialogStage.initOwner(usersTable.getScene().getWindow());
-            
+            Stage dialogStage = createTasksDialogStage(user);
             controller.setDialogStage(dialogStage);
             controller.loadUserTasks(user);
-            
             dialogStage.show();
         } catch (Exception e) {
-            System.err.println("❌ Error opening user tasks dialog: " + e.getMessage());
-            e.printStackTrace();
-            showError("Error opening tasks dialog: " + e.getMessage());
+            setError("Error opening tasks dialog: " + e.getMessage());
         }
+    }
+
+    private javafx.fxml.FXMLLoader createTasksDialogLoader() {
+        return new javafx.fxml.FXMLLoader(
+            com.taskmanagement.App.class.getResource("fxml/dialog/UserTasksDialog.fxml")
+        );
+    }
+
+    private Stage createTasksDialogStage(User user) {
+        Stage stage = new Stage();
+        stage.setTitle("Tasks - " + user.getUsername());
+        stage.setScene(new javafx.scene.Scene(new BorderPane(), 900, 600));
+        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        stage.initOwner(usersTable.getScene().getWindow());
+        return stage;
     }
 }

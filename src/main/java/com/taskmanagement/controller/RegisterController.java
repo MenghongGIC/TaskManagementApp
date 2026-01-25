@@ -5,7 +5,9 @@ import java.io.IOException;
 import com.taskmanagement.App;
 import com.taskmanagement.model.User;
 import com.taskmanagement.service.UserService;
+import com.taskmanagement.utils.UIUtils;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -13,6 +15,23 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class RegisterController {
+    
+    // Validation Messages
+    private static final String MSG_EMAIL_REQUIRED = "Email is required";
+    private static final String MSG_USERNAME_REQUIRED = "Username is required";
+    private static final String MSG_PASSWORD_REQUIRED = "Password is required";
+    private static final String MSG_PASSWORD_MIN_LENGTH = "Password must be at least 8 characters";
+    private static final String MSG_PASSWORD_MISMATCH = "Passwords do not match";
+    private static final String MSG_INVALID_EMAIL = "Please enter a valid email address";
+    private static final String MSG_REGISTRATION_SUCCESS = "Registration successful! User account created with role: ";
+    private static final String MSG_REGISTRATION_FAILED = "Registration failed: ";
+    private static final String MSG_NAVIGATION_ERROR = "Error navigating to login: ";
+    
+    // Validation Constants
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final long REDIRECT_DELAY_MS = 1500;
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+    private static final String LOGIN_VIEW = "auth/LoginView";
 
     @FXML private TextField emailField;
     @FXML private TextField usernameField;
@@ -30,12 +49,12 @@ public class RegisterController {
 
     @FXML
     public void initialize() {
-        if (errorLabel != null) {
-            errorLabel.setVisible(false);
-        }
-        if (successLabel != null) {
-            successLabel.setVisible(false);
-        }
+        setLabelVisibility(false);
+    }
+    
+    private void setLabelVisibility(boolean show) {
+        if (errorLabel != null) errorLabel.setVisible(show && false);
+        if (successLabel != null) successLabel.setVisible(show && false);
     }
 
     
@@ -45,72 +64,63 @@ public class RegisterController {
         
         String email = emailField.getText().trim();
         String username = usernameField.getText().trim();
-        // Get password from whichever field is visible
-        String password = passwordField.isVisible() ? passwordField.getText() : passwordFieldVisible.getText();
-        // Get confirm password from whichever field is visible
-        String confirmPassword = confirmPasswordField.isVisible() ? confirmPasswordField.getText() : confirmPasswordFieldVisible.getText();
+        String password = getPasswordValue(passwordField, passwordFieldVisible);
+        String confirmPassword = getPasswordValue(confirmPasswordField, confirmPasswordFieldVisible);
         
-        // Validation
-        if (email.isEmpty()) {
-            showError("Email is required");
+        String validationError = validateRegistration(email, username, password, confirmPassword);
+        if (validationError != null) {
+            showError(validationError);
             return;
         }
         
-        if (username.isEmpty()) {
-            showError("Username is required");
-            return;
-        }
-        
-        if (password.isEmpty()) {
-            showError("Password is required");
-            return;
-        }
-        
-        if (password.length() < 8) {
-            showError("Password must be at least 8 characters");
-            return;
-        }
-        
+        performRegistration(username, email, password);
+    }
+    
+    private String validateRegistration(String email, String username, String password, String confirmPassword) {
+        if (email.isEmpty()) return MSG_EMAIL_REQUIRED;
+        if (username.isEmpty()) return MSG_USERNAME_REQUIRED;
+        if (password.isEmpty()) return MSG_PASSWORD_REQUIRED;
+        if (password.length() < MIN_PASSWORD_LENGTH) return MSG_PASSWORD_MIN_LENGTH;
         if (!password.equals(confirmPassword)) {
-            showError("Passwords do not match");
             confirmPasswordField.clear();
-            return;
+            return MSG_PASSWORD_MISMATCH;
         }
-        
-        // Email validation
-        if (!isValidEmail(email)) {
-            showError("Please enter a valid email address");
-            return;
-        }
-        
+        if (!isValidEmail(email)) return MSG_INVALID_EMAIL;
+        return null;
+    }
+    
+    private void performRegistration(String username, String email, String password) {
         try {
             User newUser = userService.register(username, email, password);
-            showSuccess("Registration successful! User account created with role: " + newUser.getRole());
+            showSuccess(MSG_REGISTRATION_SUCCESS + newUser.getRole());
             clearFields();
-            // Navigate back to login after a brief delay
-            javafx.application.Platform.runLater(() -> {
-                try {
-                    Thread.sleep(1500);
-                    App.setRoot("auth/LoginView");
-                } catch (IOException | InterruptedException e) {
-                    showError("Error navigating to login: " + e.getMessage());
-                }
-            });
+            navigateToLoginAfterDelay();
         } catch (IllegalArgumentException e) {
             showError(e.getMessage());
         } catch (Exception e) {
-            showError("Registration failed: " + e.getMessage());
+            showError(MSG_REGISTRATION_FAILED + e.getMessage());
         }
+    }
+    
+    private void navigateToLoginAfterDelay() {
+        Platform.runLater(() -> {
+            try {
+                Thread.sleep(REDIRECT_DELAY_MS);
+                App.setRoot(LOGIN_VIEW);
+            } catch (IOException | InterruptedException e) {
+                showError(MSG_NAVIGATION_ERROR + e.getMessage());
+            }
+        });
     }
     
     @FXML
     private void handleBackToLogin() throws IOException {
-        App.setRoot("auth/LoginView");
+        App.setRoot(LOGIN_VIEW);
     }
     
     private void showError(String message) {
         if (errorLabel != null) {
-            errorLabel.setText(message);
+            UIUtils.setErrorStyle(errorLabel, message);
             errorLabel.setVisible(true);
         }
         if (successLabel != null) {
@@ -120,7 +130,7 @@ public class RegisterController {
     
     private void showSuccess(String message) {
         if (successLabel != null) {
-            successLabel.setText(message);
+            UIUtils.setSuccessStyle(successLabel, message);
             successLabel.setVisible(true);
         }
         if (errorLabel != null) {
@@ -129,12 +139,8 @@ public class RegisterController {
     }
     
     private void clearMessages() {
-        if (errorLabel != null) {
-            errorLabel.setVisible(false);
-        }
-        if (successLabel != null) {
-            successLabel.setVisible(false);
-        }
+        if (errorLabel != null) errorLabel.setVisible(false);
+        if (successLabel != null) successLabel.setVisible(false);
     }
     
     private void clearFields() {
@@ -148,30 +154,33 @@ public class RegisterController {
     
     @FXML
     private void togglePasswordVisibility() {
-        if (showPasswordCheckBox.isSelected()) {
-            passwordFieldVisible.setText(passwordField.getText());
-            passwordField.setVisible(false);
-            passwordFieldVisible.setVisible(true);
-        } else {
-            passwordField.setText(passwordFieldVisible.getText());
-            passwordField.setVisible(true);
-            passwordFieldVisible.setVisible(false);
-        }
+        toggleFieldVisibility(showPasswordCheckBox, passwordField, passwordFieldVisible);
     }
 
     @FXML
     private void toggleConfirmPasswordVisibility() {
-        if (showConfirmPasswordCheckBox.isSelected()) {
-            confirmPasswordFieldVisible.setText(confirmPasswordField.getText());
-            confirmPasswordField.setVisible(false);
-            confirmPasswordFieldVisible.setVisible(true);
+        toggleFieldVisibility(showConfirmPasswordCheckBox, confirmPasswordField, confirmPasswordFieldVisible);
+    }
+    
+    private void toggleFieldVisibility(CheckBox checkBox, PasswordField hidden, TextField visible) {
+        if (checkBox.isSelected()) {
+            visible.setText(hidden.getText());
+            setFieldVisibility(hidden, false, visible, true);
         } else {
-            confirmPasswordField.setText(confirmPasswordFieldVisible.getText());
-            confirmPasswordField.setVisible(true);
-            confirmPasswordFieldVisible.setVisible(false);
+            hidden.setText(visible.getText());
+            setFieldVisibility(hidden, true, visible, false);
         }
     }
+    
+    private void setFieldVisibility(PasswordField hidden, boolean showHidden, TextField visible, boolean showVisible) {
+        hidden.setVisible(showHidden);
+        visible.setVisible(showVisible);
+    }
+    
+    private String getPasswordValue(PasswordField hidden, TextField visible) {
+        return hidden.isVisible() ? hidden.getText() : visible.getText();
+    }
     private boolean isValidEmail(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+        return email.matches(EMAIL_REGEX);
     }
 }

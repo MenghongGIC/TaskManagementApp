@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+// ====================================================================
+// Project Detail View - Project Details with Tasks and Statistics
+// ====================================================================
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -10,6 +14,7 @@
             fx:controller="com.taskmanagement.controller.ProjectDetailController"
             style="-fx-background-color: #f8f9fa;">
 
+    // ============ Top Header Section ============
     <top>
         <VBox style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;" spacing="15">
             <HBox spacing="15" alignment="CENTER_LEFT">
@@ -40,10 +45,13 @@
     </top>
 
     <center>
+        // ============ Center Tabbed Content ============
         <TabPane style="-fx-font-size: 11px;" tabClosingPolicy="UNAVAILABLE">
+            // ---------- Tasks Tab ----------
             <!-- Tasks Tab -->
             <Tab text="Tasks" style="-fx-text-fill: #2c3e50;">
                 <BorderPane style="-fx-background-color: #f8f9fa;">
+                    // ---------- Top Search/Action Controls ----------
                     <top>
                         <HBox spacing="10" style="-fx-padding: 15; -fx-background-color: #ffffff; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
                             <TextField fx:id="taskSearchField" promptText="🔍 Search tasks..." HBox.hgrow="ALWAYS" style="-fx-padding: 8; -fx-border-radius: 5;"/>
@@ -52,6 +60,7 @@
                         </HBox>
                     </top>
                     
+                    // ---------- Center Task Table ----------
                     <center>
                         <TableView fx:id="tasksTable" style="-fx-font-size: 11px;">
                             <columns>
@@ -67,15 +76,18 @@
                 </BorderPane>
             </Tab>
             
+            // ---------- Project Info Tab ----------
             <!-- Project Info Tab -->
             <Tab text="ℹInfo" style="-fx-text-fill: #2c3e50;">
                 <BorderPane style="-fx-background-color: #f8f9fa;">
+                    // ---------- Project Statistics Section ----------
                     <center>
                         <VBox spacing="20" style="-fx-padding: 20;">
                             <!-- Project Stats -->
                             <VBox style="-fx-border-color: #ecf0f1; -fx-border-width: 1; -fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 8;" spacing="15">
                                 <Label text="Project Statistics" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                                 
+                                // ---------- Statistics Cards ----------
                                 <HBox spacing="20">
                                     <VBox spacing="5" style="-fx-padding: 10; -fx-background-color: #e8f5e9; -fx-background-radius: 5;">
                                         <Label text="Total Tasks" style="-fx-font-size: 11px; -fx-text-fill: #2e7d32; -fx-font-weight: bold;"/>
@@ -99,10 +111,12 @@
                                 </HBox>
                             </VBox>
                             
+                            // ---------- Additional Project Details Section ----------
                             <!-- Additional Project Details -->
                             <VBox style="-fx-border-color: #ecf0f1; -fx-border-width: 1; -fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 8;" spacing="15">
                                 <Label text="Project Details" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                                 
+                                // ---------- Details Grid ----------
                                 <GridPane hgap="15" vgap="10">
                                     <Label text="Project ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
                                     <Label fx:id="detailProjectId" text="N/A" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 11px;"/>

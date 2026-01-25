@@ -1,84 +1,100 @@
 package com.taskmanagement.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.taskmanagement.App;
+import com.taskmanagement.constants.AppConstants;
 import com.taskmanagement.model.Task;
 import com.taskmanagement.model.User;
 import com.taskmanagement.model.Project;
 import com.taskmanagement.repository.TaskRepository;
 import com.taskmanagement.service.ProjectService;
 import com.taskmanagement.utils.CurrentUser;
+import com.taskmanagement.utils.UIUtils;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.collections.*;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
+import javafx.scene.Node;
 import javafx.beans.property.SimpleStringProperty;
+@SuppressWarnings("unused")
 
 public class DashboardController {
 
+    private static final String CARD_STYLE = "-fx-background-color: white; -fx-border-radius: 5; -fx-padding: 12; -fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);";
+    private static final String CARD_DRAG_STYLE = "-fx-background-color: #e8f4f8; -fx-border-radius: 5; -fx-padding: 12; -fx-border-color: #3498db; -fx-border-width: 2; -fx-cursor: move; -fx-opacity: 0.8;";
+    private static final String KANBAN_CARD_STYLE = "-fx-background-color: white; -fx-border-radius: 5; -fx-padding: 10; -fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);";
+    private static final String COLUMN_HIGHLIGHT_STYLE = "-fx-border-color: #2ecc71; -fx-border-width: 3; -fx-border-radius: 5; -fx-background-color: #c8e6c9; -fx-padding: 5;";
+    private static final String COLUMN_NORMAL_STYLE = "-fx-padding: 5; -fx-fill-width: true;";
+    private static final String BTN_ACTIVE = "-fx-padding: 8 12; -fx-font-size: 11px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 4;";
+    private static final String BTN_INACTIVE = "-fx-padding: 8 12; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 4;";
+    private static final String LABEL_TITLE = "-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;";
+    private static final String LABEL_DESC = "-fx-font-size: 10px; -fx-text-fill: #7f8c8d;";
+    private static final String PROFILE_IMG_PATH = "/com/taskmanagement/img/profile-default.png";
+
+    // Input Controls
     @FXML private TextField taskNameField;
+    @FXML private TextField searchField;
     @FXML private ComboBox<String> priorityCombo;
-    @FXML private Label statusLabel;
-    @FXML private ComboBox projectComboBox;
+    @FXML private ComboBox<Project> projectComboBox;
     @FXML private ComboBox<String> statusComboBox;
     @FXML private ComboBox<String> priorityComboBox;
-    @FXML private Label taskCountLabel;
-    @FXML private TextField searchField;
-    @FXML private Button searchBtn;
-    @FXML private Button clearSearchBtn;
+
+    // View Toggle Buttons
     @FXML private Button tableViewBtn;
     @FXML private Button kanbanViewBtn;
     @FXML private Button listViewBtn;
+    @FXML private Button searchBtn;
+    @FXML private Button clearSearchBtn;
+
+    // Kanban View - Columns
     @FXML private VBox todoColumn;
     @FXML private VBox inProgressColumn;
     @FXML private VBox doneColumn;
-    
+
+    // Kanban View - Panels
     @FXML private VBox todoPanel;
     @FXML private VBox inProgressPanel;
     @FXML private VBox donePanel;
-    
+
+    // Kanban View - ScrollPanes
     @FXML private ScrollPane todoScrollPane;
     @FXML private ScrollPane inProgressScrollPane;
     @FXML private ScrollPane doneScrollPane;
-    
-    @FXML private ImageView profileImageView;
+
+    // Table View
+    @FXML private VBox tableView;
+    @FXML private TableView<Task> tasksTableView;
+
+    // List View
+    @FXML private VBox taskListContainer;
+
+    // View Stack
+    @FXML private StackPane viewStack;
+    @FXML private VBox kanbanView;
+
+    // Status & Info Labels
+    @FXML private Label statusLabel;
+    @FXML private Label taskCountLabel;
     @FXML private Label usernameLabel;
+
+    // Profile & User Controls
+    @FXML private ImageView profileImageView;
     @FXML private Button profileButton;
     @FXML private Button settingsButton;
     @FXML private Button logoutButton;
-    
-    @FXML private StackPane viewStack;
-    @FXML private VBox kanbanView;
-    @FXML private VBox tableView;
-    @FXML private TableView<Task> tasksTableView;
-    @FXML private VBox taskListContainer;
 
+    // State
     private Task draggedTask = null;
     private final List<Task> allTasks = new ArrayList<>();
     private boolean isTableViewActive = false;
@@ -86,85 +102,73 @@ public class DashboardController {
     @FXML
     public void initialize() {
         try {
-            // Initialize priority combo box if it exists
-            if (priorityCombo != null) {
-                priorityCombo.getItems().addAll("Low", "Medium", "High");
-                priorityCombo.setValue("Medium");
-            }
-            
-            // Initialize project combo box
-            if (projectComboBox != null) {
-                loadProjectsIntoCombo();
-                projectComboBox.setOnAction(event -> handleProjectSelection());
-            }
-            
-            // Initialize status combo box
-            if (statusComboBox != null) {
-                statusComboBox.getItems().addAll("All", "To Do", "In Progress", "Done");
-                statusComboBox.setValue("All");
-                statusComboBox.setOnAction(event -> filterTasks());
-            }
-            
-            // Initialize priority combo box for filtering
-            if (priorityComboBox != null) {
-                priorityComboBox.getItems().addAll("All", "Low", "Medium", "High");
-                priorityComboBox.setValue("All");
-                priorityComboBox.setOnAction(event -> filterTasks());
-            }
-            
-            // Setup search field listener
-            if (searchField != null) {
-                searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-                    filterTasks();
-                    // Show clear button when there's text, hide when empty
-                    if (clearSearchBtn != null) {
-                        clearSearchBtn.setVisible(!newValue.isEmpty());
-                    }
-                });
-            }
-            
-            // Setup profile sidebar
-            if (profileButton != null || settingsButton != null || logoutButton != null) {
-                setupProfileSidebar();
-            }
-            
-            // Load tasks from database
+            initializeComboBoxes();
+            initializeSearch();
             loadTasks();
-            
-            // Configure scroll pane behavior
-            if (todoScrollPane != null) configureScrollPane(todoScrollPane);
-            if (inProgressScrollPane != null) configureScrollPane(inProgressScrollPane);
-            if (doneScrollPane != null) configureScrollPane(doneScrollPane);
-            
-            // Setup drag handlers for panels
-            if (todoPanel != null && todoScrollPane != null) setupDragHandlers(todoPanel, todoScrollPane);
-            if (inProgressPanel != null && inProgressScrollPane != null) setupDragHandlers(inProgressPanel, inProgressScrollPane);
-            if (donePanel != null && doneScrollPane != null) setupDragHandlers(donePanel, doneScrollPane);
-            
-            // Setup table view with table as default
-            if (tasksTableView != null) {
-                setupTableColumns();
-                isTableViewActive = true; // Start with table view active
-            }
-            
-            // CRITICAL: Initialize StackPane view visibility
-            // Ensure table view is visible by default
-            if (viewStack != null) {
-                if (viewStack.getChildren().size() > 0) {
-                    // Show table view (index 0)
-                    viewStack.getChildren().get(0).setVisible(true);
-                }
-                if (viewStack.getChildren().size() > 1) {
-                    // Hide kanban view (index 1)
-                    viewStack.getChildren().get(1).setVisible(false);
-                }
-                if (viewStack.getChildren().size() > 2) {
-                    // Hide list view (index 2)
-                    viewStack.getChildren().get(2).setVisible(false);
-                }
-            }
+            configureScrollPanes();
+            setupDragDropColumns();
+            initializeTableView();
+            initializeViewStack();
         } catch (Exception e) {
-            System.err.println("Error initializing DashboardController: " + e.getMessage());
+            UIUtils.showError("Initialization Error", e.getMessage());
+        }
+    }
+
+    private void initializeComboBoxes() {
+        if (priorityCombo != null) {
+            priorityCombo.getItems().addAll(AppConstants.PRIORITY_LOW, AppConstants.PRIORITY_MEDIUM, AppConstants.PRIORITY_HIGH);
+            priorityCombo.setValue(AppConstants.PRIORITY_MEDIUM);
+        }
+        
+        if (projectComboBox != null) {
+            loadProjectsIntoCombo();
+            projectComboBox.setOnAction(event -> handleProjectSelection());
+        }
+        
+        if (statusComboBox != null) {
+            statusComboBox.getItems().addAll("All", AppConstants.STATUS_TODO, AppConstants.STATUS_IN_PROGRESS, AppConstants.STATUS_DONE);
+            statusComboBox.setValue("All");
+            statusComboBox.setOnAction(event -> filterTasks());
+        }
+        
+        if (priorityComboBox != null) {
+            priorityComboBox.getItems().addAll("All", AppConstants.PRIORITY_LOW, AppConstants.PRIORITY_MEDIUM, AppConstants.PRIORITY_HIGH);
+            priorityComboBox.setValue("All");
+            priorityComboBox.setOnAction(event -> filterTasks());
+        }
+    }
+
+    private void initializeSearch() {
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, old, newVal) -> {
+                filterTasks();
+                if (clearSearchBtn != null) clearSearchBtn.setVisible(!newVal.isEmpty());
+            });
+        }
+    }
+
+    private void configureScrollPanes() {
+        Arrays.asList(todoScrollPane, inProgressScrollPane, doneScrollPane).forEach(this::configureScrollPane);
+    }
+
+    private void setupDragDropColumns() {
+        setupColumnDropHandler(todoScrollPane, todoColumn, AppConstants.STATUS_TODO);
+        setupColumnDropHandler(inProgressScrollPane, inProgressColumn, AppConstants.STATUS_IN_PROGRESS);
+        setupColumnDropHandler(doneScrollPane, doneColumn, AppConstants.STATUS_DONE);
+    }
+
+    private void initializeTableView() {
+        if (tasksTableView != null) {
+            setupTableColumns();
+            isTableViewActive = true;
+        }
+    }
+
+    private void initializeViewStack() {
+        if (viewStack != null && viewStack.getChildren().size() > 1) {
+            for (int i = 0; i < viewStack.getChildren().size(); i++) {
+                viewStack.getChildren().get(i).setVisible(i == 0);
+            }
         }
     }
     
@@ -206,7 +210,6 @@ public class DashboardController {
         
         tasksTableView.getColumns().addAll(idCol, titleCol, statusCol, priorityCol, assigneeCol, dueCol);
         
-        // Add row double-click handler to open task detail
         tasksTableView.setRowFactory(tv -> {
             javafx.scene.control.TableRow<Task> row = new javafx.scene.control.TableRow<Task>() {
                 @Override
@@ -232,46 +235,7 @@ public class DashboardController {
         if (tasksTableView == null) {
             return;
         }
-        
-        // Check visibility of table and its parent
-        
-        String selectedProjectName = "All Projects";
-        Object selectedProjectObj = projectComboBox != null ? projectComboBox.getValue() : null;
-        if (selectedProjectObj instanceof Project) {
-            selectedProjectName = ((Project)selectedProjectObj).getName();
-        }
-        final String finalProjectName = selectedProjectName;
-        final String selectedStatus = statusComboBox != null ? statusComboBox.getValue() : "All";
-        final String selectedPriority = priorityComboBox != null ? priorityComboBox.getValue() : "All";
-        final String searchText = searchField != null ? searchField.getText().toLowerCase() : "";
-        
-        System.out.println("   Filtering by - Project: " + finalProjectName + ", Status: " + selectedStatus + ", Priority: " + selectedPriority);
-        
-        List<Task> filteredTasks = allTasks.stream()
-            .filter(task -> {
-                if (!"All Projects".equals(finalProjectName) && task.getProject() != null) {
-                    if (!task.getProject().getName().equals(finalProjectName)) {
-                        return false;
-                    }
-                }
-                
-                if (selectedStatus != null && !"All".equals(selectedStatus) && !selectedStatus.equals(task.getStatus())) {
-                    return false;
-                }
-                
-                if (selectedPriority != null && !"All".equals(selectedPriority) && !selectedPriority.equals(task.getPriority())) {
-                    return false;
-                }
-                
-                if (!searchText.isEmpty()) {
-                    String title = task.getTitle() != null ? task.getTitle().toLowerCase() : "";
-                    String description = task.getDescription() != null ? task.getDescription().toLowerCase() : "";
-                    return title.contains(searchText) || description.contains(searchText);
-                }
-                
-                return true;
-            })
-            .collect(Collectors.toList());
+        List<Task> filteredTasks = getFilteredTasks();
         
         ObservableList<Task> tableItems = FXCollections.observableArrayList(filteredTasks);
         tasksTableView.setItems(tableItems);
@@ -281,164 +245,6 @@ public class DashboardController {
         }
     }
     
-    private void setupProfileSidebar() {
-        try {
-            if (usernameLabel != null) {
-                String username = CurrentUser.getUsername();
-                if (username != null && !username.isEmpty()) {
-                    usernameLabel.setText(username);
-                }
-            }
-            
-            if (profileImageView != null) {
-                String imagePath = "/com/taskmanagement/img/profile-default.png";
-                try {
-                    Image image = new Image(getClass().getResourceAsStream(imagePath));
-                    profileImageView.setImage(image);
-                } catch (NullPointerException e) {
-                    System.out.println("Profile image resource not found at: " + imagePath);
-                    System.out.println("You can add images to: src/main/resources/com/taskmanagement/img/");
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error setting up profile image: " + e.getMessage());
-        }
-    }
-    public void setProfileImage(String imagePath) {
-        try {
-            Image image = new Image("file:" + imagePath);
-            profileImageView.setImage(image);
-        } catch (Exception e) {
-            System.err.println("Error loading image: " + e.getMessage());
-        }
-    }
-    public void setProfileImageFromResource(String resourcePath) {
-        try {
-            Image image = new Image(getClass().getResourceAsStream(resourcePath));
-            profileImageView.setImage(image);
-        } catch (Exception e) {
-            System.err.println("Error loading image from resource: " + e.getMessage());
-        }
-    }
-    
-    private void setupDragHandlers(VBox panel, ScrollPane scrollPane) {
-        panel.setOnDragOver(event -> {
-            if (draggedTask != null && event.getGestureSource() != panel) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-            event.consume();
-        });
-        
-        panel.setOnDragEntered(event -> {
-            if (draggedTask != null && event.getGestureSource() != panel) {
-                panel.setStyle("-fx-background-color: #d6eaf8; -fx-padding: 10; -fx-border-color: #3498db; -fx-border-width: 2;");
-            }
-        });
-        
-        panel.setOnDragExited(event -> {
-            panel.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        });
-        
-        panel.setOnDragDropped(event -> {
-            handleDropOnPanel(event, panel);
-        });
-        
-        // Setup handlers on the scroll pane to catch events from contained cards
-        scrollPane.setOnDragOver(event -> {
-            if (draggedTask != null && event.getGestureSource() != panel) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-            event.consume();
-        });
-        
-        scrollPane.setOnDragEntered(event -> {
-            if (draggedTask != null && event.getGestureSource() != panel) {
-                panel.setStyle("-fx-background-color: #d6eaf8; -fx-padding: 10; -fx-border-color: #3498db; -fx-border-width: 2;");
-            }
-        });
-        
-        scrollPane.setOnDragExited(event -> {
-            panel.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        });
-        
-        scrollPane.setOnDragDropped(event -> {
-            handleDropOnPanel(event, panel);
-        });
-    }
-    
-    private void handleDropOnPanel(DragEvent event, VBox targetPanel) {
-        boolean success = false;
-        
-        if (draggedTask != null && draggedTask.getId() != null) {
-            VBox panel = targetPanel;
-            
-            // Determine which panel was dropped on
-            if (panel == todoPanel) {
-                draggedTask.setStatus("To Do");
-            } else if (panel == inProgressPanel) {
-                draggedTask.setStatus("In Progress");
-            } else if (panel == donePanel) {
-                draggedTask.setStatus("Done");
-            }
-            
-            try {
-                // Update task in database
-                TaskRepository taskRepository = new TaskRepository();
-                taskRepository.update(draggedTask);
-                
-                // Remove task card from all panels
-                removeTaskCardFromAllPanels();
-                
-                // Create new card and add to target panel
-                HBox newCard = createTaskCard(draggedTask);
-                panel.getChildren().add(newCard);
-                
-                // Update table view if active
-                if (isTableViewActive) {
-                    updateTableView();
-                }
-                
-                success = true;
-                showStatus("✓ Task moved to " + draggedTask.getStatus(), false);
-            } catch (Exception e) {
-                showStatus("Error updating task: " + e.getMessage(), true);
-                e.printStackTrace();
-                success = false;
-            }
-        } else if (draggedTask != null && draggedTask.getId() == null) {
-            showStatus("Error: Cannot move task - task has no ID. Please refresh and try again.", true);
-        }
-        
-        // Reset styling
-        todoPanel.setStyle("-fx-background-color: transparent;");
-        inProgressPanel.setStyle("-fx-background-color: transparent;");
-        donePanel.setStyle("-fx-background-color: transparent;");
-        
-        event.setDropCompleted(success);
-        event.consume();
-    }
-    
-    private void removeTaskCardFromAllPanels() {
-        todoPanel.getChildren().removeIf(node -> {
-            if (node instanceof HBox) {
-                return ((HBox) node).getUserData() == draggedTask;
-            }
-            return false;
-        });
-        inProgressPanel.getChildren().removeIf(node -> {
-            if (node instanceof HBox) {
-                return ((HBox) node).getUserData() == draggedTask;
-            }
-            return false;
-        });
-        donePanel.getChildren().removeIf(node -> {
-            if (node instanceof HBox) {
-                return ((HBox) node).getUserData() == draggedTask;
-            }
-            return false;
-        });
-    }
-
     private void configureScrollPane(ScrollPane scrollPane) {
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(false);
@@ -446,137 +252,114 @@ public class DashboardController {
 
     private void loadTasks() {
         try {
-            // Only load into panels if they exist
-            if (todoPanel != null) todoPanel.getChildren().clear();
-            if (inProgressPanel != null) inProgressPanel.getChildren().clear();
-            if (donePanel != null) donePanel.getChildren().clear();
+            clearAllPanels();
             allTasks.clear();
 
-            String selectedProjectName = "All Projects";
-            Object selectedProjectObj = projectComboBox != null ? projectComboBox.getValue() : null;
-            if (selectedProjectObj instanceof Project) {
-                selectedProjectName = ((Project)selectedProjectObj).getName();
-            }
-            
-            // Load tasks from database
+            String selectedProjectName = getSelectedProjectName();
             TaskRepository taskRepository = new TaskRepository();
             List<Task> dbTasks = taskRepository.findAll();
             
-            // Filter tasks by selected project
-            List<Task> filteredTasks = new ArrayList<>();
             if (dbTasks != null && !dbTasks.isEmpty()) {
-                if ("All Projects".equals(selectedProjectName)) {
-                    // Load all tasks
-                    filteredTasks.addAll(dbTasks);
-                } else {
-                    // Load only tasks from selected project
-                    for (Task task : dbTasks) {
-                        if (task.getProject() != null && 
-                            task.getProject().getName().equals(selectedProjectName)) {
-                            filteredTasks.add(task);
-                        }
-                    }
-                }
+                List<Task> filtered = "All Projects".equals(selectedProjectName) ? dbTasks :
+                    dbTasks.stream()
+                        .filter(t -> t.getProject() != null && selectedProjectName.equals(t.getProject().getName()))
+                        .collect(Collectors.toList());
+                allTasks.addAll(filtered);
             }
             
-            if (!filteredTasks.isEmpty()) {
-                allTasks.addAll(filteredTasks);
-                System.out.println("✓ Loaded " + filteredTasks.size() + " tasks for project: " + selectedProjectName);
-                
-                // Add each task to the appropriate panel (if panels exist)
-                if (todoPanel != null || inProgressPanel != null || donePanel != null) {
-                    for (Task task : filteredTasks) {
-                        addTaskCard(task);
-                    }
-                }
-            } else {
-                System.out.println("ℹ No tasks found for project: " + selectedProjectName);
-            }
+            filterTasks();
+            updateTableViewDisplay();
         } catch (Exception e) {
-            System.err.println("Error loading tasks: " + e.getMessage());
-            e.printStackTrace();
-            showStatus("Error loading tasks: " + e.getMessage(), true);
+            showStatus(AppConstants.Messages.ERROR_LOADING_TASKS + e.getMessage(), true);
         }
     }
 
+    private void clearAllPanels() {
+        Arrays.asList(todoPanel, inProgressPanel, donePanel, todoColumn, inProgressColumn, doneColumn, taskListContainer)
+            .stream().filter(Objects::nonNull).forEach(pane -> pane.getChildren().clear());
+    }
+    private String getSelectedProjectName() {
+        Object obj = projectComboBox != null ? projectComboBox.getValue() : null;
+        if (obj instanceof Project) {
+            String name = ((Project) obj).getName();
+            if (name != null && !name.isEmpty()) return name;
+        }
+        return "All Projects";
+    }
     @FXML
     private void handleCreateTask() {
-        String taskName = taskNameField.getText().trim();
-        String priority = priorityCombo.getValue();
-
+        String taskName = taskNameField != null ? taskNameField.getText().trim() : "";
         if (taskName.isEmpty()) {
-            showStatus("Please enter a task name", true);
+            showStatus(AppConstants.Messages.PLEASE_FILL_REQUIRED, true);
             return;
         }
 
         try {
+            Object obj = projectComboBox != null ? projectComboBox.getValue() : null;
+            if (!(obj instanceof Project)) {
+                showStatus("Please select a project", true);
+                return;
+            }
+            
+            Project project = (Project) obj;
             Task newTask = new Task();
             newTask.setTitle(taskName);
-            newTask.setDescription("Priority: " + priority);
-            newTask.setStatus("To Do");
-            
-            // Set current user as creator
+            newTask.setProject(project);
+            newTask.setStatus(AppConstants.STATUS_TODO);
+            newTask.setPriority(priorityCombo != null ? (String) priorityCombo.getValue() : AppConstants.PRIORITY_MEDIUM);
             User currentUser = new User();
-            currentUser.setId(CurrentUser.getId());
+            currentUser.setUsername(CurrentUser.getUsername());
             newTask.setCreatedBy(currentUser);
             
-            // Save to database
             TaskRepository taskRepository = new TaskRepository();
             Task savedTask = taskRepository.save(newTask);
             
-            // Verify task was saved with ID
             if (savedTask == null || savedTask.getId() == null) {
                 showStatus("Error: Task was not saved properly (missing ID)", true);
                 return;
             }
             
             allTasks.add(savedTask);
-            addTaskCard(savedTask);
+            filterTasks();
             taskNameField.clear();
-            showStatus("Task created successfully", false);
+            showStatus(AppConstants.Messages.TASK_CREATED, false);
         } catch (Exception e) {
             showStatus("Error creating task: " + e.getMessage(), true);
-            e.printStackTrace();
         }
     }
 
     @FXML
     private void handleCreateProject() {
-        String projectName = taskNameField.getText().trim();
-
+        String projectName = taskNameField != null ? taskNameField.getText().trim() : "";
         if (projectName.isEmpty()) {
-            showStatus("Please enter a project name", true);
+            showStatus(AppConstants.Messages.PLEASE_FILL_REQUIRED, true);
             return;
         }
 
         try {
-            // Create project logic
-            Task projectTask = new Task();
-            projectTask.setTitle("📁 " + projectName);
-            projectTask.setDescription("Project");
-            projectTask.setStatus("To Do");
-
-            allTasks.add(projectTask);
-            addTaskCard(projectTask);
+            Project newProject = new Project();
+            newProject.setName(projectName);
+            newProject.setDescription("New Project");
+            
+            ProjectService projectService = new ProjectService();
+            projectService.createProject(projectName, "New Project", "#3498db");
+            loadProjectsIntoCombo();
             taskNameField.clear();
-            showStatus("Project created successfully", false);
+            showStatus(AppConstants.Messages.PROJECT_CREATED, false);
         } catch (Exception e) {
-            showStatus("Error creating project: " + e.getMessage(), true);
+            showStatus("Error: " + e.getMessage(), true);
         }
     }
-
-    private void addTaskCard(Task task) {
-        // Only add card if we have a panel to add it to
-        if (todoPanel == null && inProgressPanel == null && donePanel == null) {
-            return;
-        }
+    
+    private void _addTaskCard(Task task) {
+        if (todoPanel == null && inProgressPanel == null && donePanel == null) return;
         
         HBox taskCard = createTaskCard(task);
+        String status = task.getStatus() != null ? task.getStatus() : AppConstants.STATUS_TODO;
         
-        String status = task.getStatus() != null ? task.getStatus() : "To Do";
-        if ("In Progress".equalsIgnoreCase(status) && inProgressPanel != null) {
+        if (AppConstants.STATUS_IN_PROGRESS.equals(status) && inProgressPanel != null) {
             inProgressPanel.getChildren().add(taskCard);
-        } else if ("Done".equalsIgnoreCase(status) && donePanel != null) {
+        } else if (AppConstants.STATUS_DONE.equals(status) && donePanel != null) {
             donePanel.getChildren().add(taskCard);
         } else if (todoPanel != null) {
             todoPanel.getChildren().add(taskCard);
@@ -585,70 +368,40 @@ public class DashboardController {
 
     private HBox createTaskCard(Task task) {
         HBox card = new HBox(10);
-        card.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-padding: 12; " +
-                     "-fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-cursor: hand;");
+        card.setStyle(CARD_STYLE);
         card.setPrefHeight(100);
         card.setMinHeight(100);
-        card.setUserData(task);  // Store task reference for drag and drop identification
-        card.setStyle(card.getStyle() + " -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        card.setUserData(task);
 
-        // Card content
+        VBox content = createCardContent(task);
+        VBox actions = createCardActions(task);
+        card.getChildren().addAll(content, actions);
+        HBox.setHgrow(content, javafx.scene.layout.Priority.ALWAYS);
+        setupTaskCardDragDrop(card, task);
+        return card;
+    }
+
+    private VBox createCardContent(Task task) {
         VBox content = new VBox(5);
         Label titleLabel = new Label(task.getTitle());
         titleLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-        
         Label descLabel = new Label(task.getDescription() != null ? task.getDescription() : "");
-        descLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #7f8c8d;");
+        descLabel.setStyle(LABEL_DESC);
         descLabel.setWrapText(true);
-        
         content.getChildren().addAll(titleLabel, descLabel);
-        
-        // Action buttons
+        return content;
+    }
+
+    private VBox createCardActions(Task task) {
         VBox actions = new VBox(5);
         Button editBtn = new Button("✏️");
         editBtn.setStyle("-fx-padding: 5; -fx-font-size: 10;");
         editBtn.setOnAction(e -> handleEditTask(task));
-        
         Button deleteBtn = new Button("🗑️");
         deleteBtn.setStyle("-fx-padding: 5; -fx-font-size: 10;");
         deleteBtn.setOnAction(e -> handleDeleteTask(task));
-        
         actions.getChildren().addAll(editBtn, deleteBtn);
-
-        card.getChildren().addAll(content, actions);
-        HBox.setHgrow(content, javafx.scene.layout.Priority.ALWAYS);
-
-        // Drag detection - initiate drag and drop
-        card.setOnDragDetected(event -> {
-            draggedTask = task;  // Set the dragged task reference
-            
-            Dragboard dragboard = card.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent content2 = new ClipboardContent();
-            content2.putString(String.valueOf(task.getId() != null ? task.getId() : task.getTitle()));
-            dragboard.setContent(content2);
-            
-            try {
-                dragboard.setDragView(card.snapshot(null, null), 50, 50);
-            } catch (Exception e) {
-                System.err.println("Error creating drag view: " + e.getMessage());
-            }
-            
-            // Visual feedback
-            card.setStyle("-fx-background-color: #e8f4f8; -fx-border-radius: 5; -fx-padding: 12; " +
-                         "-fx-border-color: #3498db; -fx-border-width: 2; -fx-cursor: move; -fx-opacity: 0.8;");
-            event.consume();
-        });
-
-        // Drag done - reset styling
-        card.setOnDragDone(event -> {
-            card.setStyle("-fx-background-color: white; -fx-border-radius: 5; -fx-padding: 12; " +
-                         "-fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-cursor: hand; " +
-                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
-            draggedTask = null;
-            event.consume();
-        });
-
-        return card;
+        return actions;
     }
 
     @FXML
@@ -659,21 +412,18 @@ public class DashboardController {
     @FXML
     private void handleDeleteTask(Task task) {
         try {
-            TaskRepository taskRepository = new TaskRepository();
-            taskRepository.delete(task.getId());
-            
+            new TaskRepository().delete(task.getId());
             allTasks.remove(task);
             loadTasks();
-            showStatus("✓ Task deleted", false);
+            showStatus(AppConstants.Messages.TASK_DELETED, false);
         } catch (Exception e) {
-            showStatus("Error deleting task: " + e.getMessage(), true);
-            e.printStackTrace();
+            showStatus(AppConstants.Messages.ERROR_DELETING_TASK + e.getMessage(), true);
         }
     }
 
     @FXML
-    private void handleViewProfile() throws IOException {
-        App.setRoot("main/Profile");
+    private void handleProfile() {
+        showStatus("Profile panel coming soon", false);
     }
 
     @FXML
@@ -688,108 +438,45 @@ public class DashboardController {
     }
 
     @FXML
-    private void toggleTableView() {
-        isTableViewActive = !isTableViewActive;
-        if (isTableViewActive) {
-            viewStack.getChildren().clear();
-            viewStack.getChildren().add(tableView);
-            updateTableView();
-        } else {
-            viewStack.getChildren().clear();
-            viewStack.getChildren().add(kanbanView);
-        }
-    }
-
-    private void updateTableView() {
-        if (tasksTableView != null) {
-            tasksTableView.getItems().clear();
-            tasksTableView.getItems().addAll(allTasks);
-        }
-    }
-
-    private void showStatus(String message, boolean isError) {
-        if (statusLabel != null) {
-            statusLabel.setText(message);
-            statusLabel.setStyle(isError ? "-fx-text-fill: #e74c3c;" : "-fx-text-fill: #27ae60;");
-        } else {
-            System.out.println((isError ? "ERROR: " : "STATUS: ") + message);
-        }
-    }
-
-    @FXML
     private void showTableView() {
-        System.out.println("📊 Switching to Table View");
-        isTableViewActive = true;
-        
-        // Hide other views in the StackPane
-        if (viewStack != null && viewStack.getChildren().size() > 1) {
-            System.out.println("   StackPane has " + viewStack.getChildren().size() + " children");
-            viewStack.getChildren().get(0).setVisible(true);   // Table - SHOULD BE FIRST
-            System.out.println("   Child 0 (Table) visible: " + viewStack.getChildren().get(0).isVisible());
-            
-            viewStack.getChildren().get(1).setVisible(false);  // Kanban
-            System.out.println("   Child 1 (Kanban) visible: " + viewStack.getChildren().get(1).isVisible());
-            
-            if (viewStack.getChildren().size() > 2) {
-                viewStack.getChildren().get(2).setVisible(false);  // List
-                System.out.println("   Child 2 (List) visible: " + viewStack.getChildren().get(2).isVisible());
-            }
-        }
-        
+        switchView(0, tableViewBtn);
         updateTableViewDisplay();
-        updateButtonStyles(tableViewBtn);
-        System.out.println("✅ Table View displayed");
     }
 
     @FXML
     private void showKanbanView() {
-        System.out.println("📋 Switching to Kanban View");
-        isTableViewActive = false;
-        
-        // Hide other views in the StackPane
-        if (viewStack != null && viewStack.getChildren().size() > 1) {
-            viewStack.getChildren().get(0).setVisible(false);  // Table
-            viewStack.getChildren().get(1).setVisible(true);   // Kanban
-            if (viewStack.getChildren().size() > 2) {
-                viewStack.getChildren().get(2).setVisible(false);  // List
-            }
-        }
-        
+        switchView(1, kanbanViewBtn);
         filterTasks();
-        updateButtonStyles(kanbanViewBtn);
-        System.out.println("✅ Kanban View displayed");
     }
 
     @FXML
     private void showListView() {
-        System.out.println("📝 Switching to List View");
-        isTableViewActive = false;
-        
-        // Hide other views in the StackPane
-        if (viewStack != null && viewStack.getChildren().size() > 2) {
-            viewStack.getChildren().get(0).setVisible(false);  // Table
-            viewStack.getChildren().get(1).setVisible(false);  // Kanban
-            viewStack.getChildren().get(2).setVisible(true);   // List
-        }
-        
+        switchView(2, listViewBtn);
         filterTasks();
-        updateButtonStyles(listViewBtn);
-        System.out.println("✅ List View displayed");
+    }
+
+    private void switchView(int viewIndex, Button activeButton) {
+        isTableViewActive = (viewIndex == 0);
+        if (viewStack != null && viewStack.getChildren().size() > viewIndex) {
+            for (int i = 0; i < viewStack.getChildren().size(); i++) {
+                viewStack.getChildren().get(i).setVisible(i == viewIndex);
+            }
+        }
+        updateButtonStyles(activeButton);
     }
 
     @FXML
     private void showCreateTaskDialog() {
-        System.out.println("➕ Opening Create Task Dialog");
-        Object selectedProjectObj = projectComboBox != null ? projectComboBox.getValue() : null;
+        Object obj = projectComboBox != null ? projectComboBox.getValue() : null;
         
-        if (selectedProjectObj == null || !(selectedProjectObj instanceof Project)) {
-            showStatus("❌ Please select a project first", true);
+        if (!(obj instanceof Project)) {
+            showStatus("Please select a project first", true);
             return;
         }
         
-        Project selectedProject = (Project) selectedProjectObj;
-        if ("All Projects".equals(selectedProject.getName())) {
-            showStatus("❌ Please select a specific project", true);
+        Project project = (Project) obj;
+        if ("All Projects".equals(project.getName())) {
+            showStatus("Please select a specific project", true);
             return;
         }
         
@@ -797,704 +484,417 @@ public class DashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/taskmanagement/fxml/dialog/CreateTaskView.fxml"));
             BorderPane root = loader.load();
             
-            // Get the controller and set the project
             CreateTaskController controller = loader.getController();
-            controller.setCurrentProject(selectedProject);
+            controller.setCurrentProject(project);
             
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Create New Task");
-            dialogStage.setScene(new Scene(root, 650, 700));
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            
-            // Set the dialog stage in the controller
-            controller.setDialogStage(dialogStage);
-            
-            dialogStage.setOnHidden(event -> {
-                System.out.println("Task dialog closed, refreshing tasks...");
-                loadTasks();
-                filterTasks();
-            });
-            
-            dialogStage.showAndWait();
+            Stage stage = new Stage();
+            stage.setTitle("Create New Task");
+            stage.setScene(new Scene(root, 650, 700));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            controller.setDialogStage(stage);
+            stage.setOnHidden(event -> { loadTasks(); filterTasks(); });
+            stage.showAndWait();
         } catch (Exception e) {
-            System.err.println("Error opening create task dialog: " + e.getMessage());
             showStatus("Error opening task dialog: " + e.getMessage(), true);
         }
     }
 
     @FXML
     private void refreshTasks() {
-        System.out.println("🔄 Refreshing tasks");
         try {
             loadTasks();
             filterTasks();
-            showStatus("✅ Tasks refreshed", false);
+            showStatus("Tasks refreshed", false);
         } catch (Exception e) {
-            System.err.println("Error refreshing tasks: " + e.getMessage());
             showStatus("Error refreshing tasks", true);
         }
     }
     
     private void updateButtonStyles(Button activeButton) {
-        String activeStyle = "-fx-padding: 8 12; -fx-font-size: 11px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 4;";
-        String inactiveStyle = "-fx-padding: 8 12; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 4;";
-        
-        if (tableViewBtn != null) tableViewBtn.setStyle(tableViewBtn == activeButton ? activeStyle : inactiveStyle);
-        if (kanbanViewBtn != null) kanbanViewBtn.setStyle(kanbanViewBtn == activeButton ? activeStyle : inactiveStyle);
-        if (listViewBtn != null) listViewBtn.setStyle(listViewBtn == activeButton ? activeStyle : inactiveStyle);
+        if (tableViewBtn != null) tableViewBtn.setStyle(tableViewBtn == activeButton ? BTN_ACTIVE : BTN_INACTIVE);
+        if (kanbanViewBtn != null) kanbanViewBtn.setStyle(kanbanViewBtn == activeButton ? BTN_ACTIVE : BTN_INACTIVE);
+        if (listViewBtn != null) listViewBtn.setStyle(listViewBtn == activeButton ? BTN_ACTIVE : BTN_INACTIVE);
     }
 
-    /**
-     * Perform search when search button is clicked
-     */
     @FXML
     private void performSearch() {
         String searchText = searchField != null ? searchField.getText().trim() : "";
         if (!searchText.isEmpty()) {
-            System.out.println("Search: '" + searchText + "'");
             filterTasks();
-            // If table view is active, also update table display
             if (isTableViewActive) {
                 updateTableViewDisplay();
             }
-        } else {
-            System.out.println("Search field is empty");
         }
     }
 
-    /**
-     * Clear search field and display all tasks
-     */
     @FXML
     private void clearSearch() {
         if (searchField != null) {
             searchField.clear();
-            System.out.println("Search cleared - displaying all tasks");
             filterTasks();
-            // If table view is active, also update table display
             if (isTableViewActive) {
                 updateTableViewDisplay();
             }
         }
-        // Hide clear button
         if (clearSearchBtn != null) {
             clearSearchBtn.setVisible(false);
         }
     }
 
-    /**
-     * Load all projects into the project combo box
-     */
     private void loadProjectsIntoCombo() {
         try {
-            System.out.println("📁 Loading projects into combo box...");
+            if (projectComboBox == null) return;
             
-            if (projectComboBox == null) {
-                System.err.println("❌ projectComboBox is null!");
-                return;
-            }
+            List<Project> projects = new ProjectService().getAllProjects();
+            List<Project> items = new ArrayList<>();
             
-            ProjectService projectService = new ProjectService();
-            List<Project> projects = projectService.getAllProjects();
-            
-            System.out.println("📊 Projects loaded from service: " + (projects != null ? projects.size() : 0));
-            
-            // Store project objects and create a special "All Projects" object
-            ObservableList<Object> projectItems = FXCollections.observableArrayList();
-            Project allProjectsItem = new Project();
-            allProjectsItem.setName("All Projects");
-            projectItems.add(allProjectsItem);
+            Project allProjects = new Project();
+            allProjects.setName("All Projects");
+            items.add(allProjects);
             
             if (projects != null && !projects.isEmpty()) {
-                System.out.println("✓ Adding " + projects.size() + " projects to combo");
-                projects.forEach(p -> {
-                    projectItems.add(p);
-                    System.out.println("  - " + p.getName());
-                });
-            } else {
-                System.out.println("⚠️ No projects found in database");
+                items.addAll(projects);
             }
             
-            projectComboBox.setItems((ObservableList)projectItems);
-            projectComboBox.setConverter(new javafx.util.StringConverter<Object>() {
+            projectComboBox.setItems(FXCollections.observableArrayList(items));
+            projectComboBox.setConverter(new javafx.util.StringConverter<Project>() {
                 @Override
-                public String toString(Object obj) {
-                    if (obj instanceof Project) {
-                        return ((Project)obj).getName();
-                    }
-                    return "All Projects";
+                public String toString(Project obj) {
+                    return obj != null ? obj.getName() : "All Projects";
                 }
                 @Override
-                public Object fromString(String string) {
-                    return null;
-                }
+                public Project fromString(String s) { return null; }
             });
-            projectComboBox.setValue(allProjectsItem);
-            System.out.println("✅ Project combo box loaded successfully with " + projectItems.size() + " items");
+            projectComboBox.setValue(allProjects);
         } catch (Exception e) {
-            System.err.println("❌ Error loading projects: " + e.getMessage());
-            e.printStackTrace();
-            
-            // Fallback: Add at least the "All Projects" option
-            if (projectComboBox != null) {
-                ObservableList<Object> fallback = FXCollections.observableArrayList();
-                Project allProjects = new Project();
-                allProjects.setName("All Projects");
-                fallback.add(allProjects);
-                projectComboBox.setItems(fallback);
-                projectComboBox.setValue(allProjects);
-            }
+            setFallbackProjects();
         }
     }
 
-    /**
-     * Handle project selection from combo box
-     */
+    private void setFallbackProjects() {
+        if (projectComboBox == null) return;
+        Project all = new Project();
+        all.setName("All Projects");
+        projectComboBox.setItems(FXCollections.observableArrayList(all));
+        projectComboBox.setValue(all);
+    }
+
     private void handleProjectSelection() {
-        Object selectedProjectObj = projectComboBox != null ? projectComboBox.getValue() : null;
+        Object obj = projectComboBox != null ? projectComboBox.getValue() : null;
+        if (!(obj instanceof Project)) return;
         
-        if (selectedProjectObj == null || !(selectedProjectObj instanceof Project)) {
-            return;
-        }
+        Project project = (Project) obj;
+        if ("All Projects".equals(project.getName())) loadTasks();
         
-        Project selectedProject = (Project) selectedProjectObj;
-        String projectName = selectedProject.getName();
-        
-        System.out.println("📂 Project selected: " + projectName);
-        System.out.println("   isTableViewActive: " + isTableViewActive);
-        System.out.println("   allTasks.size(): " + allTasks.size());
-        
-        if ("All Projects".equals(projectName)) {
-            loadTasks();
-        }
-        
-        // Update whichever view is currently active
-        if (isTableViewActive) {
-            System.out.println("   Calling updateTableViewDisplay()");
-            updateTableViewDisplay();
-        } else {
-            System.out.println("   Calling filterTasks()");
-            filterTasks();
-        }
+        if (isTableViewActive) updateTableViewDisplay();
+        else filterTasks();
     }
 
-    /**
-     * Filter tasks based on search, status, and priority
-     */
     private void filterTasks() {
-        final String searchText = searchField != null ? searchField.getText().toLowerCase() : "";
-        final String selectedStatus = statusComboBox != null ? statusComboBox.getValue() : "All";
-        final String selectedPriority = priorityComboBox != null ? priorityComboBox.getValue() : "All";
+        clearAllPanels();
+        List<Task> filtered = getFilteredTasks();
         
-        String selectedProjectName = "All Projects";
-        Object selectedProjectObj = projectComboBox != null ? projectComboBox.getValue() : null;
-        if (selectedProjectObj instanceof Project) {
-            selectedProjectName = ((Project)selectedProjectObj).getName();
-        }
-        final String finalProjectName = selectedProjectName;
-        
-        // Debug logging
-        if (!searchText.isEmpty()) {
-            System.out.println("🔍 Searching for: '" + searchText + "'");
-        } else {
-            System.out.println("📋 Displaying all tasks (search cleared)");
+        for (Task task : filtered) {
+            addTaskToAppropriateView(task);
         }
         
-        // Clear all panels
-        if (todoPanel != null) todoPanel.getChildren().clear();
-        if (inProgressPanel != null) inProgressPanel.getChildren().clear();
-        if (donePanel != null) donePanel.getChildren().clear();
-        if (todoColumn != null) todoColumn.getChildren().clear();
-        if (inProgressColumn != null) inProgressColumn.getChildren().clear();
-        if (doneColumn != null) doneColumn.getChildren().clear();
-        if (taskListContainer != null) taskListContainer.getChildren().clear();
-        
-        // Filter tasks
-        List<Task> filteredTasks = allTasks.stream()
-            .filter(task -> {
-                // Filter by project
-                if (!"All Projects".equals(finalProjectName) && task.getProject() != null) {
-                    if (!task.getProject().getName().equals(finalProjectName)) {
-                        return false;
-                    }
-                }
-                
-                // Filter by status
-                if (!"All".equals(selectedStatus) && !selectedStatus.equals(task.getStatus())) {
-                    return false;
-                }
-                
-                // Filter by priority
-                if (!"All".equals(selectedPriority) && !selectedPriority.equals(task.getPriority())) {
-                    return false;
-                }
-                
-                // Filter by search text using dedicated search method
-                // If search is empty, show all tasks that pass other filters
-                if (!searchText.isEmpty()) {
-                    return matchesSearchCriteria(task, searchText);
-                }
-                
-                return true;
-            })
-            .sorted((t1, t2) -> Long.compare(t1.getId(), t2.getId())) // Sort by ID in ascending order
-            .collect(Collectors.toList());
-        
-        // Display filtered tasks
-        for (Task task : filteredTasks) {
-            // Add to kanban panels
-            if ("To Do".equals(task.getStatus())) {
-                if (todoPanel != null) {
-                    HBox card = createTaskCard(task);
-                    todoPanel.getChildren().add(card);
-                }
-                if (todoColumn != null) {
-                    VBox kanbanCard = createKanbanCard(task);
-                    todoColumn.getChildren().add(kanbanCard);
-                }
-            } else if ("In Progress".equals(task.getStatus())) {
-                if (inProgressPanel != null) {
-                    HBox card = createTaskCard(task);
-                    inProgressPanel.getChildren().add(card);
-                }
-                if (inProgressColumn != null) {
-                    VBox kanbanCard = createKanbanCard(task);
-                    inProgressColumn.getChildren().add(kanbanCard);
-                }
-            } else if ("Done".equals(task.getStatus())) {
-                if (donePanel != null) {
-                    HBox card = createTaskCard(task);
-                    donePanel.getChildren().add(card);
-                }
-                if (doneColumn != null) {
-                    VBox kanbanCard = createKanbanCard(task);
-                    doneColumn.getChildren().add(kanbanCard);
-                }
-            }
-            
-            // Add to list view
-            if (taskListContainer != null) {
-                VBox listItem = createListItem(task);
-                taskListContainer.getChildren().add(listItem);
-            }
-        }
-        
-        // Update task count
-        if (taskCountLabel != null) {
-            taskCountLabel.setText(filteredTasks.size() + " tasks");
-        }
-        
-        // Setup drop handlers for kanban columns (both ScrollPane and inner VBox)
-        if (todoScrollPane != null && todoColumn != null) {
-            setupColumnDropHandler(todoScrollPane, todoColumn, "To Do");
-        }
-        if (inProgressScrollPane != null && inProgressColumn != null) {
-            setupColumnDropHandler(inProgressScrollPane, inProgressColumn, "In Progress");
-        }
-        if (doneScrollPane != null && doneColumn != null) {
-            setupColumnDropHandler(doneScrollPane, doneColumn, "Done");
-        }
+        if (taskCountLabel != null) taskCountLabel.setText(filtered.size() + " tasks");
     }
-    
-    /**
-     * Search method to match tasks against search criteria
-     * Searches in: title, description, and task ID
-     */
-    private boolean matchesSearchCriteria(Task task, String searchText) {
-        if (searchText == null || searchText.isEmpty()) {
-            return true;
-        }
+
+    private void addTaskToAppropriateView(Task task) {
+        String status = task.getStatus();
         
-        // Search in task title
-        String title = task.getTitle() != null ? task.getTitle().toLowerCase() : "";
-        if (title.contains(searchText)) {
-            return true;
-        }
+        if (AppConstants.STATUS_TODO.equals(status)) addToTodoViews(task);
+        else if (AppConstants.STATUS_IN_PROGRESS.equals(status)) addToInProgressViews(task);
+        else if (AppConstants.STATUS_DONE.equals(status)) addToDoneViews(task);
         
-        // Search in task description
-        String description = task.getDescription() != null ? task.getDescription().toLowerCase() : "";
-        if (description.contains(searchText)) {
-            return true;
-        }
-        
-        // Search in task ID
-        String taskId = String.valueOf(task.getId());
-        if (taskId.contains(searchText)) {
-            return true;
-        }
-        
-        // Search in task status
-        String status = task.getStatus() != null ? task.getStatus().toLowerCase() : "";
-        if (status.contains(searchText)) {
-            return true;
-        }
-        
-        // Search in task priority
-        String priority = task.getPriority() != null ? task.getPriority().toLowerCase() : "";
-        if (priority.contains(searchText)) {
-            return true;
-        }
-        
-        return false;
+        if (taskListContainer != null) taskListContainer.getChildren().add(createListItem(task));
     }
-    
-    /**
-     * Advanced search method with multiple search options
-     */
-    public List<Task> searchTasks(String query, boolean searchTitle, boolean searchDescription, 
-                                  boolean searchId, boolean searchStatus, boolean searchPriority) {
-        if (query == null || query.isEmpty()) {
-            return allTasks;
-        }
-        
-        final String searchText = query.toLowerCase();
+
+    private void addToTodoViews(Task task) {
+        if (todoPanel != null) todoPanel.getChildren().add(createTaskCard(task));
+        if (todoColumn != null) todoColumn.getChildren().add(createKanbanCard(task));
+    }
+
+    private void addToInProgressViews(Task task) {
+        if (inProgressPanel != null) inProgressPanel.getChildren().add(createTaskCard(task));
+        if (inProgressColumn != null) inProgressColumn.getChildren().add(createKanbanCard(task));
+    }
+
+    private void addToDoneViews(Task task) {
+        if (donePanel != null) donePanel.getChildren().add(createTaskCard(task));
+        if (doneColumn != null) doneColumn.getChildren().add(createKanbanCard(task));
+    }
+
+    private List<Task> getFilteredTasks() {
+        String projectName = getSelectedProjectName();
+        String status = statusComboBox != null ? statusComboBox.getValue() : "All";
+        String priority = priorityComboBox != null ? priorityComboBox.getValue() : "All";
+        String search = (searchField != null ? searchField.getText().trim() : "").toLowerCase();
+
         return allTasks.stream()
-            .filter(task -> {
-                if (searchTitle) {
-                    String title = task.getTitle() != null ? task.getTitle().toLowerCase() : "";
-                    if (title.contains(searchText)) return true;
-                }
-                
-                if (searchDescription) {
-                    String description = task.getDescription() != null ? task.getDescription().toLowerCase() : "";
-                    if (description.contains(searchText)) return true;
-                }
-                
-                if (searchId) {
-                    String taskId = String.valueOf(task.getId());
-                    if (taskId.contains(searchText)) return true;
-                }
-                
-                if (searchStatus) {
-                    String status = task.getStatus() != null ? task.getStatus().toLowerCase() : "";
-                    if (status.contains(searchText)) return true;
-                }
-                
-                if (searchPriority) {
-                    String priority = task.getPriority() != null ? task.getPriority().toLowerCase() : "";
-                    if (priority.contains(searchText)) return true;
-                }
-                
-                return false;
-            })
+            .filter(task -> matchesProjectFilter(task, projectName))
+            .filter(task -> matchesStatusFilter(task, status))
+            .filter(task -> matchesPriorityFilter(task, priority))
+            .filter(task -> search.isEmpty() || matchesSearchCriteria(task, search))
+            .sorted(Comparator.comparingLong(task -> task.getId() != null ? task.getId() : 0L))
+            .collect(Collectors.toList());
+    }
+
+    private boolean matchesProjectFilter(Task task, String projectName) {
+        if ("All Projects".equals(projectName)) return true;
+        return task.getProject() != null && projectName.equals(task.getProject().getName());
+    }
+
+    private boolean matchesStatusFilter(Task task, String status) {
+        if (status == null || "All".equals(status)) return true;
+        return status.equals(task.getStatus());
+    }
+
+    private boolean matchesPriorityFilter(Task task, String priority) {
+        if (priority == null || "All".equals(priority)) return true;
+        return priority.equals(task.getPriority());
+    }
+
+    private boolean matchesSearchCriteria(Task task, String search) {
+        if (search == null || search.isEmpty()) return true;
+        return containsIgnoreCase(task.getTitle(), search)
+            || containsIgnoreCase(task.getDescription(), search)
+            || String.valueOf(task.getId()).contains(search)
+            || containsIgnoreCase(task.getStatus(), search)
+            || containsIgnoreCase(task.getPriority(), search);
+    }
+
+    public List<Task> searchTasks(String query) {
+        if (query == null || query.isEmpty()) return allTasks;
+        
+        String search = query.toLowerCase();
+        return allTasks.stream()
+            .filter(task -> matchesSearchCriteria(task, search))
             .sorted((t1, t2) -> Long.compare(t1.getId(), t2.getId()))
             .collect(Collectors.toList());
     }
     
-    /**
-     * Simple search method - searches all fields
-     */
-    public List<Task> searchTasks(String query) {
-        return searchTasks(query, true, true, true, true, true);
+    private boolean containsIgnoreCase(String text, String search) {
+        return text != null && text.toLowerCase().contains(search);
     }
-    
-    /**
-     * Setup drag and drop handlers for kanban columns
-     */
+
     private void setupColumnDropHandler(ScrollPane scrollPane, VBox column, String status) {
-        // Create a handler function for setting up drag handlers
-        Runnable setupHandlers = () -> {
-            // Handle drag over on the ScrollPane
-            scrollPane.setOnDragOver(event -> {
-                if (event.getGestureSource() != column && event.getDragboard().hasString()) {
-                    event.acceptTransferModes(TransferMode.MOVE);
-                    // Highlight column
-                    highlightColumn(column, status, true);
-                }
-            });
-            
-            scrollPane.setOnDragExited(event -> {
-                highlightColumn(column, status, false);
-            });
-            
-            scrollPane.setOnDragDropped(event -> {
-                Dragboard db = event.getDragboard();
-                boolean success = false;
-                if (db.hasString()) {
-                    try {
-                        Long taskId = Long.parseLong(db.getString());
-                        if (draggedTask != null) {
-                            String oldStatus = draggedTask.getStatus();
-                            
-                            // Only update if status actually changed
-                            if (!oldStatus.equals(status)) {
-                                // Update task status in database
-                                draggedTask.setStatus(status);
-                                TaskRepository taskRepository = new TaskRepository();
-                                taskRepository.update(draggedTask);
-                                
-                                System.out.println("✅ Task #" + taskId + " (" + draggedTask.getTitle() + ") moved from '" + oldStatus + "' to '" + status + "'");
-                                
-                                // Refresh the view to show task in new column
-                                filterTasks();
-                                success = true;
-                            } else {
-                                System.out.println("ℹ️  Task #" + taskId + " dropped in same column, no change needed");
-                                success = true;
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.err.println("❌ Error moving task: " + e.getMessage());
-                        e.printStackTrace();
-                    }
-                }
-                
-                // Reset column style
-                highlightColumn(column, status, false);
-                event.setDropCompleted(success);
-            });
-            
-            // Also add handlers to the inner VBox for drop zones between cards
-            column.setOnDragOver(event -> {
-                if (event.getGestureSource() != column && event.getDragboard().hasString()) {
-                    event.acceptTransferModes(TransferMode.MOVE);
-                    highlightColumn(column, status, true);
-                }
-            });
-            
-            column.setOnDragExited(event -> {
-                highlightColumn(column, status, false);
-            });
-            
-            column.setOnDragDropped(event -> {
-                Dragboard db = event.getDragboard();
-                boolean success = false;
-                if (db.hasString()) {
-                    try {
-                        Long taskId = Long.parseLong(db.getString());
-                        if (draggedTask != null) {
-                            String oldStatus = draggedTask.getStatus();
-                            
-                            // Only update if status actually changed
-                            if (!oldStatus.equals(status)) {
-                                // Update task status in database
-                                draggedTask.setStatus(status);
-                                TaskRepository taskRepository = new TaskRepository();
-                                taskRepository.update(draggedTask);
-                                
-                                System.out.println("✅ Task #" + taskId + " (" + draggedTask.getTitle() + ") moved from '" + oldStatus + "' to '" + status + "'");
-                                
-                                // Refresh the view to show task in new column
-                                filterTasks();
-                                success = true;
-                            } else {
-                                System.out.println("ℹ️  Task #" + taskId + " dropped in same column, no change needed");
-                                success = true;
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.err.println("❌ Error moving task: " + e.getMessage());
-                        e.printStackTrace();
-                    }
-                }
-                
-                // Reset column style
-                highlightColumn(column, status, false);
-                event.setDropCompleted(success);
-            });
-        };
-        
-        setupHandlers.run();
+        if (scrollPane == null || column == null) return;
+
+        configureDropTarget(scrollPane, column, status);
     }
-    
-    /**
-     * Helper method to highlight/unhighlight a column
-     */
-    private void highlightColumn(VBox column, String status, boolean highlight) {
-        if (highlight) {
-            // Highlight on drag over
-            column.setStyle("-fx-border-color: #2ecc71; -fx-border-width: 3; -fx-border-radius: 5; -fx-background-color: #c8e6c9; -fx-padding: 5; -fx-opacity: 1.0;");
-        } else {
-            // Reset to original color based on status
-            if ("To Do".equals(status)) {
-                column.setStyle("-fx-padding: 5; -fx-fill-width: true;");
-            } else if ("In Progress".equals(status)) {
-                column.setStyle("-fx-padding: 5; -fx-fill-width: true;");
-            } else if ("Done".equals(status)) {
-                column.setStyle("-fx-padding: 5; -fx-fill-width: true;");
+
+    private void configureDropTarget(Node target, VBox column, String status) {
+        target.setOnDragOver(event -> {
+            if (event.getGestureSource() != target && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+                if (column != null) highlightColumn(column, true);
             }
+            event.consume();
+        });
+
+        target.setOnDragEntered(event -> {
+            if (column != null) highlightColumn(column, true);
+        });
+
+        target.setOnDragExited(event -> {
+            if (column != null) highlightColumn(column, false);
+        });
+
+        target.setOnDragDropped(event -> {
+            boolean success = event.getDragboard().hasString() && handleKanbanDrop(column, status);
+            if (column != null) highlightColumn(column, false);
+            event.setDropCompleted(success);
+            event.consume();
+        });
+    }
+
+    private boolean handleKanbanDrop(VBox column, String status) {
+        if (draggedTask == null) {
+            return false;
+        }
+        return updateTaskStatus(draggedTask, status);
+    }
+
+    private boolean updateTaskStatus(Task task, String newStatus) {
+        if (task == null || newStatus == null) {
+            return false;
+        }
+
+        if (newStatus.equals(task.getStatus())) {
+            return true;
+        }
+
+        task.setStatus(newStatus);
+        try {
+            new TaskRepository().update(task);
+            refreshViewsAfterTaskUpdate();
+            showStatus("Task moved to " + newStatus, false);
+            return true;
+        } catch (Exception e) {
+            showStatus(AppConstants.Messages.ERROR_UPDATING_TASK + e.getMessage(), true);
+            return false;
         }
     }
 
-    /**
-     * Create a kanban-style card for tasks
-     */
+    private void refreshViewsAfterTaskUpdate() {
+        filterTasks();
+        updateTableViewDisplay();
+    }
+
+    private void highlightColumn(VBox column, boolean highlight) {
+        column.setStyle(highlight ? COLUMN_HIGHLIGHT_STYLE : COLUMN_NORMAL_STYLE);
+    }
+
     private VBox createKanbanCard(Task task) {
-        VBox card = new VBox(8);
-        card.setStyle("-fx-border-color: #3498db; -fx-border-width: 2; -fx-border-radius: 6; "
-                    + "-fx-padding: 12; -fx-background-color: #ffffff; -fx-min-width: 220; "
-                    + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);");
-        card.setUserData(task); // Store task data for drag and drop
-        
-        // Title
-        Label titleLabel = new Label(task.getTitle() != null ? task.getTitle() : "No Title");
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50; "
-                          + "-fx-wrap-text: true;");
+        VBox card = new VBox(5);
+        card.setStyle(KANBAN_CARD_STYLE);
+        card.setPrefWidth(200);
+        card.setMinHeight(80);
+        card.setUserData(task);
+
+        Label titleLabel = new Label(task.getTitle());
+        titleLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         titleLabel.setWrapText(true);
         
-        // Description
         Label descriptionLabel = new Label(task.getDescription() != null ? task.getDescription() : "");
-        descriptionLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #7f8c8d; -fx-wrap-text: true;");
+        descriptionLabel.setStyle(LABEL_DESC);
         descriptionLabel.setWrapText(true);
         if (task.getDescription() == null || task.getDescription().isEmpty()) {
             descriptionLabel.setVisible(false);
         }
         
-        // Priority badge
-        String priorityColor = getPriorityColor(task.getPriority());
-        Label priorityLabel = new Label(task.getPriority() != null ? task.getPriority() : "Low");
-        priorityLabel.setStyle("-fx-background-color: " + priorityColor + "; -fx-text-fill: white; "
-                             + "-fx-padding: 3 8; -fx-border-radius: 3; -fx-font-size: 9px; "
-                             + "-fx-font-weight: bold;");
-        
+        Label priorityLabel = createPriorityBadge(task);
         card.getChildren().addAll(titleLabel, descriptionLabel, priorityLabel);
-        
-        // Add double-click handler to open task detail
         card.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 openTaskDetail(task);
             }
         });
-        
-        // Change cursor to hand on hover
-        card.setStyle(card.getStyle() + "; -fx-cursor: hand;");
-        
-        // Add drag and drop support
         setupTaskCardDragDrop(card, task);
-        
         return card;
     }
-    
-    /**
-     * Setup drag and drop for task cards
-     */
-    private void setupTaskCardDragDrop(VBox card, Task task) {
-        // Make card draggable
-        card.setOnDragDetected(event -> {
-            Dragboard db = card.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent content = new ClipboardContent();
-            content.putString(String.valueOf(task.getId()));
-            db.setContent(content);
-            draggedTask = task;
-            
-            // Visual feedback - make card semi-transparent while dragging
-            card.setStyle("-fx-border-color: #3498db; -fx-border-width: 2; -fx-border-radius: 6; "
-                        + "-fx-padding: 12; -fx-background-color: #ffffff; -fx-opacity: 0.6; "
-                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 4);");
-            
-            System.out.println("🎯 Started dragging Task #" + task.getId() + ": " + task.getTitle());
-        });
-        
-        // Style on drag entered (when hovering over another card)
-        card.setOnDragEntered(event -> {
-            if (event.getGestureSource() != card && event.getDragboard().hasString()) {
-                card.setStyle("-fx-border-color: #2ecc71; -fx-border-width: 3; -fx-border-radius: 6; "
-                            + "-fx-padding: 12; -fx-background-color: #f0fdf4; "
-                            + "-fx-effect: dropshadow(gaussian, rgba(46,204,113,0.3), 8, 0, 0, 4);");
-            }
-        });
-        
-        // Reset style when drag exits the card
-        card.setOnDragExited(event -> {
-            String priorityColor = getPriorityColor(task.getPriority());
-            card.setStyle("-fx-border-color: #3498db; -fx-border-width: 2; -fx-border-radius: 6; "
-                        + "-fx-padding: 12; -fx-background-color: #ffffff; -fx-opacity: 1.0; "
-                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);");
-        });
-        
-        // Complete drag - reset style
-        card.setOnDragDone(event -> {
-            String priorityColor = getPriorityColor(task.getPriority());
-            card.setStyle("-fx-border-color: #3498db; -fx-border-width: 2; -fx-border-radius: 6; "
-                        + "-fx-padding: 12; -fx-background-color: #ffffff; -fx-opacity: 1.0; "
-                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);");
-        });
+
+    private Label createPriorityBadge(Task task) {
+        String priorityColor = UIUtils.getPriorityColor(task.getPriority());
+        Label priorityLabel = new Label(task.getPriority() != null ? task.getPriority() : AppConstants.PRIORITY_LOW);
+        priorityLabel.setStyle("-fx-background-color: " + priorityColor + "; -fx-text-fill: white; "
+                             + "-fx-padding: 3 8; -fx-border-radius: 3; -fx-font-size: 9px; "
+                             + "-fx-font-weight: bold;");
+        return priorityLabel;
     }
 
-    /**
-     * Get color for priority level
-     */
-    private String getPriorityColor(String priority) {
-        if (priority == null) return "#95a5a6";
-        switch (priority) {
-            case "High": return "#e74c3c";
-            case "Medium": return "#f39c12";
-            case "Low": return "#27ae60";
-            default: return "#95a5a6";
+    private void setupTaskCardDragDrop(Node card, Task task) {
+        card.setOnDragDetected(event -> handleTaskDragDetected(card, task, event));
+        card.setOnDragEntered(event -> handleTaskDragEntered(card, event));
+        card.setOnDragExited(event -> handleTaskDragExited(card, event));
+        card.setOnDragDone(event -> handleTaskDragDone(event));
+    }
+
+    private void handleTaskDragDetected(Node card, Task task, MouseEvent event) {
+        draggedTask = task;
+        Dragboard dragboard = card.startDragAndDrop(TransferMode.MOVE);
+        ClipboardContent content = new ClipboardContent();
+        content.putString(String.valueOf(task.getId() != null ? task.getId() : task.getTitle()));
+        dragboard.setContent(content);
+        try {
+            if (card instanceof VBox) {
+                dragboard.setDragView(card.snapshot(null, null), 50, 50);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (card instanceof VBox) {
+            card.setStyle(((VBox) card).getStyle() + "; -fx-border-color: #3498db; -fx-border-width: 2; -fx-opacity: 0.8;");
+        }
+        event.consume();
+    }
+
+    private void handleTaskDragEntered(Node card, DragEvent event) {
+        if (event.getGestureSource() != card && event.getDragboard().hasString()) {
+            if (card instanceof VBox) {
+                card.setStyle(((VBox) card).getStyle() + "; -fx-border-color: #2ecc71; -fx-border-width: 2;");
+            }
         }
     }
 
-    /**
-     * Create a list view item for tasks
-     */
+    private void handleTaskDragExited(Node card, DragEvent event) {
+        if (card instanceof VBox) {
+            card.setStyle(KANBAN_CARD_STYLE);
+        }
+    }
+
+    private void handleTaskDragDone(DragEvent event) {
+        draggedTask = null;
+        event.consume();
+    }
+
     private VBox createListItem(Task task) {
         VBox item = new VBox(5);
-        item.setStyle("-fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-padding: 12; "
-                    + "-fx-background-color: #ffffff;");
+        item.setStyle("-fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-padding: 12; -fx-background-color: #ffffff;");
         
-        // Title and status row
-        HBox headerRow = new HBox(10);
-        headerRow.setStyle("-fx-alignment: CENTER_LEFT;");
-        
-        Label titleLabel = new Label(task.getTitle() != null ? task.getTitle() : "No Title");
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;");
-        
-        Label statusLabel = new Label(task.getStatus() != null ? task.getStatus() : "To Do");
-        String statusColor = getStatusColor(task.getStatus());
-        statusLabel.setStyle("-fx-background-color: " + statusColor + "; -fx-text-fill: white; "
-                           + "-fx-padding: 2 8; -fx-border-radius: 2; -fx-font-size: 10px;");
-        
-        Label priorityLabel = new Label(task.getPriority() != null ? task.getPriority() : "Low");
-        String priorityColor = getPriorityColor(task.getPriority());
-        priorityLabel.setStyle("-fx-background-color: " + priorityColor + "; -fx-text-fill: white; "
-                             + "-fx-padding: 2 8; -fx-border-radius: 2; -fx-font-size: 10px;");
-        
-        headerRow.getChildren().addAll(titleLabel, statusLabel, priorityLabel);
-        
-        // Description
-        Label descLabel = new Label(task.getDescription() != null ? task.getDescription() : "");
-        descLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #7f8c8d;");
-        descLabel.setWrapText(true);
-        
-        // Assignee and due date row
-        HBox footerRow = new HBox(20);
-        footerRow.setStyle("-fx-alignment: CENTER_LEFT;");
-        
-        String assignee = task.getAssignee() != null ? task.getAssignee().getUsername() : "Unassigned";
-        Label assigneeLabel = new Label("👤 " + assignee);
-        assigneeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #7f8c8d;");
-        
-        String dueDate = task.getDueDate() != null ? task.getDueDate().toString() : "No due date";
-        Label dueLabel = new Label("📅 " + dueDate);
-        dueLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #7f8c8d;");
-        
-        footerRow.getChildren().addAll(assigneeLabel, dueLabel);
+        HBox headerRow = createListItemHeader(task);
+        Label descLabel = createListItemDescription(task);
+        HBox footerRow = createListItemFooter(task);
         
         item.getChildren().addAll(headerRow, descLabel, footerRow);
-        
-        // Add double-click handler to open task detail
         item.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 openTaskDetail(task);
             }
         });
-        
-        // Change cursor to hand on hover
         item.setStyle(item.getStyle() + "; -fx-cursor: hand;");
-        
         return item;
     }
 
-    /**
-     * Open task detail dialog for viewing/editing/deleting a task
-     */
+    private HBox createListItemHeader(Task task) {
+        HBox headerRow = new HBox(10);
+        headerRow.setStyle("-fx-alignment: CENTER_LEFT;");
+        
+        Label titleLabel = new Label(task.getTitle() != null ? task.getTitle() : "No Title");
+        titleLabel.setStyle(LABEL_TITLE);
+        
+        Label statusLabel = new Label(task.getStatus() != null ? task.getStatus() : AppConstants.STATUS_TODO);
+        statusLabel.setStyle("-fx-background-color: " + UIUtils.getStatusColor(task.getStatus()) + "; -fx-text-fill: white; -fx-padding: 2 8; -fx-border-radius: 2; -fx-font-size: 10px;");
+        
+        Label priorityLabel = new Label(task.getPriority() != null ? task.getPriority() : AppConstants.PRIORITY_LOW);
+        priorityLabel.setStyle("-fx-background-color: " + UIUtils.getPriorityColor(task.getPriority()) + "; -fx-text-fill: white; -fx-padding: 2 8; -fx-border-radius: 2; -fx-font-size: 10px;");
+        
+        headerRow.getChildren().addAll(titleLabel, statusLabel, priorityLabel);
+        HBox.setHgrow(titleLabel, javafx.scene.layout.Priority.ALWAYS);
+        return headerRow;
+    }
+
+    private Label createListItemDescription(Task task) {
+        Label descLabel = new Label(task.getDescription() != null ? task.getDescription() : "");
+        descLabel.setStyle(LABEL_DESC);
+        descLabel.setWrapText(true);
+        return descLabel;
+    }
+
+    private HBox createListItemFooter(Task task) {
+        HBox footerRow = new HBox(20);
+        footerRow.setStyle("-fx-alignment: CENTER_LEFT;");
+        
+        String assignee = task.getAssignee() != null ? task.getAssignee().getUsername() : "Unassigned";
+        Label assigneeLabel = new Label("👤" + assignee);
+        assigneeLabel.setStyle(LABEL_DESC);
+        
+        String dueDate = task.getDueDate() != null ? task.getDueDate().toString() : "No due date";
+        Label dueLabel = new Label("📅" + dueDate);
+        dueLabel.setStyle(LABEL_DESC);
+        
+        footerRow.getChildren().addAll(assigneeLabel, dueLabel);
+        return footerRow;
+    }
+
     private void openTaskDetail(Task task) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/taskmanagement/fxml/main/TaskDetailView.fxml"));
             BorderPane root = loader.load();
             
             TaskDetailController controller = loader.getController();
-            
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Task Details - " + task.getTitle());
             dialogStage.setScene(new Scene(root, 700, 600));
@@ -1503,29 +903,20 @@ public class DashboardController {
             controller.setTask(task, dialogStage);
             
             dialogStage.setOnHidden(event -> {
-                System.out.println("Task detail closed, refreshing tasks...");
                 loadTasks();
                 filterTasks();
             });
             
             dialogStage.showAndWait();
         } catch (IOException e) {
-            System.err.println("❌ Error opening task detail dialog: " + e.getMessage());
-            e.printStackTrace();
+            showStatus("Error opening task details", true);
         }
     }
 
-    /**
-     * Get color for status level
-     */
-    private String getStatusColor(String status) {
-        if (status == null) return "#95a5a6";
-        switch (status) {
-            case "To Do": return "#3498db";
-            case "In Progress": return "#f39c12";
-            case "Done": return "#27ae60";
-            default: return "#95a5a6";
+    private void showStatus(String message, boolean isError) {
+        if (statusLabel != null) {
+            if (isError) UIUtils.setErrorStyle(statusLabel, message);
+            else UIUtils.setSuccessStyle(statusLabel, message);
         }
     }
 }
-

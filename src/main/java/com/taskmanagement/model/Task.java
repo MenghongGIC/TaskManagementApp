@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import com.taskmanagement.utils.CurrentUser;
 import com.taskmanagement.utils.DateUtils;
+import com.taskmanagement.utils.PermissionChecker;
 
 public class Task {
     private Long id;
@@ -30,8 +30,7 @@ public class Task {
         this.project = project;
         this.createdBy = createdBy;
     }
-
-    // Getters & Setters (abbreviated for space — full in previous message)
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -73,17 +72,11 @@ public class Task {
     public boolean isUnassigned() { return assignee == null; }
 
     public boolean canEdit() {
-        if (!CurrentUser.isLoggedIn()) return false;
-        if (CurrentUser.isAdmin()) return true;
-        if (createdBy != null && createdBy.getId().equals(CurrentUser.getId())) return true;
-        if (assignee != null && assignee.getId().equals(CurrentUser.getId())) return true;
-        return project != null && project.canEdit();
+        return PermissionChecker.canEditTask(this);
     }
+    
     public boolean canDelete() {
-        if (!CurrentUser.isLoggedIn()) return false;
-        if (CurrentUser.isAdmin()) return true;
-        if (createdBy != null && createdBy.getId().equals(CurrentUser.getId())) return true;
-        return project != null && project.canDelete();
+        return PermissionChecker.canDeleteTask(this);
     }
 
     @Override

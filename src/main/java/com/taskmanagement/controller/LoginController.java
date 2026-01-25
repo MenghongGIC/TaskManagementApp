@@ -5,7 +5,9 @@ import java.io.IOException;
 import com.taskmanagement.App;
 import com.taskmanagement.model.User;
 import com.taskmanagement.service.UserService;
+import com.taskmanagement.utils.UIUtils;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -15,6 +17,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 public class LoginController {
+    private static final String ERROR_EMPTY_FIELDS = "Please enter both username and password";
+    private static final String ERROR_INVALID_CREDENTIALS = "Invalid username or password";
+    private static final String ERROR_LOGIN_FAILED = "Login failed: ";
+    private static final String ERROR_NAVIGATION = "Navigation error: ";
+    private static final String MAIN_LAYOUT_VIEW = "main/MainLayout";
+    private static final String REGISTER_VIEW = "auth/RegisterView";
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -26,18 +34,21 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        // Add Enter key handling to both username and password fields
-        usernameField.setOnKeyPressed(this::handleKeyPress);
-        passwordField.setOnKeyPressed(this::handleKeyPress);
-        passwordFieldVisible.setOnKeyPressed(this::handleKeyPress);
+        setupKeyPressHandlers();
     }
 
-    private void handleKeyPress(KeyEvent event) {
+    private void setupKeyPressHandlers() {
+        usernameField.setOnKeyPressed(event -> handleEnterKey(event));
+        passwordField.setOnKeyPressed(event -> handleEnterKey(event));
+        passwordFieldVisible.setOnKeyPressed(event -> handleEnterKey(event));
+    }
+
+    private void handleEnterKey(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
             try {
                 handleLogin();
             } catch (IOException e) {
-                showError("Navigation error: " + e.getMessage());
+                showError(ERROR_NAVIGATION + e.getMessage());
             }
         }
     }
@@ -45,84 +56,88 @@ public class LoginController {
     @FXML
     private void togglePasswordVisibility() {
         if (showPasswordCheckBox.isSelected()) {
-            passwordFieldVisible.setText(passwordField.getText());
-            passwordField.setVisible(false);
-            passwordFieldVisible.setVisible(true);
-            passwordFieldVisible.requestFocus();
+            showPasswordField();
         } else {
-            passwordField.setText(passwordFieldVisible.getText());
-            passwordField.setVisible(true);
-            passwordFieldVisible.setVisible(false);
-            passwordField.requestFocus();
+            hidePasswordField();
         }
+    }
+
+    private void showPasswordField() {
+        String password = passwordField.getText();
+        passwordFieldVisible.setText(password);
+        passwordField.setVisible(false);
+        passwordFieldVisible.setVisible(true);
+        passwordFieldVisible.requestFocus();
+    }
+
+    private void hidePasswordField() {
+        String password = passwordFieldVisible.getText();
+        passwordField.setText(password);
+        passwordField.setVisible(true);
+        passwordFieldVisible.setVisible(false);
+        passwordField.requestFocus();
     }
 
     @FXML
     private void handleLogin() throws IOException {
         String username = usernameField.getText().trim();
-        // Get password from whichever field is visible
-        String password = passwordField.isVisible() ? passwordField.getText() : passwordFieldVisible.getText();
+        String password = getPassword();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            showError("Please enter both username and password");
+        if (!isValidInput(username, password)) {
+            showError(ERROR_EMPTY_FIELDS);
             return;
         }
 
         try {
             User user = userService.login(username, password);
             if (user != null) {
-                App.setRoot("main/MainLayout");
+                navigateToMainLayout();
             } else {
-                showError("Invalid username or password");
-                passwordField.clear();
-                passwordFieldVisible.clear();
+                handleLoginFailure();
             }
-        } catch (IllegalArgumentException e) {
-            // If login fails, allow navigation to dashboard for testing
-            // This provides a fallback for invalid credentials
-            System.out.println("⚠️ Login validation: " + e.getMessage());
-            showError("Invalid username or password - Proceeding to dashboard");
-            
-            // Create a test user and set it as current user
-            User testUser = new User();
-            testUser.setId(1L);
-            testUser.setUsername(username.isEmpty() ? "test_user" : username);
-            testUser.setEmail("test@example.com");
-            testUser.setRole(com.taskmanagement.model.Role.USER);
-            
-            com.taskmanagement.utils.CurrentUser.set(testUser);
-            
-            // Navigate to dashboard after a brief delay to show the message
-            new java.util.Timer().schedule(new java.util.TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        App.setRoot("main/MainLayout");
-                    } catch (IOException ex) {
-                        System.err.println("Navigation error: " + ex.getMessage());
-                    }
-                }
-            }, 500);
-            
         } catch (RuntimeException e) {
-            System.err.println("❌ Login error: " + e.getMessage());
-            showError("Login failed: " + e.getMessage());
-            passwordField.clear();
-            passwordFieldVisible.clear();
+            showError(ERROR_LOGIN_FAILED + e.getMessage());
+            clearPasswordFields();
         }
+    }
+
+    private String getPassword() {
+        return passwordField.isVisible() ? passwordField.getText() : passwordFieldVisible.getText();
+    }
+
+    private boolean isValidInput(String username, String password) {
+        return !username.isEmpty() && !password.isEmpty();
+    }
+
+    private void navigateToMainLayout() {
+        Platform.runLater(() -> {
+            try {
+                App.setRoot(MAIN_LAYOUT_VIEW);
+            } catch (IOException e) {
+                showError(ERROR_NAVIGATION + e.getMessage());
+            }
+        });
+    }
+
+    private void handleLoginFailure() {
+        showError(ERROR_INVALID_CREDENTIALS);
+        clearPasswordFields();
+    }
+
+    private void clearPasswordFields() {
+        passwordField.clear();
+        passwordFieldVisible.clear();
     }
 
     private void showError(String message) {
         if (errorLabel != null) {
-            errorLabel.setText(message);
+            UIUtils.setErrorStyle(errorLabel, message);
             errorLabel.setVisible(true);
-        } else {
-            System.err.println("Error: " + message);
         }
     }
 
     @FXML
     private void handleRegister() throws IOException {
-        App.setRoot("auth/RegisterView");
+        App.setRoot(REGISTER_VIEW);
     }
 }

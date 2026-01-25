@@ -14,6 +14,25 @@ import java.util.List;
 
 public class UserTasksDialogController {
     
+    // Labels
+    private static final String LABEL_TITLE_PREFIX = "Tasks for ";
+    private static final String LABEL_TASK_SINGULAR = " task";
+    private static final String LABEL_TASK_PLURAL = " tasks";
+    
+    // Messages
+    private static final String MSG_LOADING = "Loading tasks for user: ";
+    private static final String MSG_LOADED = "Loaded ";
+    private static final String MSG_ASSIGNED = "assigned ";
+    private static final String MSG_ERROR = "Error loading user tasks: ";
+    private static final String MSG_ERROR_DISPLAY = "Error: ";
+    
+    // Colors
+    private static final String COLOR_SUCCESS = "-fx-text-fill: #27ae60;";
+    private static final String COLOR_ERROR = "-fx-text-fill: #e74c3c;";
+    
+    // Labels - N/A
+    private static final String LABEL_NA = "N/A";
+    
     @FXML private Label dialogTitleLabel;
     @FXML private Label taskCountLabel;
     @FXML private Label messageLabel;
@@ -45,7 +64,7 @@ public class UserTasksDialogController {
         
         taskProjectColumn.setCellValueFactory(cellData -> {
             Task task = cellData.getValue();
-            String projectName = task.getProject() != null ? task.getProject().getName() : "N/A";
+            String projectName = task.getProject() != null ? task.getProject().getName() : LABEL_NA;
             return new javafx.beans.property.SimpleStringProperty(projectName);
         });
         
@@ -54,7 +73,7 @@ public class UserTasksDialogController {
         
         taskDueColumn.setCellValueFactory(cellData -> {
             Task task = cellData.getValue();
-            String dueDate = task.getDueDate() != null ? task.getDueDate().toString() : "N/A";
+            String dueDate = task.getDueDate() != null ? task.getDueDate().toString() : LABEL_NA;
             return new javafx.beans.property.SimpleStringProperty(dueDate);
         });
     }
@@ -69,9 +88,9 @@ public class UserTasksDialogController {
 
     public void loadUserTasks(User user) {
         try {
-            System.out.println("📋 Loading tasks for user: " + user.getUsername());
+            System.out.println(MSG_LOADING + user.getUsername());
             
-            dialogTitleLabel.setText("Tasks for " + user.getUsername());
+            dialogTitleLabel.setText(LABEL_TITLE_PREFIX + user.getUsername());
             
             List<Task> userTasks = taskService.getTasksByAssignee(user.getId());
             
@@ -79,21 +98,24 @@ public class UserTasksDialogController {
             userTasksTable.setItems(tasksList);
             
             int taskCount = userTasks.size();
-            taskCountLabel.setText("(" + taskCount + " task" + (taskCount != 1 ? "s" : "") + ")");
+            String taskLabel = getPluralLabel(taskCount, LABEL_TASK_SINGULAR, LABEL_TASK_PLURAL);
+            taskCountLabel.setText("(" + taskCount + " " + taskLabel + ")");
             
-            messageLabel.setText("Loaded " + taskCount + " assigned task" + (taskCount != 1 ? "s" : ""));
-            messageLabel.setStyle("-fx-text-fill: #27ae60;");
-            
-            System.out.println("✅ Loaded " + taskCount + " tasks");
+            displayMessage(MSG_LOADED + taskCount + MSG_ASSIGNED + taskLabel, COLOR_SUCCESS);
+            System.out.println(MSG_LOADED + taskCount + " tasks");
         } catch (Exception e) {
-            System.err.println("❌ Error loading user tasks: " + e.getMessage());
+            System.err.println(MSG_ERROR + e.getMessage());
             e.printStackTrace();
-            messageLabel.setText("Error: " + e.getMessage());
-            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            displayMessage(MSG_ERROR_DISPLAY + e.getMessage(), COLOR_ERROR);
         }
     }
-    
-    
+    private void displayMessage(String message, String colorStyle) {
+        messageLabel.setText(message);
+        messageLabel.setStyle(colorStyle);
+    }
+    private String getPluralLabel(int count, String singular, String plural) {
+        return count == 1 ? singular : plural;
+    }
 
     @FXML
     private void handleClose() {

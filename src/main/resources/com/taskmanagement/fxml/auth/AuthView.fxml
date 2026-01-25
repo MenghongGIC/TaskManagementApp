@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+// ====================================================================
+// Authentication View - Unified Login/Register Interface
+// ====================================================================
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -17,11 +21,14 @@
         <Insets top="50" right="50" bottom="50" left="50"/>
     </padding>
 
+    // ============ Application Title ============
     <Label text="Task Manager" id="appTitle"/>
 
+    // ============ Login Panel ============
     <VBox fx:id="loginPanel" spacing="15" alignment="CENTER">
         <Label text="Login" styleClass="heading"/>
 
+        // Login Form Fields
         <TextField fx:id="loginUsernameField"
                    promptText="Username"
                    styleClass="text-field"/>
@@ -30,15 +37,18 @@
                        promptText="Password"
                        styleClass="password-field"/>
 
+        // Login Action Button
         <Button text="Login"
                 onAction="#handleLogin"
                 styleClass="button"/>
 
+        // Login Error Display
         <Label fx:id="loginErrorLabel"
                styleClass="error-label"
                visible="false"/>
     </VBox>
 
+    // ============ Register Panel ============
     <VBox fx:id="registerPanel"
           spacing="15"
           alignment="CENTER"
@@ -46,6 +56,7 @@
 
         <Label text="Register" styleClass="heading"/>
 
+        // Registration Form Fields
         <TextField fx:id="registerUsernameField"
                    promptText="Username"
                    styleClass="text-field"/>
@@ -62,15 +73,18 @@
                        promptText="Confirm Password"
                        styleClass="password-field"/>
 
+        // Registration Action Button
         <Button text="Register"
                 onAction="#handleRegister"
                 styleClass="button"/>
 
+        // Registration Error/Success Display
         <Label fx:id="registerErrorLabel"
                styleClass="error-label success-label"
                visible="false"/>
     </VBox>
 
+    // ============ Panel Toggle Link ============
     <HBox alignment="CENTER" spacing="10">
         <Label fx:id="toggleMessageLabel"
                text="Don't have an account?"/>

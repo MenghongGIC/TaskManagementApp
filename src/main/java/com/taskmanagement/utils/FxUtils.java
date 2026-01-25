@@ -1,49 +1,40 @@
 package com.taskmanagement.utils;
 
-import java.io.IOException;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.stage.Stage;
-
+/**
+ * @deprecated Use UIUtils instead - this class is kept for backward compatibility only
+ */
+@Deprecated(since = "1.0.1", forRemoval = true)
 public class FxUtils {
 
+    /**
+     * @deprecated Use UIUtils.showSuccess() instead
+     */
+    @Deprecated(since = "1.0.1", forRemoval = true)
     public static void showInfo(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        UIUtils.showSuccess(title, message);
     }
+
+    /**
+     * @deprecated Use UIUtils.showError() instead
+     */
+    @Deprecated(since = "1.0.1", forRemoval = true)
     public static void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        UIUtils.showError(title, message);
     }
-    public static Parent loadFXML(String fxmlPath) {
-        try {
-            FXMLLoader loader = new FXMLLoader(FxUtils.class.getResource(fxmlPath));
-            return loader.load();
-        } catch (IOException e) {
-            showError("FXML Load Error", "Failed to load FXML: " + fxmlPath);
-            e.printStackTrace(System.err);
-            return null;
-        }
+
+    /**
+     * @deprecated Use UIUtils.loadFXML() instead
+     */
+    @Deprecated(since = "1.0.1", forRemoval = true)
+    public static javafx.scene.Parent loadFXML(String fxmlPath) {
+        return UIUtils.loadFXML(fxmlPath);
     }
-    public static void switchScene(Stage stage, String fxmlPath, String title) {
-        Parent root = loadFXML(fxmlPath);
-        if (root != null) {
-            Scene scene = new Scene(root);
-            stage.setTitle(title);
-            stage.setScene(scene);
-            stage.show();
-        }
+
+    /**
+     * @deprecated Use UIUtils.switchScene() instead
+     */
+    @Deprecated(since = "1.0.1", forRemoval = true)
+    public static void switchScene(javafx.stage.Stage stage, String fxmlPath, String title) {
+        UIUtils.switchScene(stage, fxmlPath, title);
     }
-    // public static void loadMainDashboard(Stage stage){
-    //     switchScene(stage, "/com/taskmanagement/fxml/Primary.fxml", "Task Management Dashboard");
-    // }
 }

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+// ====================================================================
+// AdminPanel.fxml - Admin User Management Interface
+// ====================================================================
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -7,6 +12,7 @@
             fx:controller="com.taskmanagement.controller.AdminController"
             style="-fx-background-color: #f8f9fa;">
     
+    // ============ Top Header Section ============
     <top>
         <VBox style="-fx-background-color: #2c3e50; -fx-padding: 15;">
             <HBox spacing="20" alignment="CENTER_LEFT">
@@ -16,25 +22,30 @@
         </VBox>
     </top>
     
+    // ============ Left Statistics Panel ============
     <left>
         <VBox style="-fx-background-color: #34495e; -fx-padding: 15;" spacing="10" minWidth="180">
             <Label text="Statistics" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             
+            // ---------- Total Users Card ----------
             <VBox style="-fx-border-color: #2c3e50; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #2c3e50;" spacing="5">
                 <Label text="Total Users" style="-fx-font-size: 11px; -fx-text-fill: #bdc3c7;"/>
                 <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #3498db;"/>
             </VBox>
             
+            // ---------- Admins Card ----------
             <VBox style="-fx-border-color: #2c3e50; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #2c3e50;" spacing="5">
                 <Label text="Admins" style="-fx-font-size: 11px; -fx-text-fill: #bdc3c7;"/>
                 <Label fx:id="adminCountLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f39c12;"/>
             </VBox>
             
+            // ---------- Regular Users Card ----------
             <VBox style="-fx-border-color: #2c3e50; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #2c3e50;" spacing="5">
                 <Label text="Regular Users" style="-fx-font-size: 11px; -fx-text-fill: #bdc3c7;"/>
                 <Label fx:id="userCountLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
             </VBox>
             
+            // ---------- Blocked Users Card ----------
             <VBox style="-fx-border-color: #2c3e50; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #2c3e50;" spacing="5">
                 <Label text="Blocked" style="-fx-font-size: 11px; -fx-text-fill: #bdc3c7;"/>
                 <Label fx:id="blockedCountLabel" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
@@ -42,8 +53,10 @@
         </VBox>
     </left>
     
+    // ============ Center Management Section ============
     <center>
         <VBox spacing="15" style="-fx-padding: 20;">
+            // ---------- Search and Filter Controls ----------
             <!-- Search and Filter Section -->
             <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 15; -fx-background-color: white; -fx-border-radius: 5; -fx-border-color: #ecf0f1; -fx-border-width: 1;">
                 <TextField fx:id="searchField" promptText="Search by username or email..." style="-fx-padding: 10; -fx-border-radius: 5; -fx-font-size: 11px;" HBox.hgrow="ALWAYS"/>
@@ -53,6 +66,7 @@
                 <Button fx:id="addUserButton" text="Add User" style="-fx-padding: 10 20; -fx-font-size: 11px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5;"/>
             </HBox>
             
+            // ---------- Users Management Table ----------
             <!-- Users Table -->
             <TableView fx:id="usersTable" style="-fx-font-size: 11px;" VBox.vgrow="ALWAYS">
                 <columns>
@@ -66,6 +80,7 @@
                 </columns>
             </TableView>
             
+            // ---------- Footer Status ----------
             <!-- Footer -->
             <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: white; -fx-border-radius: 5; -fx-border-color: #ecf0f1; -fx-border-width: 1;">
                 <Label fx:id="messageLabel" text="Ready" style="-fx-font-size: 11px; -fx-text-fill: #27ae60;"/>

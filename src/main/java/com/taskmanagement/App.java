@@ -35,25 +35,18 @@ public class App extends Application {
 
     public static void setRoot(String fxml) throws IOException {
         try {
-            System.out.println("DEBUG: Loading FXML: " + fxml);
             Parent root = loadFXML(fxml);
-            System.out.println("DEBUG: FXML loaded successfully: " + fxml);
             scene.setRoot(root);
-            System.out.println("DEBUG: Root set successfully");
             
             if (fxml.startsWith("main/")) {
                 primaryStage.setWidth(1600);
                 primaryStage.setHeight(1000);
-                primaryStage.setResizable(true);
             } else {
                 primaryStage.setWidth(800);
                 primaryStage.setHeight(800);
-                primaryStage.setResizable(true);
             }
-            System.out.println("DEBUG: Stage resized");
+            primaryStage.setResizable(true);
         } catch (IOException e) {
-            System.err.println("ERROR loading FXML " + fxml + ": " + e.getMessage());
-            e.printStackTrace();
             throw e;
         }
     }
@@ -70,20 +63,13 @@ public class App extends Application {
         try {
             DBConnection dbConnection = DBConnection.getInstance();
             Connection connection = dbConnection.getConnection();
-            
-            if (connection != null && !connection.isClosed()) {
-                System.out.println("✓ Database connection verified successfully!");
-            } else {
-                System.out.println("✗ Database connection failed: Connection is null or closed.");
+            if (connection == null || connection.isClosed()) {
                 System.exit(1);
             }
         } catch (Exception e) {
-            System.out.println("✗ Database connection test failed:");
-            System.err.println(e.getMessage());
             System.exit(1);
         }
         
-        System.out.println("=== Starting Application ===\n");
         launch(args);
     }
 }

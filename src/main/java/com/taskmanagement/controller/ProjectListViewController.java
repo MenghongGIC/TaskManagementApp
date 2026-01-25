@@ -3,28 +3,41 @@ package com.taskmanagement.controller;
 import com.taskmanagement.App;
 import com.taskmanagement.model.Project;
 import com.taskmanagement.service.ProjectService;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import com.taskmanagement.utils.UIUtils;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 import java.util.List;
 import java.util.Optional;
-
-/**
- * Displays list of all projects with details
- * Users can click a project to view its tasks
- */
 public class ProjectListViewController {
+    
+    // Button Styles
+    private static final String VIEW_BUTTON_STYLE = "-fx-font-size: 10px; -fx-padding: 5 10; -fx-background-color: #3498db; -fx-text-fill: white;";
+    private static final String EDIT_BUTTON_STYLE = "-fx-font-size: 10px; -fx-padding: 5 10; -fx-background-color: #f39c12; -fx-text-fill: white;";
+    private static final String DELETE_BUTTON_STYLE = "-fx-font-size: 10px; -fx-padding: 5 10; -fx-background-color: #e74c3c; -fx-text-fill: white;";
+    private static final String ACTIONS_HBOX_STYLE = "-fx-padding: 5;";
+    
+    // Messages
+    private static final String MSG_LOADED_PROJECTS = "✓ Loaded %d projects";
+    private static final String MSG_ERROR_LOADING = "✗ Error loading projects";
+    private static final String MSG_DELETED_SUCCESS = "✓ Project deleted successfully";
+    private static final String MSG_DELETE_CONFIRM = "Are you sure you want to delete '%s'?";
+    private static final String MSG_EDIT_COMING_SOON = "Edit feature coming soon for: ";
+    private static final String MSG_CREATE_COMING_SOON = "Create project feature coming soon";
+    private static final String MSG_NAVIGATION_ERROR = "Failed to navigate to project: ";
+    private static final String MSG_DELETE_ERROR = "Failed to delete project: ";
+    private static final String MSG_LOAD_ERROR = "Failed to load projects: ";
+    
+    // Labels
+    private static final String TITLE_DELETE = "Delete Project";
+    private static final String TITLE_ERROR = "Error";
+    private static final String TITLE_INFO = "Info";
     
     @FXML private VBox projectListContainer;
     @FXML private TextField searchField;
@@ -37,7 +50,6 @@ public class ProjectListViewController {
     @FXML private TableColumn<Project, Void> actionsColumn;
     
     private ProjectService projectService;
-    private MainLayoutController mainLayoutController;
 
     @FXML
     public void initialize() {
@@ -48,26 +60,17 @@ public class ProjectListViewController {
             loadProjects();
         }
     }
-    
-    /**
-     * Setup table columns for project list
-     */
     private void setupTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        
-        // Task count column
+
         taskCountColumn.setCellValueFactory(cellData -> {
             int count = cellData.getValue().getTasks() != null ? 
                        cellData.getValue().getTasks().size() : 0;
             return new javafx.beans.property.SimpleIntegerProperty(count).asObject();
         });
-        
-        // Actions column
         setupActionsColumn();
-        
-        // Row click handler
         projectsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 1) {
                 Project selected = projectsTable.getSelectionModel().getSelectedItem();
@@ -77,56 +80,47 @@ public class ProjectListViewController {
             }
         });
     }
-    
-    /**
-     * Setup actions column with View, Edit, Delete buttons
-     */
     private void setupActionsColumn() {
         actionsColumn.setCellFactory(param -> new TableCell<Project, Void>() {
-            private final Button viewBtn = new Button("👁️ View");
-            private final Button editBtn = new Button("✏️ Edit");
-            private final Button deleteBtn = new Button("🗑️ Delete");
-            private final HBox hbox = new HBox(5, viewBtn, editBtn, deleteBtn);
-            
-            {
-                hbox.setAlignment(Pos.CENTER);
-                hbox.setStyle("-fx-padding: 5;");
-                
-                viewBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5 10; -fx-background-color: #3498db; -fx-text-fill: white;");
-                editBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5 10; -fx-background-color: #f39c12; -fx-text-fill: white;");
-                deleteBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5 10; -fx-background-color: #e74c3c; -fx-text-fill: white;");
-                
-                viewBtn.setOnAction(e -> handleViewProject(getTableView().getItems().get(getIndex())));
-                editBtn.setOnAction(e -> handleEditProject(getTableView().getItems().get(getIndex())));
-                deleteBtn.setOnAction(e -> handleDeleteProject(getTableView().getItems().get(getIndex())));
-            }
-            
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : hbox);
+                setGraphic(empty ? null : createActionButtonsBox(getTableView().getItems().get(getIndex())));
             }
         });
     }
     
-    /**
-     * Load all projects from database
-     */
+    private HBox createActionButtonsBox(Project project) {
+        Button viewBtn = createActionButton("👁️ View", VIEW_BUTTON_STYLE, 
+            e -> handleViewProject(project));
+        Button editBtn = createActionButton("✏️ Edit", EDIT_BUTTON_STYLE, 
+            e -> handleEditProject(project));
+        Button deleteBtn = createActionButton("🗑️ Delete", DELETE_BUTTON_STYLE, 
+            e -> handleDeleteProject(project));
+        
+        HBox hbox = new HBox(5, viewBtn, editBtn, deleteBtn);
+        hbox.setAlignment(Pos.CENTER);
+        hbox.setStyle(ACTIONS_HBOX_STYLE);
+        return hbox;
+    }
+    
+    private Button createActionButton(String text, String style, EventHandler<ActionEvent> handler) {
+        Button btn = new Button(text);
+        btn.setStyle(style);
+        btn.setOnAction(handler);
+        return btn;
+    }
     private void loadProjects() {
         try {
             List<Project> projects = projectService.getAllProjects();
             projectService.setProjects(projects);
             projectsTable.setItems(projectService.getProjects());
-            updateStatus("✓ Loaded " + projects.size() + " projects");
+            updateStatus(String.format(MSG_LOADED_PROJECTS, projects.size()));
         } catch (Exception e) {
-            showAlert("Error", "Failed to load projects: " + e.getMessage(), Alert.AlertType.ERROR);
-            updateStatus("✗ Error loading projects");
+            showErrorAlert(TITLE_ERROR, MSG_LOAD_ERROR + e.getMessage());
+            updateStatus(MSG_ERROR_LOADING);
         }
     }
-    
-    /**
-     * Navigate to project details and task view
-     */
     private void handleViewProject(Project project) {
         navigateToProject(project);
     }
@@ -136,32 +130,32 @@ public class ProjectListViewController {
         try {
             App.setRoot("main/ProjectDetailView");
         } catch (Exception e) {
-            showAlert("Error", "Failed to navigate to project: " + e.getMessage(), Alert.AlertType.ERROR);
+            showErrorAlert(TITLE_ERROR, MSG_NAVIGATION_ERROR + e.getMessage());
         }
     }
     
     private void handleEditProject(Project project) {
-        showAlert("Info", "Edit feature coming soon for: " + project.getName(), Alert.AlertType.INFORMATION);
+        showInfoAlert(TITLE_INFO, MSG_EDIT_COMING_SOON + project.getName());
     }
     
     private void handleDeleteProject(Project project) {
-        Optional<ButtonType> result = showConfirmation("Delete Project",
-            "Are you sure you want to delete '" + project.getName() + "'?");
+        Optional<ButtonType> result = showConfirmation(TITLE_DELETE,
+            String.format(MSG_DELETE_CONFIRM, project.getName()));
         
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 projectService.deleteProject(project.getId());
                 loadProjects();
-                updateStatus("✓ Project deleted successfully");
+                updateStatus(MSG_DELETED_SUCCESS);
             } catch (Exception e) {
-                showAlert("Error", "Failed to delete project: " + e.getMessage(), Alert.AlertType.ERROR);
+                showErrorAlert(TITLE_ERROR, MSG_DELETE_ERROR + e.getMessage());
             }
         }
     }
     
     @FXML
     private void handleNewProject() {
-        showAlert("Info", "Create project feature coming soon", Alert.AlertType.INFORMATION);
+        showInfoAlert(TITLE_INFO, MSG_CREATE_COMING_SOON);
     }
     
     @FXML
@@ -175,19 +169,19 @@ public class ProjectListViewController {
         }
     }
     
-    private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private void showErrorAlert(String title, String message) {
+        UIUtils.showError(title, message);
+    }
+    
+    private void showInfoAlert(String title, String message) {
+        UIUtils.showSuccess(title, message);
+    }
+    
+    private void showWarningAlert(String title, String message) {
+        UIUtils.showWarning(title, message);
     }
     
     private Optional<ButtonType> showConfirmation(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        return alert.showAndWait();
+        return Optional.of(UIUtils.showCustomConfirmation(title, null, content) ? ButtonType.OK : ButtonType.CANCEL);
     }
 }

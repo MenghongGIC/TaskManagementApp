@@ -9,17 +9,16 @@ import javafx.scene.Scene;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import com.taskmanagement.model.Task;
 import com.taskmanagement.model.Project;
@@ -27,9 +26,45 @@ import com.taskmanagement.model.User;
 import com.taskmanagement.service.TaskService;
 import com.taskmanagement.service.ProjectService;
 import com.taskmanagement.utils.DateUtils;
+import com.taskmanagement.utils.UIUtils;
 import com.taskmanagement.App;
 
 public class ProjectDetailController {
+    // FXML Paths
+    private static final String TASK_DETAIL_VIEW = "fxml/main/TaskDetailView.fxml";
+    private static final String CREATE_TASK_VIEW = "/com/taskmanagement/fxml/dialog/CreateTaskView.fxml";
+    private static final String EDIT_PROJECT_VIEW = "fxml/main/EditProjectView.fxml";
+    
+    // Dialog Titles
+    private static final String TITLE_TASK = "Task: ";
+    private static final String TITLE_CREATE_TASK = "Create Task in ";
+    private static final String TITLE_EDIT_PROJECT = "Edit Project - ";
+    
+    // Messages
+    private static final String MSG_CONFIRM_DELETE_PROJECT = "Are you sure you want to delete this project? This action cannot be undone.";
+    private static final String MSG_NO_DESCRIPTION = "No description";
+    private static final String MSG_UNKNOWN = "Unknown";
+    private static final String MSG_UNASSIGNED = "Unassigned";
+    
+    // Status Colors
+    private static final Map<String, String> STATUS_COLORS = Map.of(
+        "to do", "#e8f4f8",
+        "in progress", "#fff3cd",
+        "done", "#d4edda"
+    );
+    
+    // Priority Colors
+    private static final Map<String, String> PRIORITY_BG_COLORS = Map.of(
+        "Low", "#DBEAFE",
+        "Medium", "#FCD34D",
+        "High", "#FCA5A5"
+    );
+    
+    private static final Map<String, String> PRIORITY_TEXT_COLORS = Map.of(
+        "Low", "#0C4A6E",
+        "Medium", "#78350F",
+        "High", "#7F1D1D"
+    );
     
     @FXML private Label projectNameLabel;
     @FXML private Label projectDescLabel;
@@ -70,210 +105,9 @@ public class ProjectDetailController {
         setupTaskTableColumns();
         setupTaskSearchListener();
     }
-    
-    /**
-     * Set the ProjectController reference for navigation callbacks
-     */
-    public void setProjectController(ProjectController controller) {
-        this.projectController = controller;
-    }
-    
-    /**
-     * Set the project to display
-     */
-    public void setProject(Project project) {
-        this.project = project;
-        populateProjectDetails();
-        loadProjectTasks();
-    }
-    
-    /**
-     * Populate project details in UI
-     */
-    private void populateProjectDetails() {
-        projectNameLabel.setText(project.getName());
-        projectDescLabel.setText(project.getDescription() != null ? project.getDescription() : "No description");
-        
-        if (project.getCreatedBy() != null) {
-            projectCreatedByLabel.setText(project.getCreatedBy().getUsername());
-            detailCreatedBy.setText(project.getCreatedBy().getUsername());
-        } else {
-            projectCreatedByLabel.setText("Unknown");
-            detailCreatedBy.setText("Unknown");
-        }
-        
-        projectCreatedAtLabel.setText(DateUtils.formatDateTime(project.getCreatedAt()));
-        detailCreatedAt.setText(DateUtils.formatDateTime(project.getCreatedAt()));
-        
-        String color = project.getColor() != null ? project.getColor() : "#3498db";
-        projectColorLabel.setText(color);
-        colorBox.setStyle("-fx-fill: " + color + "; -fx-stroke: #bdc3c7; -fx-stroke-width: 1;");
-        
-        detailProjectId.setText(String.valueOf(project.getId()));
-        detailDescription.setText(project.getDescription() != null ? project.getDescription() : "No description provided");
-    }
-    
-    /**
-     * Setup task table columns
-     */
-    private void setupTaskTableColumns() {
-        taskIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        taskTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        taskStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        taskPriorityColumn.setCellValueFactory(new PropertyValueFactory<>("priority"));
-        
-        // Setup status column styling using TaskStatus enum
-        taskStatusColumn.setCellFactory(param -> new TableCell<Task, String>() {
-            @Override
-            protected void updateItem(String status, boolean empty) {
-                super.updateItem(status, empty);
-                if (empty || status == null) {
-                    setText(null);
-                    setStyle(null);
-                } else {
-                    setText(status);
-                    String bgColor = "#f0f0f0";
-                    String textColor = "#000000";
-                    switch(status.toLowerCase()) {
-                        case "to do": bgColor = "#e8f4f8"; break;
-                        case "in progress": bgColor = "#fff3cd"; break;
-                        case "done": bgColor = "#d4edda"; break;
-                    }
-                    setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: " + textColor + "; -fx-padding: 5 10; -fx-border-radius: 3; -fx-font-weight: bold;");
-                }
-            }
-        });
-        
-        // Setup priority column styling
-        taskPriorityColumn.setCellFactory(param -> new TableCell<Task, String>() {
-            @Override
-            protected void updateItem(String priority, boolean empty) {
-                super.updateItem(priority, empty);
-                if (empty || priority == null) {
-                    setText(null);
-                    setStyle(null);
-                } else {
-                    setText(priority);
-                    setStyle("-fx-background-color: " + getColorForPriority(priority) + "; -fx-text-fill: " + getTextColorForPriority(priority) + "; -fx-padding: 3 8; -fx-border-radius: 2; -fx-font-weight: 600;");
-                }
-            }
-        });
-        
-        taskDueColumn.setCellValueFactory(cellData -> {
-            return new javafx.beans.property.SimpleStringProperty(
-                DateUtils.formatDate(cellData.getValue().getDueDate())
-            );
-        });
-        
-        taskAssigneeColumn.setCellValueFactory(cellData -> {
-            User assignee = cellData.getValue().getAssignee();
-            return new javafx.beans.property.SimpleStringProperty(
-                assignee != null ? assignee.getUsername() : "Unassigned"
-            );
-        });
-        
-        // Add double-click handler on task to edit
-        tasksTable.setRowFactory(tv -> {
-            TableRow<Task> row = new TableRow<Task>() {
-                @Override
-                protected void updateItem(Task item, boolean empty) {
-                    super.updateItem(item, empty);
-                }
-            };
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    Task task = row.getItem();
-                    editTask(task);
-                }
-            });
-            return row;
-        });
-    }
-    
-    /**
-     * Open edit task dialog
-     */
-    private void editTask(Task task) {
-        try {
-            System.out.println("📂 Opening task detail popup for: " + task.getTitle());
-            
-            // Load TaskDetailView.fxml
-            FXMLLoader loader = new FXMLLoader(App.class.getResource("fxml/main/TaskDetailView.fxml"));
-            BorderPane taskDetailView = loader.load();
-            
-            // Create a new Stage for the popup
-            Stage taskDetailStage = new Stage();
-            taskDetailStage.setTitle("Task: " + task.getTitle());
-            taskDetailStage.setScene(new Scene(taskDetailView, 700, 600));
-            taskDetailStage.initModality(Modality.WINDOW_MODAL);
-            
-            // Get the controller and set the task
-            TaskDetailController controller = loader.getController();
-            controller.setTask(task, taskDetailStage);
-            
-            // Set callback to refresh task list when task is saved/deleted
-            controller.setOnSaveCallback(() -> {
-                System.out.println("✅ Task updated, refreshing task list");
-                loadProjectTasks();
-                taskDetailStage.close();
-            });
-            controller.setOnDeleteCallback(() -> {
-                System.out.println("✅ Task deleted, refreshing task list");
-                loadProjectTasks();
-                taskDetailStage.close();
-            });
-            
-            // Show the popup as modal dialog
-            taskDetailStage.showAndWait();
-            
-        } catch (IOException e) {
-            System.err.println("❌ Error opening task detail popup: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Load tasks for this project
-     */
-    private void loadProjectTasks() {
-        try {
-            // Get all tasks and filter for this project
-            List<Task> allTasks = taskService.getAllTasks();
-            List<Task> projectTasks = allTasks.stream()
-                .filter(t -> t.getProject() != null && t.getProject().getId().equals(project.getId()))
-                .collect(Collectors.toList());
-            
-            tasksList = FXCollections.observableArrayList(projectTasks);
-            filteredTasks = new FilteredList<>(tasksList, t -> true);
-            tasksTable.setItems(filteredTasks);
-            
-            updateStatistics();
-        } catch (Exception e) {
-            showAlert("Error", "Failed to load tasks: " + e.getMessage(), Alert.AlertType.ERROR);
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Update task statistics
-     */
-    private void updateStatistics() {
-        long total = tasksList.size();
-        long inProgress = tasksList.stream().filter(t -> "In Progress".equals(t.getStatus())).count();
-        long completed = tasksList.stream().filter(t -> "Done".equals(t.getStatus())).count();
-        long todo = tasksList.stream().filter(t -> "To Do".equals(t.getStatus())).count();
-        
-        statTotalTasks.setText(String.valueOf(total));
-        statInProgress.setText(String.valueOf(inProgress));
-        statCompleted.setText(String.valueOf(completed));
-        statTodo.setText(String.valueOf(todo));
-    }
-    
     @FXML
     private void setupTaskSearchListener() {
-        taskSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterTasks(newValue);
-        });
+        taskSearchField.textProperty().addListener((observable, oldValue, newValue) -> filterTasks(newValue));
     }
     
     @FXML
@@ -300,22 +134,16 @@ public class ProjectDetailController {
         System.out.println("➕ Opening create task dialog for project: " + project.getName());
         
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/taskmanagement/fxml/dialog/CreateTaskView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(CREATE_TASK_VIEW));
             BorderPane dialogRoot = loader.load();
             CreateTaskController controller = loader.getController();
             
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Create Task in " + project.getName());
+            dialogStage.setTitle(TITLE_CREATE_TASK + project.getName());
             dialogStage.setScene(new Scene(dialogRoot, 650, 700));
             dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(projectNameLabel.getScene().getWindow());
             
-            // Get owner stage
-            Stage ownerStage = (Stage) projectNameLabel.getScene().getWindow();
-            if (ownerStage != null) {
-                dialogStage.initOwner(ownerStage);
-            }
-            
-            // Set project and callbacks
             controller.setProject(project);
             controller.setDialogStage(dialogStage);
             controller.setOnTaskCreated(() -> {
@@ -325,95 +153,28 @@ public class ProjectDetailController {
             });
             
             dialogStage.showAndWait();
-            
         } catch (IOException e) {
-            System.err.println("❌ Error opening create task dialog: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Error", "Error opening create task dialog: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
-    
-    private void handleViewTask(Task task) {
-        System.out.println("👁️ Opening task detail view for: " + task.getTitle());
-        
-        try {
-            FXMLLoader loader = new FXMLLoader(App.class.getResource("fxml/main/TaskDetailView.fxml"));
-            BorderPane taskDetailRoot = loader.load();
-            TaskDetailController controller = loader.getController();
-            
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Task Details - " + task.getTitle());
-            dialogStage.setScene(new Scene(taskDetailRoot, 600, 700));
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            
-            // Get owner stage
-            Stage ownerStage = (Stage) projectNameLabel.getScene().getWindow();
-            if (ownerStage != null) {
-                dialogStage.initOwner(ownerStage);
-            }
-            
-            // Set task and callbacks
-            controller.setTask(task, dialogStage);
-            controller.setOnSaveCallback(() -> {
-                System.out.println("🔄 Refreshing task list after save");
-                loadProjectTasks();
-                updateStatistics();
-            });
-            controller.setOnDeleteCallback(() -> {
-                System.out.println("🔄 Refreshing task list after delete");
-                loadProjectTasks();
-                updateStatistics();
-            });
-            
-            dialogStage.showAndWait();
-            
-        } catch (IOException e) {
-            System.err.println("❌ Error opening task detail view: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Error", "Error opening task details: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
-    
-    private void handleEditTask(Task task) {
-        showAlert("Info", "Task edit feature will open edit dialog", Alert.AlertType.INFORMATION);
-    }
-    
-    private void handleDeleteTask(Task task) {
-        Optional<ButtonType> result = showConfirmation("Delete Task", 
-            "Are you sure you want to delete '" + task.getTitle() + "'?");
-        
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                taskService.deleteTask(task.getId());
-                loadProjectTasks();
-                showAlert("Success", "Task deleted successfully!", Alert.AlertType.INFORMATION);
-            } catch (Exception e) {
-                showAlert("Error", "Failed to delete task: " + e.getMessage(), Alert.AlertType.ERROR);
-            }
+            showErrorAlert("Error opening create task dialog", e);
         }
     }
     
     @FXML
     private void handleEditProject() {
-        System.out.println("✏️ Opening edit project dialog for: " + project.getName());
+        System.out.println("Opening edit project dialog for: " + project.getName());
         
         try {
-            FXMLLoader loader = new FXMLLoader(App.class.getResource("fxml/main/EditProjectView.fxml"));
+            FXMLLoader loader = new FXMLLoader(App.class.getResource(EDIT_PROJECT_VIEW));
             BorderPane editRoot = loader.load();
             EditProjectController controller = loader.getController();
             
-            // Create dialog stage
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Edit Project - " + project.getName());
+            dialogStage.setTitle(TITLE_EDIT_PROJECT + project.getName());
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setScene(new Scene(editRoot, 500, 400));
             
             controller.setProject(project, dialogStage);
-            
-            // Set a callback to refresh the project details after saving
             controller.setOnSaveCallback(() -> {
                 System.out.println("🔄 Refreshing project details after edit");
-                // Reload the project from database to get updated values
                 Project updatedProject = projectService.getProjectById(project.getId());
                 if (updatedProject != null) {
                     setProject(updatedProject);
@@ -421,80 +182,231 @@ public class ProjectDetailController {
             });
             
             dialogStage.showAndWait();
-            
         } catch (Exception e) {
-            System.err.println("❌ Error opening edit project dialog: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Error", "Failed to open edit dialog: " + e.getMessage(), Alert.AlertType.ERROR);
+            showErrorAlert("Failed to open edit dialog", e);
         }
     }
     
     @FXML
     private void handleDeleteProject() {
-        Optional<ButtonType> result = showConfirmation("Delete Project", 
-            "Are you sure you want to delete this project? This action cannot be undone.");
+        Optional<ButtonType> result = showConfirmation("Delete Project", MSG_CONFIRM_DELETE_PROJECT);
         
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 projectService.deleteProject(project.getId());
-                showAlert("Success", "Project deleted successfully!", Alert.AlertType.INFORMATION);
+                showSuccessAlert("Project deleted successfully!");
                 handleClose();
             } catch (Exception e) {
-                showAlert("Error", "Failed to delete project: " + e.getMessage(), Alert.AlertType.ERROR);
+                showErrorAlert("Failed to delete project", e);
             }
         }
     }
     
     @FXML
     private void handleClose() {
-        System.out.println("← Going back to Projects list");
+        System.out.println("Going back to Projects list");
         if (projectController != null) {
             projectController.clearProjectDetails();
         }
     }
     
-    private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    public void setProjectController(ProjectController controller) {
+        this.projectController = controller;
+    }
+    
+    public void setProject(Project project) {
+        this.project = project;
+        populateProjectDetails();
+        loadProjectTasks();
+    }
+    
+    
+    private void populateProjectDetails() {
+        projectNameLabel.setText(project.getName());
+        projectDescLabel.setText(getOrDefault(project.getDescription(), MSG_NO_DESCRIPTION));
+        
+        String createdBy = project.getCreatedBy() != null ? project.getCreatedBy().getUsername() : MSG_UNKNOWN;
+        projectCreatedByLabel.setText(createdBy);
+        detailCreatedBy.setText(createdBy);
+        
+        String createdAt = DateUtils.formatDateTime(project.getCreatedAt());
+        projectCreatedAtLabel.setText(createdAt);
+        detailCreatedAt.setText(createdAt);
+        
+        String color = getOrDefault(project.getColor(), "#3498db");
+        projectColorLabel.setText(color);
+        colorBox.setStyle("-fx-fill: " + color + "; -fx-stroke: #bdc3c7; -fx-stroke-width: 1;");
+        
+        detailProjectId.setText(String.valueOf(project.getId()));
+        detailDescription.setText(getOrDefault(project.getDescription(), MSG_NO_DESCRIPTION + " provided"));
+    }
+    
+    
+    private void setupTaskTableColumns() {
+        taskIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        taskTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        taskStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        taskPriorityColumn.setCellValueFactory(new PropertyValueFactory<>("priority"));
+        
+        taskStatusColumn.setCellFactory(param -> createStatusCell());
+        taskPriorityColumn.setCellFactory(param -> createPriorityCell());
+        
+        taskDueColumn.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(
+                DateUtils.formatDate(cellData.getValue().getDueDate())
+            )
+        );
+        
+        taskAssigneeColumn.setCellValueFactory(cellData -> {
+            User assignee = cellData.getValue().getAssignee();
+            return new javafx.beans.property.SimpleStringProperty(
+                assignee != null ? assignee.getUsername() : MSG_UNASSIGNED
+            );
+        });
+        
+        tasksTable.setRowFactory(tv -> createTaskRow());
+    }
+    
+    private TableCell<Task, String> createStatusCell() {
+        return new TableCell<Task, String>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setText(null);
+                    setStyle(null);
+                } else {
+                    setText(status);
+                    String bgColor = STATUS_COLORS.getOrDefault(status.toLowerCase(), "#f0f0f0");
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: #000000; " +
+                            "-fx-padding: 5 10; -fx-border-radius: 3; -fx-font-weight: bold;");
+                }
+            }
+        };
+    }
+    
+    private TableCell<Task, String> createPriorityCell() {
+        return new TableCell<Task, String>() {
+            @Override
+            protected void updateItem(String priority, boolean empty) {
+                super.updateItem(priority, empty);
+                if (empty || priority == null) {
+                    setText(null);
+                    setStyle(null);
+                } else {
+                    setText(priority);
+                    String bgColor = PRIORITY_BG_COLORS.getOrDefault(priority, "#DBEAFE");
+                    String textColor = PRIORITY_TEXT_COLORS.getOrDefault(priority, "#0C4A6E");
+                    setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: " + textColor + 
+                            "; -fx-padding: 3 8; -fx-border-radius: 2; -fx-font-weight: 600;");
+                }
+            }
+        };
+    }
+    
+    private TableRow<Task> createTaskRow() {
+        TableRow<Task> row = new TableRow<Task>() {
+            @Override
+            protected void updateItem(Task item, boolean empty) {
+                super.updateItem(item, empty);
+            }
+        };
+        row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && !row.isEmpty()) {
+                editTask(row.getItem());
+            }
+        });
+        return row;
+    }
+    
+    private String getOrDefault(String value, String defaultValue) {
+        return value != null ? value : defaultValue;
+    }
+    
+    
+    private void editTask(Task task) {
+        try {
+            System.out.println("📂 Opening task detail popup for: " + task.getTitle());
+            loadTaskDialog(TASK_DETAIL_VIEW, TITLE_TASK + task.getTitle(), 700, 600, 
+                loader -> {
+                    TaskDetailController controller = loader.getController();
+                    controller.setTask(task, null);
+                    controller.setOnSaveCallback(() -> {
+                        System.out.println("Task updated, refreshing task list");
+                        loadProjectTasks();
+                    });
+                    controller.setOnDeleteCallback(() -> {
+                        System.out.println("Task deleted, refreshing task list");
+                        loadProjectTasks();
+                    });
+                });
+        } catch (IOException e) {
+            showErrorAlert("Error opening task detail popup", e);
+        }
+    }
+    
+    private void loadProjectTasks() {
+        try {
+            List<Task> allTasks = taskService.getAllTasks();
+            List<Task> projectTasks = allTasks.stream()
+                .filter(t -> t.getProject() != null && t.getProject().getId().equals(project.getId()))
+                .collect(Collectors.toList());
+            
+            tasksList = FXCollections.observableArrayList(projectTasks);
+            filteredTasks = new FilteredList<>(tasksList, t -> true);
+            tasksTable.setItems(filteredTasks);
+            
+            updateStatistics();
+        } catch (Exception e) {
+            showErrorAlert("Failed to load tasks", e);
+        }
+    }
+    
+    private void updateStatistics() {
+        long total = tasksList.size();
+        long inProgress = tasksList.stream().filter(t -> "In Progress".equals(t.getStatus())).count();
+        long completed = tasksList.stream().filter(t -> "Done".equals(t.getStatus())).count();
+        long todo = tasksList.stream().filter(t -> "To Do".equals(t.getStatus())).count();
+        
+        statTotalTasks.setText(String.valueOf(total));
+        statInProgress.setText(String.valueOf(inProgress));
+        statCompleted.setText(String.valueOf(completed));
+        statTodo.setText(String.valueOf(todo));
+    }
+    
+    private void loadTaskDialog(String fxmlPath, String title, int width, int height,
+                               Consumer<FXMLLoader> setupController) throws IOException {
+        FXMLLoader loader = new FXMLLoader(App.class.getResource(fxmlPath));
+        BorderPane view = loader.load();
+        setupController.accept(loader);
+        showDialog(view, title, width, height, Modality.WINDOW_MODAL);
+    }
+    
+    private void showDialog(BorderPane view, String title, int width, int height, Modality modality) {
+        Stage stage = new Stage();
+        stage.setTitle(title);
+        stage.setScene(new Scene(view, width, height));
+        stage.initModality(modality);
+        stage.initOwner(projectNameLabel.getScene().getWindow());
+        stage.showAndWait();
+    }
+    
+    private void showSuccessAlert(String message) {
+        UIUtils.showSuccess("Success", message);
+    }
+    
+    private void showErrorAlert(String title, Exception e) {
+        System.err.println(title + ": " + e.getMessage());
+        e.printStackTrace();
+        UIUtils.showError(title, e.getMessage());
+    }
+    
+    private void showErrorAlert(String title, String message) {
+        UIUtils.showError(title, message);
     }
     
     private Optional<ButtonType> showConfirmation(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        return alert.showAndWait();
-    }
-    
-    /**
-     * Get priority color based on priority level
-     */
-    private String getColorForPriority(String priority) {
-        if ("Low".equals(priority)) {
-            return "#DBEAFE";
-        } else if ("Medium".equals(priority)) {
-            return "#FCD34D";
-        } else if ("High".equals(priority)) {
-            return "#FCA5A5";
-        }
-        return "#DBEAFE";
-    }
-    
-    /**
-     * Get text color based on priority level
-     */
-    private String getTextColorForPriority(String priority) {
-        if ("Low".equals(priority)) {
-            return "#0C4A6E";
-        } else if ("Medium".equals(priority)) {
-            return "#78350F";
-        } else if ("High".equals(priority)) {
-            return "#7F1D1D";
-        }
-        return "#0C4A6E";
+        return Optional.of(UIUtils.showCustomConfirmation(title, null, content) ? ButtonType.OK : ButtonType.CANCEL);
     }
 }
 

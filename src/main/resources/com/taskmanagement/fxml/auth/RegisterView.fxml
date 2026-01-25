@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+// ====================================================================
+// Register View - User Account Creation Interface
+// ====================================================================
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -18,7 +22,7 @@
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.taskmanagement.controller.RegisterController">
 
-    <!-- Content Layer -->
+    // ============ Main Content Container ============
     <VBox alignment="TOP_CENTER" 
           spacing="20.0"
           prefWidth="400"
@@ -34,17 +38,18 @@
         </padding>
 
         <children>
+            // ============ Header Section ============
             <Label text="Create Account" 
                    styleClass="login-title" />
 
             <Label text="Join us today" 
                    styleClass="login-subtitle" />
 
-            <!-- Modern Form Card -->
+            // ============ Registration Form Card ============
             <VBox spacing="12" 
                   styleClass="login-form-card">
                 <children>
-                    <!-- Email Section -->
+                    // ---------- Email Field ----------
                     <VBox spacing="6">
                         <Label text="Email Address" 
                                styleClass="form-label" />
@@ -53,7 +58,7 @@
                                    styleClass="form-input" />
                     </VBox>
 
-                    <!-- Username Section -->
+                    // ---------- Username Field ----------
                     <VBox spacing="6">
                         <Label text="Username" 
                                styleClass="form-label" />
@@ -62,14 +67,16 @@
                                    styleClass="form-input" />
                     </VBox>
 
-                    <!-- Password Section -->
+                    // ---------- Password Field with Toggle ----------
                     <VBox spacing="6">
                         <Label text="Password" 
                                styleClass="form-label" />
                         <StackPane prefHeight="42">
+                            // Hidden password field (default)
                             <PasswordField fx:id="passwordField" 
                                           promptText="Minimum 8 characters" 
                                           styleClass="form-password" />
+                            // Visible password field (when toggled)
                             <TextField fx:id="passwordFieldVisible" 
                                       promptText="Minimum 8 characters" 
                                       visible="false" 
@@ -77,21 +84,23 @@
                         </StackPane>
                     </VBox>
 
-                    <!-- Show Password Checkbox -->
+                    // ---------- Show Password Toggle ----------
                     <CheckBox fx:id="showPasswordCheckBox" 
                               mnemonicParsing="false" 
                               onAction="#togglePasswordVisibility" 
                               text="Show password" 
                               styleClass="form-checkbox" />
 
-                    <!-- Confirm Password Section -->
+                    // ---------- Confirm Password Field with Toggle ----------
                     <VBox spacing="6">
                         <Label text="Confirm Password" 
                                styleClass="form-label" />
                         <StackPane prefHeight="42">
+                            // Hidden confirm password field (default)
                             <PasswordField fx:id="confirmPasswordField" 
                                           promptText="Re-enter your password" 
                                           styleClass="form-password" />
+                            // Visible confirm password field (when toggled)
                             <TextField fx:id="confirmPasswordFieldVisible" 
                                       promptText="Re-enter your password" 
                                       visible="false" 
@@ -99,24 +108,26 @@
                         </StackPane>
                     </VBox>
 
-                    <!-- Show Confirm Password Checkbox -->
+                    // ---------- Show Confirm Password Toggle ----------
                     <CheckBox fx:id="showConfirmPasswordCheckBox" 
                               mnemonicParsing="false" 
                               onAction="#toggleConfirmPasswordVisibility" 
                               text="Show password" 
                               styleClass="form-checkbox" />
 
+                    // ---------- Error Display ----------
                     <Label fx:id="errorLabel" 
                            styleClass="error-label"
                            visible="false"
                            wrapText="true" />
 
+                    // ---------- Success Display ----------
                     <Label fx:id="successLabel" 
                            styleClass="success-label"
                            visible="false"
                            wrapText="true" />
 
-                    <!-- Register Button -->
+                    // ---------- Register Action Button ----------
                     <HBox alignment="CENTER">
                         <Button text="Register"
                                 onAction="#handleRegister"
@@ -125,7 +136,7 @@
                                 styleClass="login-button" />
                     </HBox>
                     
-                    <!-- Back to Login Link -->
+                    // ---------- Back to Login Link ----------
                     <HBox alignment="CENTER" spacing="5">
                         <Label text="Already have an account?" 
                                styleClass="register-text" />

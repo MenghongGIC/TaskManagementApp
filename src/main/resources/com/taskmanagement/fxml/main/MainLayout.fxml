@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+// ====================================================================
+// Main Layout - Application Root Container with Header, Sidebar, and Content Area
+// ====================================================================
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -10,10 +15,10 @@
             stylesheets="@../css/style.css"
             style="-fx-background-color: #f8f9fa;">
     
-    <!-- TOP: Global Header (Never Changes) -->
+    // ============ Top Header Section ============
     <top>
         <VBox spacing="0">
-            <!-- Main Header Bar -->
+            // ---------- Main Header Bar ----------
             <HBox spacing="20" alignment="CENTER_LEFT" 
                  style="-fx-background-color: #2c3e50; -fx-padding: 15;">
                 <Label text="Task Management System" 
@@ -25,7 +30,7 @@
                        style="-fx-padding: 8 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 4;"/>
             </HBox>
             
-            <!-- Breadcrumb Navigation -->
+            // ---------- Breadcrumb Navigation ----------
             <HBox spacing="10" style="-fx-padding: 10 15; -fx-background-color: #34495e;">
                 <Label text="📍" style="-fx-font-size: 12px; -fx-text-fill: #bdc3c7;"/>
                 <Label fx:id="breadcrumbLabel" text="Dashboard" 
@@ -34,16 +39,16 @@
         </VBox>
     </top>
     
-    <!-- LEFT: Persistent Sidebar Navigation (Never Changes) -->
+    // ============ Left Sidebar Navigation ============
     <left>
         <VBox spacing="15" style="-fx-background-color: #34495e; -fx-padding: 20;" 
              minWidth="220" maxWidth="220" prefWidth="220">
             
-            <!-- Navigation Title -->
+            // ---------- Navigation Section Title ----------
             <Label text="Navigation" 
                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             
-            <!-- Main Navigation Buttons -->
+            // ---------- Main Navigation Buttons ----------
             <VBox spacing="8" style="-fx-padding: 0;">
                 <Button text="Dashboard" fx:id="dashboardBtn" onAction="#switchToDashboard" 
                        style="-fx-padding: 12 15; -fx-font-size: 12px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" 
@@ -53,26 +58,26 @@
                        maxWidth="Infinity" prefWidth="180" wrapText="true"/>
             </VBox>
             
-            <!-- Separator -->
+            // ---------- Sidebar Divider ----------
             <Separator style="-fx-padding: 5 0;"/>
             
-            <!-- Admin Section -->
+            // ---------- Admin Section ----------
             <Label text="Admin" 
                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #bdc3c7;"/>
             <Button text="Admin Panel" fx:id="adminBtn" onAction="#switchToAdminPanel" 
                    style="-fx-padding: 12 15; -fx-font-size: 12px; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" 
                    maxWidth="Infinity" prefWidth="180" wrapText="true"/>
             
-            <!-- Spacer -->
+            // ---------- Spacer Area ----------
             <Region VBox.vgrow="ALWAYS"/>
             
-            <!-- Footer -->
+            // ---------- Sidebar Footer Version ----------
             <Label text="v1.0.0" 
                   style="-fx-font-size: 9px; -fx-text-fill: #7f8c8d; -fx-alignment: CENTER;"/>
         </VBox>
     </left>
     
-    <!-- CENTER: Dynamic Content Area (Changes on Navigation) -->
+    // ============ Center Dynamic Content Area ============
     <center>
         <StackPane fx:id="contentArea" style="-fx-background-color: #ffffff;"/>
     </center>

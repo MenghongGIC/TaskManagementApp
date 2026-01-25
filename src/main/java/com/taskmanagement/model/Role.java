@@ -26,7 +26,7 @@ public enum Role {
     public String toString() {
         return displayName;
     }
-    // Permissions
+    
     public boolean ViewOwnTasks() { return this == USER; }
     public boolean CompleteOwnTasks() { return this == USER; }
     public boolean ViewAllTasks() { return this == ADMIN || this == USER; }

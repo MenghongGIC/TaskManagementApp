@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+// ====================================================================
+// User Management Panel - User Administration Interface
+// ====================================================================
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -10,12 +14,16 @@
             fx:controller="com.taskmanagement.controller.AdminController"
             style="-fx-background-color: #f5f7fa;">
 
+    // ============ Top Header Section ============
     <top>
         <VBox spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 20;">
+            // Page title
             <Label text="User Management Panel"
                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" />
             
+            // Statistics cards
             <HBox spacing="20" alignment="CENTER_LEFT">
+                // Total users card
                 <VBox spacing="5" style="-fx-border-color: #3498db; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
                     <Label text="Total Users"
                            style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />
@@ -24,6 +32,7 @@
                            style="-fx-text-fill: #3498db; -fx-font-size: 28; -fx-font-weight: bold;" />
                 </VBox>
 
+                // Admins card
                 <VBox spacing="5" style="-fx-border-color: #e74c3c; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
                     <Label text="Admins"
                            style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />
@@ -32,6 +41,7 @@
                            style="-fx-text-fill: #e74c3c; -fx-font-size: 28; -fx-font-weight: bold;" />
                 </VBox>
 
+                // Regular users card
                 <VBox spacing="5" style="-fx-border-color: #2ecc71; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
                     <Label text="Users"
                            style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />
@@ -40,6 +50,7 @@
                            style="-fx-text-fill: #2ecc71; -fx-font-size: 28; -fx-font-weight: bold;" />
                 </VBox>
 
+                // Blocked users card
                 <VBox spacing="5" style="-fx-border-color: #f39c12; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
                     <Label text="Blocked"
                            style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />

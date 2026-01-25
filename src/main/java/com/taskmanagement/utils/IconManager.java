@@ -1,17 +1,15 @@
 package com.taskmanagement.utils;
 
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 
-
-
+/**
+ * Simple icon manager using Unicode symbols
+ * Provides basic icon constants without external icon libraries
+ */
 public class IconManager {
     
-    
+    // Icon Constants (Unicode Symbols)
     public static final String ICON_TABLE = "\u25A0";        
     public static final String ICON_KANBAN = "\u268A";       
     public static final String ICON_LIST = "\u2261";         
@@ -26,6 +24,10 @@ public class IconManager {
     public static final String ICON_ADMIN = "\u1F465";       
     public static final String ICON_CHECKMARK = "\u2713";    
     public static final String ICON_CROSSMARK = "\u274C";    
+    
+    private IconManager() {
+        // Utility class, no instantiation
+    }    
     
     
 

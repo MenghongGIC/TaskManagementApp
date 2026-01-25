@@ -11,7 +11,7 @@ public class User {
     private Role role = Role.USER;
     private LocalDateTime createdAt;
     private LocalDateTime lastLogin;
-    private String position; // Position/role/skill (e.g., 'Backend Developer', 'Designer')
+    private String position;
 
     public User() {}
 
@@ -37,7 +37,7 @@ public class User {
         this.lastLogin = lastLogin;
     }
 
-    // Getters and Setters
+
     public Long getId(){return id;}
     public void setId(Long id){this.id = id;}
 
@@ -54,17 +54,14 @@ public class User {
     public void setRole(Role role){this.role = role != null ? role : Role.USER;}
 
     public LocalDateTime getCreatedAt() {return createdAt;}
-
     public void setCreatedAt(LocalDateTime createdAt){this.createdAt = createdAt;}
 
     public LocalDateTime getLastLogin(){return lastLogin;}
-
     public void setLastLogin(LocalDateTime lastLogin){this.lastLogin = lastLogin;}
 
     public String getPosition() { return position; }
     public void setPosition(String position) { this.position = position; }
 
-    // Convenience methods
     public String getRoleDisplayName() {
         return role != null ? role.getDisplayName() : "Unknown";
     }
@@ -73,7 +70,6 @@ public class User {
     public boolean isAdmin() {return role == Role.ADMIN;}
     public boolean isUser() {return role == Role.USER;}
 
-    // Permission checks delegated to Role enum
     public boolean canViewOwnTasks()         { return role.ViewOwnTasks(); }
     public boolean canCompleteOwnTasks()     { return role.CompleteOwnTasks(); }
     public boolean canViewAllTasks()         { return role.ViewAllTasks(); }
@@ -95,7 +91,6 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        
         User user = (User) o;
 
         if (id != null && user.id != null) {

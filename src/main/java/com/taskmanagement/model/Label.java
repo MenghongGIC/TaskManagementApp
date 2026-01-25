@@ -1,6 +1,7 @@
 package com.taskmanagement.model;
 
 import java.util.Objects;
+import com.taskmanagement.utils.ColorValidator;
 
 public class Label {
     private Long id;
@@ -26,7 +27,7 @@ public class Label {
     public void setColor(String color) { this.color = color; }
 
     public String getColorOrDefault() {
-        return (color != null && color.matches("^#[0-9A-Fa-f]{6}$")) ? color : "#007BFF";
+        return ColorValidator.getLabelColorOrDefault(color);
     }
 
     @Override
