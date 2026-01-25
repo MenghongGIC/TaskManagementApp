@@ -37,6 +37,7 @@ public class DBConnection {
         try {
             if (isConnectionInvalid()) {
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                connection.setAutoCommit(true);
                 System.out.println(MSG_CONNECTED);
             }
         } catch (SQLException e) {

@@ -255,13 +255,16 @@ public class AdminController {
     }
 
     private void showAddUserDialog() {
-        Dialog<User> dialog = new Dialog<>();
+        Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Add New User");
         dialog.setHeaderText("Create a new user account");
         GridPane grid = createAddUserGrid();
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dialog.showAndWait().ifPresent(user -> handleAddUserResult(grid));
+        Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            handleAddUserResult(grid);
+        }
     }
     
     private GridPane createAddUserGrid() {
