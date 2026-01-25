@@ -52,6 +52,8 @@ public class DashboardController {
     @FXML private ComboBox<String> priorityComboBox;
     @FXML private Label taskCountLabel;
     @FXML private TextField searchField;
+    @FXML private Button searchBtn;
+    @FXML private Button clearSearchBtn;
     @FXML private Button tableViewBtn;
     @FXML private Button kanbanViewBtn;
     @FXML private Button listViewBtn;
@@ -114,7 +116,13 @@ public class DashboardController {
             
             // Setup search field listener
             if (searchField != null) {
-                searchField.textProperty().addListener((observable, oldValue, newValue) -> filterTasks());
+                searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+                    filterTasks();
+                    // Show clear button when there's text, hide when empty
+                    if (clearSearchBtn != null) {
+                        clearSearchBtn.setVisible(!newValue.isEmpty());
+                    }
+                });
             }
             
             // Setup profile sidebar
@@ -863,15 +871,42 @@ public class DashboardController {
         if (listViewBtn != null) listViewBtn.setStyle(listViewBtn == activeButton ? activeStyle : inactiveStyle);
     }
 
+    /**
+     * Perform search when search button is clicked
+     */
     @FXML
-    private void clearFilters() {
-        System.out.println("Clearing filters");
-        if (taskNameField != null) taskNameField.clear();
-        if (priorityCombo != null) priorityCombo.setValue("Medium");
-        if (searchField != null) searchField.clear();
-        if (statusComboBox != null) statusComboBox.setValue("All");
-        if (priorityComboBox != null) priorityComboBox.setValue("All");
-        loadTasks();
+    private void performSearch() {
+        String searchText = searchField != null ? searchField.getText().trim() : "";
+        if (!searchText.isEmpty()) {
+            System.out.println("Search: '" + searchText + "'");
+            filterTasks();
+            // If table view is active, also update table display
+            if (isTableViewActive) {
+                updateTableViewDisplay();
+            }
+        } else {
+            System.out.println("Search field is empty");
+        }
+    }
+
+    /**
+     * Clear search field and display all tasks
+     */
+    @FXML
+    private void clearSearch() {
+        if (searchField != null) {
+            searchField.clear();
+            System.out.println("Search cleared - displaying all tasks");
+            filterTasks();
+            // If table view is active, also update table display
+            if (isTableViewActive) {
+                updateTableViewDisplay();
+            }
+        }
+        // Hide clear button
+        if (clearSearchBtn != null) {
+            clearSearchBtn.setVisible(false);
+        }
     }
 
     /**
@@ -985,6 +1020,13 @@ public class DashboardController {
         }
         final String finalProjectName = selectedProjectName;
         
+        // Debug logging
+        if (!searchText.isEmpty()) {
+            System.out.println("🔍 Searching for: '" + searchText + "'");
+        } else {
+            System.out.println("📋 Displaying all tasks (search cleared)");
+        }
+        
         // Clear all panels
         if (todoPanel != null) todoPanel.getChildren().clear();
         if (inProgressPanel != null) inProgressPanel.getChildren().clear();
@@ -1014,11 +1056,10 @@ public class DashboardController {
                     return false;
                 }
                 
-                // Filter by search text
+                // Filter by search text using dedicated search method
+                // If search is empty, show all tasks that pass other filters
                 if (!searchText.isEmpty()) {
-                    String title = task.getTitle() != null ? task.getTitle().toLowerCase() : "";
-                    String description = task.getDescription() != null ? task.getDescription().toLowerCase() : "";
-                    return title.contains(searchText) || description.contains(searchText);
+                    return matchesSearchCriteria(task, searchText);
                 }
                 
                 return true;
@@ -1080,6 +1121,98 @@ public class DashboardController {
         if (doneScrollPane != null && doneColumn != null) {
             setupColumnDropHandler(doneScrollPane, doneColumn, "Done");
         }
+    }
+    
+    /**
+     * Search method to match tasks against search criteria
+     * Searches in: title, description, and task ID
+     */
+    private boolean matchesSearchCriteria(Task task, String searchText) {
+        if (searchText == null || searchText.isEmpty()) {
+            return true;
+        }
+        
+        // Search in task title
+        String title = task.getTitle() != null ? task.getTitle().toLowerCase() : "";
+        if (title.contains(searchText)) {
+            return true;
+        }
+        
+        // Search in task description
+        String description = task.getDescription() != null ? task.getDescription().toLowerCase() : "";
+        if (description.contains(searchText)) {
+            return true;
+        }
+        
+        // Search in task ID
+        String taskId = String.valueOf(task.getId());
+        if (taskId.contains(searchText)) {
+            return true;
+        }
+        
+        // Search in task status
+        String status = task.getStatus() != null ? task.getStatus().toLowerCase() : "";
+        if (status.contains(searchText)) {
+            return true;
+        }
+        
+        // Search in task priority
+        String priority = task.getPriority() != null ? task.getPriority().toLowerCase() : "";
+        if (priority.contains(searchText)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Advanced search method with multiple search options
+     */
+    public List<Task> searchTasks(String query, boolean searchTitle, boolean searchDescription, 
+                                  boolean searchId, boolean searchStatus, boolean searchPriority) {
+        if (query == null || query.isEmpty()) {
+            return allTasks;
+        }
+        
+        final String searchText = query.toLowerCase();
+        return allTasks.stream()
+            .filter(task -> {
+                if (searchTitle) {
+                    String title = task.getTitle() != null ? task.getTitle().toLowerCase() : "";
+                    if (title.contains(searchText)) return true;
+                }
+                
+                if (searchDescription) {
+                    String description = task.getDescription() != null ? task.getDescription().toLowerCase() : "";
+                    if (description.contains(searchText)) return true;
+                }
+                
+                if (searchId) {
+                    String taskId = String.valueOf(task.getId());
+                    if (taskId.contains(searchText)) return true;
+                }
+                
+                if (searchStatus) {
+                    String status = task.getStatus() != null ? task.getStatus().toLowerCase() : "";
+                    if (status.contains(searchText)) return true;
+                }
+                
+                if (searchPriority) {
+                    String priority = task.getPriority() != null ? task.getPriority().toLowerCase() : "";
+                    if (priority.contains(searchText)) return true;
+                }
+                
+                return false;
+            })
+            .sorted((t1, t2) -> Long.compare(t1.getId(), t2.getId()))
+            .collect(Collectors.toList());
+    }
+    
+    /**
+     * Simple search method - searches all fields
+     */
+    public List<Task> searchTasks(String query) {
+        return searchTasks(query, true, true, true, true, true);
     }
     
     /**

@@ -914,3 +914,241 @@ Label.subtitle {
     -fx-background-color: #16A34A;
     -fx-text-fill: white;
 }
+
+/* ===================================
+   DASHBOARD VIEW SPECIFIC STYLES
+   =================================== */
+
+/* Dashboard Root */
+.dashboard-view {
+    -fx-background-color: #f8f9fa;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    -fx-padding: 20;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ecf0f1;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Dashboard Title */
+.dashboard-title {
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Dashboard Form Label */
+.dashboard-label {
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Dashboard ComboBox */
+.dashboard-combo {
+    -fx-font-size: 11;
+}
+
+/* Dashboard Button - Primary (Blue) */
+.dashboard-btn-primary {
+    -fx-padding: 8 12;
+    -fx-font-size: 11;
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.dashboard-btn-primary:hover {
+    -fx-background-color: #2980b9;
+}
+
+/* Dashboard Button - Secondary (Gray) */
+.dashboard-btn-secondary {
+    -fx-padding: 8 12;
+    -fx-font-size: 11;
+    -fx-background-color: #95a5a6;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.dashboard-btn-secondary:hover {
+    -fx-background-color: #7f8c8d;
+}
+
+/* Dashboard Button - Success (Green) */
+.dashboard-btn-success {
+    -fx-padding: 8 15;
+    -fx-font-size: 11;
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.dashboard-btn-success:hover {
+    -fx-background-color: #229954;
+}
+
+/* Dashboard Search Field */
+.dashboard-search {
+    -fx-padding: 10;
+    -fx-font-size: 11;
+    -fx-border-radius: 4;
+    -fx-border-color: #ecf0f1;
+}
+
+/* Dashboard Status Label */
+.dashboard-status {
+    -fx-font-size: 11;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* Dashboard View Container */
+.dashboard-view-stack {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15;
+}
+
+/* Dashboard Table View Wrapper */
+.dashboard-table-wrapper {
+    -fx-border-color: #3498db;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-color: #ffffff;
+}
+
+/* Dashboard Kanban Wrapper */
+.dashboard-kanban-wrapper {
+    -fx-padding: 20;
+    -fx-fill-width: true;
+}
+
+/* Dashboard Kanban Main HBox */
+.dashboard-kanban-main {
+    -fx-fill-height: true;
+    -fx-min-height: 600;
+}
+
+/* Kanban Column Container */
+.kanban-column-container {
+    -fx-border-radius: 5;
+    -fx-padding: 15;
+    -fx-pref-width: 350;
+    -fx-max-height: 550;
+    -fx-min-height: 550;
+}
+
+/* Kanban Column - To Do */
+.kanban-column-todo {
+    -fx-border-color: #3498db;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-color: #ebf5fb;
+    -fx-padding: 15;
+    -fx-pref-width: 350;
+    -fx-max-height: 550;
+    -fx-min-height: 550;
+}
+
+.kanban-column-todo:hover {
+    -fx-border-color: #2980b9;
+}
+
+/* Kanban Column - In Progress */
+.kanban-column-progress {
+    -fx-border-color: #f39c12;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-color: #fef5e7;
+    -fx-padding: 15;
+    -fx-pref-width: 350;
+    -fx-max-height: 550;
+    -fx-min-height: 550;
+}
+
+.kanban-column-progress:hover {
+    -fx-border-color: #d68910;
+}
+
+/* Kanban Column - Done */
+.kanban-column-done {
+    -fx-border-color: #27ae60;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-color: #eafaf1;
+    -fx-padding: 15;
+    -fx-pref-width: 350;
+    -fx-max-height: 550;
+    -fx-min-height: 550;
+}
+
+.kanban-column-done:hover {
+    -fx-border-color: #1e8449;
+}
+
+/* Kanban Column Header */
+.kanban-column-header {
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-padding: 5 0 0 0;
+}
+
+.kanban-column-header-todo {
+    -fx-text-fill: #1a5276;
+}
+
+.kanban-column-header-progress {
+    -fx-text-fill: #7d4f00;
+}
+
+.kanban-column-header-done {
+    -fx-text-fill: #186a3b;
+}
+
+/* Kanban ScrollPane */
+.kanban-scroll {
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+}
+
+/* Kanban Column Inner VBox */
+.kanban-column-inner {
+    -fx-padding: 5;
+    -fx-fill-width: true;
+}
+
+/* Dashboard List View Wrapper */
+.dashboard-list-wrapper {
+    -fx-padding: 0;
+}
+
+/* Dashboard List Container */
+.dashboard-list-container {
+    -fx-padding: 10;
+    -fx-border-color: #3498db;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-color: #ffffff;
+}
+
+/* Dashboard Status Bar */
+.dashboard-status-bar {
+    -fx-padding: 12 20;
+    -fx-background-color: #ecf0f1;
+    -fx-border-color: #d5dbdb;
+    -fx-border-width: 1 0 0 0;
+}
+
+.dashboard-status-text {
+    -fx-font-size: 10;
+    -fx-text-fill: #27ae60;
+}
+
+.dashboard-status-tip {
+    -fx-font-size: 10;
+    -fx-text-fill: #7f8c8d;
+}

@@ -14,7 +14,7 @@
     <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
         
         <!-- Title -->
-        <Label text="Dashboard - Select a Project" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <Label text="Dashboard " style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
         
         <!-- Project Selection Row -->
         <HBox spacing="15" alignment="CENTER_LEFT">
@@ -43,18 +43,22 @@
         
         <!-- Search & Filter Row -->
         <HBox spacing="10" alignment="CENTER_LEFT">
-            <TextField fx:id="searchField" promptText="Search tasks..." 
-                      style="-fx-padding: 10; -fx-font-size: 11px; -fx-border-radius: 4; -fx-border-color: #ecf0f1;" 
-                      HBox.hgrow="ALWAYS" maxWidth="400"/>
+            <!-- Search Field with Button -->
+            <HBox spacing="0" alignment="CENTER" style="-fx-border-color: #ecf0f1; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-color: #ffffff;" HBox.hgrow="ALWAYS" maxWidth="400">
+                <TextField fx:id="searchField" promptText="Search tasks..." 
+                          style="-fx-padding: 10; -fx-font-size: 11px; -fx-border-color: transparent; -fx-background-color: transparent;" 
+                          HBox.hgrow="ALWAYS"/>
+                <Button fx:id="clearSearchBtn" text="×" onAction="#clearSearch" 
+                       style="-fx-padding: 5 8; -fx-font-size: 16px; -fx-background-color: transparent; -fx-text-fill: #95a5a6; -fx-cursor: hand; -fx-border-color: transparent;" visible="false"/>
+                <Button fx:id="searchBtn" text="search" onAction="#performSearch" 
+                       style="-fx-padding: 5 10; -fx-font-size: 12px; -fx-background-color: transparent; -fx-text-fill: #3498db; -fx-cursor: hand; -fx-border-color: transparent;"/>
+            </HBox>
             
             <ComboBox fx:id="statusComboBox" promptText="Status" 
                      style="-fx-font-size: 11px;" prefWidth="120"/>
             
             <ComboBox fx:id="priorityComboBox" promptText="Priority" 
                      style="-fx-font-size: 11px;" prefWidth="120"/>
-            
-            <Button text="Clear" onAction="#clearFilters" 
-                   style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 4;"/>
         </HBox>
         
         <!-- Status Labels -->
