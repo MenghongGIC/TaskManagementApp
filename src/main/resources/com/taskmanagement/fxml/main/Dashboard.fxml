@@ -1,166 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.image.ImageView?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.taskmanagement.controller.DashboardController"
-            style="-fx-background-color: #f5f7fa;">
-
-    <!-- Left Sidebar -->
-    <left>
-        <VBox spacing="20" style="-fx-background-color: #2c3e50; -fx-padding: 20; -fx-min-width: 220;">
-            <!-- Profile Image Area -->
-            <VBox spacing="10" alignment="TOP_CENTER" style="-fx-padding: 10;">
-                <StackPane style="-fx-border-color: #3498db; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #34495e;">
-                    <ImageView fx:id="profileImageView"
-                               fitHeight="150"
-                               fitWidth="150"
-                               preserveRatio="true"
-                               style="-fx-padding: 10;" />
-                </StackPane>
-                <Label fx:id="usernameLabel"
-                       text="User Profile"
-                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;"
-                       alignment="CENTER" />
-            </VBox>
-
-            <!-- Separator -->
-            <Separator style="-fx-padding: 10 0;" />
-
-            <!-- Navigation Buttons -->
-            <VBox spacing="10">
-                <Button fx:id="profileButton"
-                        text="Profile"
-                        onAction="#handleViewProfile"
-                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 12 15; -fx-font-size: 13; -fx-pref-width: 180;"
-                        wrapText="true" />
-                <Button fx:id="settingsButton"
-                        text="Settings"
-                        onAction="#handleSettings"
-                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 12 15; -fx-font-size: 13; -fx-pref-width: 180;"
-                        wrapText="true" />
-                <Button fx:id="logoutButton"
-                        text="Logout"
-                        onAction="#handleLogout"
-                        style="-fx-background-color: #f1311cff; -fx-text-fill: white; -fx-padding: 12 15; -fx-font-size: 13; -fx-pref-width: 180;"
-                        wrapText="true" />
-            </VBox>
-
-            <!-- Spacer -->
-            <Region VBox.vgrow="ALWAYS" />
-
-            <!-- Bottom Info -->
-            <Label text="Task Manager v1.0"
-                   style="-fx-font-size: 10px; -fx-text-fill: #95a5a6;"
-                   alignment="CENTER" />
+<VBox xmlns="http://javafx.com/javafx/21" 
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.taskmanagement.controller.DashboardController"
+      stylesheets="@../css/style.css"
+      style="-fx-background-color: #f8f9fa;"
+      spacing="0">
+    
+    <!-- TOP: Project Selection & Controls -->
+    <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
+        
+        <!-- Title -->
+        <Label text="Dashboard - Select a Project" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        
+        <!-- Project Selection Row -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Project:" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <ComboBox fx:id="projectComboBox" promptText="Choose a project..." prefWidth="250" style="-fx-font-size: 11px;"/>
+        </HBox>
+        
+        <!-- View Toggle Row -->
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="View:" style="-fx-font-size: 12px; -fx-text-fill: #2c3e50; -fx-font-weight: bold;"/>
+            <Button fx:id="tableViewBtn" text="Table View" onAction="#showTableView" 
+                   style="-fx-padding: 8 12; -fx-font-size: 11px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 4;"/>
+            <Button fx:id="kanbanViewBtn" text="Kanban Board" onAction="#showKanbanView" 
+                   style="-fx-padding: 8 12; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 4;"/>
+            <Button fx:id="listViewBtn" text="List View" onAction="#showListView" 
+                   style="-fx-padding: 8 12; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 4;"/>
+            
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <Button text="Create Task" onAction="#showCreateTaskDialog" 
+                   style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 4;"/>
+            
+            <Button text="Refresh" onAction="#refreshTasks" 
+                   style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 4;"/>
+        </HBox>
+        
+        <!-- Search & Filter Row -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="Search tasks..." 
+                      style="-fx-padding: 10; -fx-font-size: 11px; -fx-border-radius: 4; -fx-border-color: #ecf0f1;" 
+                      HBox.hgrow="ALWAYS" maxWidth="400"/>
+            
+            <ComboBox fx:id="statusComboBox" promptText="Status" 
+                     style="-fx-font-size: 11px;" prefWidth="120"/>
+            
+            <ComboBox fx:id="priorityComboBox" promptText="Priority" 
+                     style="-fx-font-size: 11px;" prefWidth="120"/>
+            
+            <Button text="Clear" onAction="#clearFilters" 
+                   style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 4;"/>
+        </HBox>
+        
+        <!-- Status Labels -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label fx:id="statusLabel" text="Select a project to view tasks" 
+                  style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="taskCountLabel" text="0 tasks" 
+                  style="-fx-font-size: 11px; -fx-text-fill: #7f8c8d;"/>
+        </HBox>
+    </VBox>
+    
+    <!-- CENTER: Task Views (Table/Kanban/List) -->
+    <StackPane fx:id="viewStack" style="-fx-background-color: #ffffff; -fx-padding: 15;" VBox.vgrow="ALWAYS">
+        
+        <!-- View 0: Table View -->
+        <VBox style="-fx-border-color: #3498db; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-color: #ffffff;" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tasksTableView" style="-fx-font-size: 11px;" VBox.vgrow="ALWAYS"/>
         </VBox>
-    </left>
-
-    <!-- Top Header Bar -->
-    <top>
-        <VBox style="-fx-background-color: #34495e; -fx-padding: 15;">
-            <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
-                <Label text="Task Management Dashboard"
-                       style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" />
-            </HBox>
-        </VBox>
-    </top>
-
-    <!-- Main Content Area -->
-    <center>
-        <VBox spacing="15" style="-fx-padding: 20;">
-            <!-- Control Panel -->
-            <HBox spacing="10" alignment="CENTER_LEFT"
-                  style="-fx-background-color: white; -fx-padding: 15; -fx-border-radius: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                <TextField fx:id="taskNameField"
-                           promptText="Task or Project name..."
-                           prefWidth="300"
-                           style="-fx-font-size: 12; -fx-padding: 8;" />
-                <ComboBox fx:id="priorityCombo"
-                          prefWidth="100"
-                          style="-fx-font-size: 12;">
-                </ComboBox>
-                <Button text="Create Task"
-                        onAction="#handleCreateTask"
-                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
-                <Button text="Create Project"
-                        onAction="#handleCreateProject"
-                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Button text="📊 Table View"
-                        onAction="#toggleTableView"
-                        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-padding: 8 15; -fx-font-size: 12;" />
-                <Label fx:id="statusLabel"
-                       style="-fx-font-size: 11; -fx-text-fill: #27ae60;" />
-            </HBox>
-
-            <!-- Kanban Board or Table View -->
-            <StackPane fx:id="viewStack" VBox.vgrow="ALWAYS">
-                <!-- Kanban Board -->
-                <VBox fx:id="kanbanView" spacing="15">
-                    <HBox spacing="15" VBox.vgrow="ALWAYS">
+        
+        <!-- View 1: Kanban View -->
+        <VBox spacing="10" style="-fx-padding: 20; -fx-fill-width: true;" VBox.vgrow="ALWAYS">
+            <HBox spacing="15" VBox.vgrow="ALWAYS" style="-fx-fill-height: true; -fx-min-height: 600;">
                 <!-- To Do Column -->
-                <VBox spacing="10" prefWidth="350"
-                      style="-fx-background-color: #ecf0f1; -fx-padding: 15; -fx-border-radius: 5;">
-                    <Label text="TO DO"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-                    <ScrollPane fx:id="todoScrollPane"
-                                VBox.vgrow="ALWAYS"
-                                style="-fx-background-color: transparent; -fx-padding: 5;">
-                        <VBox fx:id="todoPanel"
-                              spacing="10"
-                              style="-fx-background-color: transparent;" />
+                <VBox spacing="10" HBox.hgrow="ALWAYS"
+                     style="-fx-border-color: #3498db; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #ebf5fb; -fx-padding: 15; -fx-pref-width: 350; -fx-max-height: 550; -fx-min-height: 550;">
+                    <Label text="To Do" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1a5276; -fx-padding: 5 0 0 0;"/>
+                    <ScrollPane fx:id="todoScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS" style="-fx-padding: 0; -fx-border-color: transparent;">
+                        <VBox fx:id="todoColumn" spacing="10" style="-fx-padding: 5; -fx-fill-width: true;"/>
                     </ScrollPane>
-                </VBox>
-
-                <!-- In Progress Column -->
-                <VBox spacing="10" prefWidth="350"
-                      style="-fx-background-color: #fef5e7; -fx-padding: 15; -fx-border-radius: 5;">
-                    <Label text="IN PROGRESS"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-                    <ScrollPane fx:id="inProgressScrollPane"
-                                VBox.vgrow="ALWAYS"
-                                style="-fx-background-color: transparent; -fx-padding: 5;">
-                        <VBox fx:id="inProgressPanel"
-                              spacing="10"
-                              style="-fx-background-color: transparent;" />
-                    </ScrollPane>
-                </VBox>
-
-                <!-- Done Column -->
-                <VBox spacing="10" prefWidth="350"
-                      style="-fx-background-color: #e8f8f5; -fx-padding: 15; -fx-border-radius: 5;">
-                    <Label text="DONE"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-                    <ScrollPane fx:id="doneScrollPane"
-                                VBox.vgrow="ALWAYS"
-                                style="-fx-background-color: transparent; -fx-padding: 5;">
-                        <VBox fx:id="donePanel"
-                              spacing="10"
-                              style="-fx-background-color: transparent;" />
-                    </ScrollPane>
-                </VBox>
-                    </HBox>
                 </VBox>
                 
-                <!-- Table View -->
-                <VBox fx:id="tableView" spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-border-radius: 5;">
-                    <TableView fx:id="tasksTableView" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn text="ID" prefWidth="50"/>
-                            <TableColumn text="Title" prefWidth="200"/>
-                            <TableColumn text="Status" prefWidth="100"/>
-                            <TableColumn text="Priority" prefWidth="100"/>
-                            <TableColumn text="Assignee" prefWidth="150"/>
-                            <TableColumn text="Due Date" prefWidth="120"/>
-                        </columns>
-                    </TableView>
+                <!-- In Progress Column -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS"
+                     style="-fx-border-color: #f39c12; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #fef5e7; -fx-padding: 15; -fx-pref-width: 350; -fx-max-height: 550; -fx-min-height: 550;">
+                    <Label text="In Progress" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #7d4f00; -fx-padding: 5 0 0 0;"/>
+                    <ScrollPane fx:id="inProgressScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS" style="-fx-padding: 0; -fx-border-color: transparent;">
+                        <VBox fx:id="inProgressColumn" spacing="10" style="-fx-padding: 5; -fx-fill-width: true;"/>
+                    </ScrollPane>
                 </VBox>
-            </StackPane>
+                
+                <!-- Done Column -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS"
+                     style="-fx-border-color: #27ae60; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #eafaf1; -fx-padding: 15; -fx-pref-width: 350; -fx-max-height: 550; -fx-min-height: 550;">
+                    <Label text="Done" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #186a3b; -fx-padding: 5 0 0 0;"/>
+                    <ScrollPane fx:id="doneScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS" style="-fx-padding: 0; -fx-border-color: transparent;">
+                        <VBox fx:id="doneColumn" spacing="10" style="-fx-padding: 5; -fx-fill-width: true;"/>
+                    </ScrollPane>
+                </VBox>
+            </HBox>
         </VBox>
-    </center>
-</BorderPane>
+        
+        <!-- View 2: List View -->
+        <ScrollPane fitToWidth="true" style="-fx-padding: 0;">
+            <VBox fx:id="taskListContainer" spacing="10" style="-fx-padding: 10; -fx-border-color: #3498db; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-color: #ffffff;">
+                <!-- List items will be added dynamically -->
+            </VBox>
+        </ScrollPane>
+    </StackPane>
+    
+    <!-- BOTTOM: Status Bar -->
+    <HBox spacing="15" style="-fx-padding: 12 20; -fx-background-color: #ecf0f1; -fx-border-color: #d5dbdb; -fx-border-width: 1 0 0 0;">
+        <Label text="Ready" style="-fx-font-size: 10px; -fx-text-fill: #27ae60;"/>
+        <Label text="Tip: Drag tasks in Kanban board to change status" style="-fx-font-size: 10px; -fx-text-fill: #7f8c8d;"/>
+    </HBox>
+</VBox>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.taskmanagement.controller.TaskDetailController"
+            style="-fx-background-color: #f8f9fa;">
+
+    <top>
+        <VBox style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;" spacing="10">
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label fx:id="taskIdLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="editBtn" text="✏️ Edit" style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 5;"/>
+                <Button fx:id="saveBtn" text="💾 Save" style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5;"/>
+                <Button fx:id="cancelBtn" text="✕ Cancel" style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;"/>
+                <Button fx:id="deleteBtn" text="🗑️ Delete" style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane style="-fx-background-color: #f8f9fa; -fx-border-style: none;" fitToWidth="true">
+            <GridPane style="-fx-padding: 20; -fx-hgap: 15; -fx-vgap: 15; -fx-background-color: #f8f9fa;">
+                <!-- Title Row -->
+                <Label text="Title:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="titleField" style="-fx-padding: 10; -fx-font-size: 12px;" prefWidth="400" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <!-- Description Row -->
+                <Label text="Description:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.valignment="TOP"/>
+                <TextArea fx:id="descriptionArea" style="-fx-padding: 10; -fx-font-size: 11px;" prefHeight="100" prefWidth="400" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <!-- Status Row -->
+                <Label text="Status:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="statusCombo" style="-fx-padding: 8;" prefWidth="400" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <!-- Priority Row -->
+                <Label text="Priority:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <ComboBox fx:id="priorityCombo" style="-fx-padding: 8;" prefWidth="400" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                <!-- Due Date Row -->
+                <Label text="Due Date:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <DatePicker fx:id="dueDatePicker" style="-fx-padding: 8;" prefWidth="400" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                <!-- Assignee Row -->
+                <Label text="Assigned To:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                    <ComboBox fx:id="assigneeCombo" style="-fx-padding: 8;" prefWidth="300"/>
+                    <Label fx:id="assigneeInfoLabel" style="-fx-font-size: 12px; -fx-padding: 10;" HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <!-- Project Row -->
+                <Label text="Project:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                <Label fx:id="projectLabel" style="-fx-font-size: 12px; -fx-padding: 10;" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+
+                <!-- Created By Row -->
+                <Label text="Created By:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                <Label fx:id="createdByLabel" style="-fx-font-size: 12px; -fx-padding: 10; -fx-text-fill: #7f8c8d;" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                <ComboBox fx:id="createdByCombo" style="-fx-padding: 8; -fx-font-size: 12px;" prefWidth="350" GridPane.columnIndex="1" GridPane.rowIndex="7" visible="false"/>
+
+                <!-- Created At Row -->
+                <Label text="Created At:" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2c3e50;" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+                <Label fx:id="createdAtLabel" style="-fx-font-size: 12px; -fx-padding: 10;" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+            </GridPane>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

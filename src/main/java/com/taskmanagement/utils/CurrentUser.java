@@ -58,7 +58,6 @@ public class CurrentUser {
     public static boolean canManageTeams()          { return safeRole().ManageTeams(); }
     public static boolean canManageUsers()          { return safeRole().ManageUsers(); }
     public static boolean hasFullAccess()           { return safeRole().FullAccess(); }
-    public static boolean canViewPublicProjects()   { return safeRole().ViewPublicProjects(); }
     public static boolean canRegisterOrLogin()      { return safeRole().RegisterOrLogin(); }
 
     private static Role safeRole() {

@@ -1,163 +1,164 @@
-CREATE DATABASE TaskManagementDB;
+USE TaskManagementDB;
 GO
 
--- Users table
-CREATE TABLE Users (
-    id BIGINT IDENTITY(1,1) PRIMARY KEY,
-    username NVARCHAR(50) NOT NULL UNIQUE,
-    password_hash NVARCHAR(255) NOT NULL,
-    email NVARCHAR(100),
-    role NVARCHAR(20) DEFAULT 'USER',
-    position NVARCHAR(100),
-    created_at DATETIME2 DEFAULT GETDATE(),
-    last_login DATETIME2 NULL
-);
+-- Create Users table
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Users')
+BEGIN
+    CREATE TABLE Users (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        username NVARCHAR(255) UNIQUE NOT NULL,
+        password_hash NVARCHAR(255) NOT NULL,
+        email NVARCHAR(255),
+        role NVARCHAR(50) DEFAULT 'USER',
+        position NVARCHAR(255),
+        is_blocked BIT DEFAULT 0,
+        created_at DATETIME DEFAULT GETDATE(),
+        last_login DATETIME
+    );
+END
+ELSE
+BEGIN
+    -- Add is_blocked column if it doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Users' AND COLUMN_NAME = 'is_blocked')
+    BEGIN
+        ALTER TABLE Users ADD is_blocked BIT DEFAULT 0;
+    END
+END
 GO
 
-CREATE TABLE Teams (
-        id BIGINT IDENTITY(1,1) PRIMARY KEY,
-        name NVARCHAR(100) NOT NULL UNIQUE,
-        description NVARCHAR(MAX),
-        created_by BIGINT NOT NULL,
-        created_at DATETIME2 DEFAULT GETDATE(),
-        FOREIGN KEY (created_by) REFERENCES Users(id) ON DELETE NO ACTION
-    );
-    GO
-
-    -- TeamMembers junction table (many-to-many)
-    CREATE TABLE TeamMembers (
-        team_id BIGINT NOT NULL,
-        user_id BIGINT NOT NULL,
-        joined_at DATETIME2 DEFAULT GETDATE(),
-        PRIMARY KEY (team_id, user_id),
-        FOREIGN KEY (team_id) REFERENCES Teams(id) ON DELETE CASCADE,
-        FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
-    );
-    GO
-
-    -- Projects table
+-- Create Projects table
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Projects')
+BEGIN
     CREATE TABLE Projects (
-        id BIGINT IDENTITY(1,1) PRIMARY KEY,
-        name NVARCHAR(100) NOT NULL,
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        name NVARCHAR(255) NOT NULL,
         description NVARCHAR(MAX),
-        color NVARCHAR(7),  -- e.g., '#007BFF'
-        created_by BIGINT NOT NULL,
-        team_id BIGINT NULL,
-        created_at DATETIME2 DEFAULT GETDATE(),
-        FOREIGN KEY (created_by) REFERENCES Users(id),
-        FOREIGN KEY (team_id) REFERENCES Teams(id) ON DELETE SET NULL
-    );
-    GO
-
-    -- Labels table (e.g., Bug, Feature, Urgent)
-    CREATE TABLE Labels (
-        id BIGINT IDENTITY(1,1) PRIMARY KEY,
-        name NVARCHAR(50) NOT NULL UNIQUE,
-        color NVARCHAR(20) DEFAULT '#007BFF'
-    );
-    GO
-
-    -- Tasks table
-    CREATE TABLE Tasks (
-        id BIGINT IDENTITY(1,1) PRIMARY KEY,
-        title NVARCHAR(100) NOT NULL,
-        description NVARCHAR(MAX),
-        status NVARCHAR(20) DEFAULT 'To Do',
-        priority NVARCHAR(20) DEFAULT 'Medium',
-        due_date DATE NULL,
-        project_id BIGINT NULL,
-        assignee_id BIGINT NULL,
-        created_by BIGINT NOT NULL,
-        created_at DATETIME2 DEFAULT GETDATE(),
-        FOREIGN KEY (project_id) REFERENCES Projects(id) ON DELETE CASCADE,
-        FOREIGN KEY (assignee_id) REFERENCES Users(id) ON DELETE SET NULL,
+        color NVARCHAR(50),
+        created_by INT NOT NULL,
+        created_at DATETIME DEFAULT GETDATE(),
         FOREIGN KEY (created_by) REFERENCES Users(id)
     );
-    GO
+END
+GO
 
-    -- TaskLabels junction table (many-to-many)
+-- Create Labels table
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Labels')
+BEGIN
+    CREATE TABLE Labels (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        name NVARCHAR(255) NOT NULL,
+        color NVARCHAR(50)
+    );
+END
+GO
+
+-- Create Tasks table
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Tasks')
+BEGIN
+    CREATE TABLE Tasks (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        title NVARCHAR(255) NOT NULL,
+        description NVARCHAR(MAX),
+        status NVARCHAR(50) DEFAULT 'To Do',
+        priority NVARCHAR(50) DEFAULT 'Medium',
+        due_date DATE,
+        project_id INT NOT NULL,
+        assignee_id INT,
+        created_by INT NOT NULL,
+        created_at DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (project_id) REFERENCES Projects(id) ON DELETE CASCADE,
+        FOREIGN KEY (assignee_id) REFERENCES Users(id),
+        FOREIGN KEY (created_by) REFERENCES Users(id)
+    );
+END
+GO
+
+-- Create TaskLabels table
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'TaskLabels')
+BEGIN
     CREATE TABLE TaskLabels (
-        task_id BIGINT NOT NULL,
-        label_id BIGINT NOT NULL,
+        task_id INT NOT NULL,
+        label_id INT NOT NULL,
         PRIMARY KEY (task_id, label_id),
         FOREIGN KEY (task_id) REFERENCES Tasks(id) ON DELETE CASCADE,
-        FOREIGN KEY (label_id) REFERENCES Labels(id) ON DELETE CASCADE
+        FOREIGN KEY (label_id) REFERENCES Labels(id)
     );
-    GO
+END
+GO
 
-    -- Comments table
-    CREATE TABLE Comments (
-        id BIGINT IDENTITY(1,1) PRIMARY KEY,
-        content NVARCHAR(MAX) NOT NULL,
-        task_id BIGINT NOT NULL,
-        author_id BIGINT NOT NULL,
-        created_at DATETIME2 DEFAULT GETDATE(),
-        FOREIGN KEY (task_id) REFERENCES Tasks(id) ON DELETE CASCADE,
-        FOREIGN KEY (author_id) REFERENCES Users(id)
-    );
-    GO
-
-    -- ActivityLog table for audit trail
+-- Create ActivityLog table
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'ActivityLog')
+BEGIN
     CREATE TABLE ActivityLog (
-        id BIGINT IDENTITY(1,1) PRIMARY KEY,
-        action NVARCHAR(50) NOT NULL,
-        entity_type NVARCHAR(50) NOT NULL,
-        entity_id BIGINT NOT NULL,
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        action NVARCHAR(50),
+        entity_type NVARCHAR(50),
+        entity_id INT,
         entity_name NVARCHAR(255),
-        actor_id BIGINT,
+        actor_id INT,
         details NVARCHAR(MAX),
-        timestamp DATETIME2 DEFAULT GETDATE(),
-        FOREIGN KEY (actor_id) REFERENCES Users(id) ON DELETE SET NULL
+        timestamp DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (actor_id) REFERENCES Users(id)
     );
-    GO
+END
+GO
 
-    -- =============================================
-    -- Insert default data
-    -- =============================================
-
-    -- Admin user (username: admin, password: admin12345)
+-- Insert admin user
+IF NOT EXISTS (SELECT 1 FROM Users WHERE username = 'admin')
+BEGIN
     INSERT INTO Users (username, password_hash, email, role)
     VALUES ('admin', 'admin12345', 'admin@gmail.com', 'ADMIN');
-    GO
+END
+GO
 
-    -- Sample users
+-- Insert sample users
+IF NOT EXISTS (SELECT 1 FROM Users WHERE username = 'john')
+BEGIN
     INSERT INTO Users (username, password_hash, email, role)
-    VALUES 
-    ('john', 'password123', 'john@gmail.com', 'USER'),
-    ('jane', 'password123', 'jane@gmail.com', 'USER'),
-    ('bob', 'password123', 'bob@gmail.com', 'USER');
-    GO
+    VALUES ('john', 'password123', 'john@gmail.com', 'USER');
+END
+GO
 
-    -- Some default labels
+IF NOT EXISTS (SELECT 1 FROM Users WHERE username = 'jane')
+BEGIN
+    INSERT INTO Users (username, password_hash, email, role)
+    VALUES ('jane', 'password123', 'jane@gmail.com', 'USER');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Users WHERE username = 'bob')
+BEGIN
+    INSERT INTO Users (username, password_hash, email, role)
+    VALUES ('bob', 'password123', 'bob@gmail.com', 'USER');
+END
+GO
+
+-- Insert labels
+IF NOT EXISTS (SELECT 1 FROM Labels WHERE name = 'Bug')
+BEGIN
     INSERT INTO Labels (name, color) VALUES
     ('Bug', '#DC3545'),
     ('Feature', '#28A745'),
     ('Urgent', '#FD7E14'),
     ('Improvement', '#FFC107'),
     ('Documentation', '#17A2B8');
-    GO
+END
+GO
 
-    -- Sample team
-    INSERT INTO Teams (name, description, created_by)
-    VALUES ('Development Team', 'Main development team', 1);
-    GO
-
-    -- Add team members
-    INSERT INTO TeamMembers (team_id, user_id) VALUES
-    (1, 1),
-    (1, 2),
-    (1, 3);
-    GO
-
-    -- Sample projects
-    INSERT INTO Projects (name, description, color, created_by, team_id)
+-- Insert sample projects
+IF NOT EXISTS (SELECT 1 FROM Projects WHERE name = 'Task Management App')
+BEGIN
+    INSERT INTO Projects (name, description, color, created_by)
     VALUES 
-    ('Task Management App', 'A comprehensive task management application', '#007BFF', 1, 1),
-    ('Mobile App', 'Mobile application development project', '#28A745', 1, 1),
-    ('Website Redesign', 'Redesigning the company website', '#FFC107', 1, 1);
-    GO
+    ('Task Management App', 'A comprehensive task management application', '#007BFF', 1),
+    ('Mobile App', 'Mobile application development project', '#28A745', 1),
+    ('Website Redesign', 'Redesigning the company website', '#FFC107', 1);
+END
+GO
 
-    -- Sample tasks for Project 1
+-- Insert sample tasks for Project 1
+IF NOT EXISTS (SELECT 1 FROM Tasks WHERE title = 'Setup Database Schema')
+BEGIN
     INSERT INTO Tasks (title, description, status, priority, due_date, project_id, assignee_id, created_by)
     VALUES 
     ('Setup Database Schema', 'Create all necessary database tables and relationships', 'Done', 'High', '2025-12-20', 1, 2, 1),
@@ -168,29 +169,30 @@ CREATE TABLE Teams (
     ('Add Task Categories', 'Implement task categorization feature', 'To Do', 'Medium', '2026-01-10', 1, NULL, 1),
     ('Implement Notifications', 'Add notification system for task updates', 'To Do', 'Low', '2026-01-15', 1, NULL, 1),
     ('Database Performance Optimization', 'Optimize database queries and indexes', 'To Do', 'Low', '2026-01-20', 1, NULL, 1);
-    GO
+END
+GO
 
-    -- Sample tasks for Project 2
+-- Insert sample tasks for Project 2
+IF NOT EXISTS (SELECT 1 FROM Tasks WHERE title = 'Design Mobile UI')
+BEGIN
     INSERT INTO Tasks (title, description, status, priority, due_date, project_id, assignee_id, created_by)
     VALUES 
     ('Design Mobile UI', 'Create mockups and design for mobile application', 'In Progress', 'High', '2026-01-15', 2, 2, 1),
     ('Setup Mobile Development Environment', 'Configure development tools and SDKs', 'Done', 'High', '2025-12-27', 2, 3, 1),
     ('Implement Mobile Authentication', 'Add login and registration for mobile app', 'To Do', 'High', '2026-02-01', 2, NULL, 1);
-    GO
+END
+GO
 
-    -- Sample tasks for Project 3
+-- Insert sample tasks for Project 3
+IF NOT EXISTS (SELECT 1 FROM Tasks WHERE title = 'Design New Website Layout')
+BEGIN
     INSERT INTO Tasks (title, description, status, priority, due_date, project_id, assignee_id, created_by)
     VALUES 
     ('Design New Website Layout', 'Create modern website design', 'In Progress', 'High', '2026-01-20', 3, 2, 1),
     ('Content Migration', 'Migrate existing content to new website', 'To Do', 'Medium', '2026-02-05', 3, NULL, 1),
     ('Setup Hosting', 'Configure web hosting and domain', 'To Do', 'High', '2026-01-30', 3, 3, 1);
-    GO
+END
+GO
 
-    -- Sample comments
-    INSERT INTO Comments (content, task_id, author_id)
-    VALUES 
-    ('This task is almost complete. Need to test on different browsers.', 3, 2),
-    ('Great progress on the dashboard! Keep it up.', 5, 1),
-    ('We should prioritize this for the next sprint.', 6, 1),
-    ('Mobile design looks great! Moving forward with development.', 9, 2);
-    GO
+PRINT 'Database initialization complete!';
+GO

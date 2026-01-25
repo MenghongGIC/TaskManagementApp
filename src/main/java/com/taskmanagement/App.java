@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.sql.Connection;
 
 import com.taskmanagement.database.DBConnection;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -25,38 +23,43 @@ public class App extends Application {
         stage.setTitle("Task Management System");
         stage.setResizable(true);
         
-        // Set minimum size (prevents window from being too small)
+
         stage.setMinWidth(800);
         stage.setMinHeight(600);
         
-        // Set maximum size (prevents window from being too large)
         stage.setMaxWidth(1400);
         stage.setMaxHeight(1000);
-        
-        try {
-            Image icon = new Image(getClass().getResourceAsStream("/com/taskmanagement/img/app-icon.png"));
-            stage.getIcons().add(icon);
-        } catch (Exception e) {
-            System.out.println("Icon not found: " + e.getMessage());
-        }
         
         stage.show();
     }
 
     public static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-        
-        // Expand window for dashboard views (now wider for left sidebar + kanban board)
-        if (fxml.startsWith("main/")) {
-            primaryStage.setWidth(1600);
-            primaryStage.setHeight(1000);
-            primaryStage.setResizable(true);
-        } else {
-            // Keep medium size for auth views but resizable
-            primaryStage.setWidth(800);
-            primaryStage.setHeight(800);
-            primaryStage.setResizable(true);
+        try {
+            System.out.println("DEBUG: Loading FXML: " + fxml);
+            Parent root = loadFXML(fxml);
+            System.out.println("DEBUG: FXML loaded successfully: " + fxml);
+            scene.setRoot(root);
+            System.out.println("DEBUG: Root set successfully");
+            
+            if (fxml.startsWith("main/")) {
+                primaryStage.setWidth(1600);
+                primaryStage.setHeight(1000);
+                primaryStage.setResizable(true);
+            } else {
+                primaryStage.setWidth(800);
+                primaryStage.setHeight(800);
+                primaryStage.setResizable(true);
+            }
+            System.out.println("DEBUG: Stage resized");
+        } catch (IOException e) {
+            System.err.println("ERROR loading FXML " + fxml + ": " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
+    }
+    
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/com/taskmanagement/fxml/" + fxml + ".fxml"));
@@ -64,14 +67,12 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.println("=== Testing Database Connection ===");
         try {
             DBConnection dbConnection = DBConnection.getInstance();
             Connection connection = dbConnection.getConnection();
             
             if (connection != null && !connection.isClosed()) {
                 System.out.println("✓ Database connection verified successfully!");
-                System.out.println("✓ Application is ready to start.");
             } else {
                 System.out.println("✗ Database connection failed: Connection is null or closed.");
                 System.exit(1);

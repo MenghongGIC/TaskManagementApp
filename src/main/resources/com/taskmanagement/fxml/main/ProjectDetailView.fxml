@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.taskmanagement.controller.ProjectDetailController"
+            style="-fx-background-color: #f8f9fa;">
+
+    <top>
+        <VBox style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;" spacing="15">
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label fx:id="projectNameLabel" text="Project Name" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Edit" onAction="#handleEditProject" style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 5;"/>
+                <Button text="Delete" onAction="#handleDeleteProject" style="-fx-padding: 8 15; -fx-font-size: 11px; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5;"/>
+            </HBox>
+            
+            <!-- Project Info Grid -->
+            <GridPane hgap="20" vgap="10" style="-fx-padding: 10 0 0 0;">
+                <Label text="Description:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                <Label fx:id="projectDescLabel" text="No description" GridPane.rowIndex="0" GridPane.columnIndex="1" HBox.hgrow="ALWAYS" style="-fx-font-size: 11px;" wrapText="true"/>
+                
+                <Label text="Created By:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                <Label fx:id="projectCreatedByLabel" text="Unknown" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-size: 11px;"/>
+                
+                <Label text="Created Date:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                <Label fx:id="projectCreatedAtLabel" text="N/A" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-size: 11px;"/>
+                
+                <Label text="Color:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                <HBox spacing="10" GridPane.rowIndex="3" GridPane.columnIndex="1">
+                    <Rectangle fx:id="colorBox" width="30" height="30" style="-fx-fill: #3498db; -fx-stroke: #bdc3c7; -fx-stroke-width: 1;"/>
+                    <Label fx:id="projectColorLabel" text="#3498db" style="-fx-font-size: 11px;"/>
+                </HBox>
+            </GridPane>
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane style="-fx-font-size: 11px;" tabClosingPolicy="UNAVAILABLE">
+            <!-- Tasks Tab -->
+            <Tab text="Tasks" style="-fx-text-fill: #2c3e50;">
+                <BorderPane style="-fx-background-color: #f8f9fa;">
+                    <top>
+                        <HBox spacing="10" style="-fx-padding: 15; -fx-background-color: #ffffff; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
+                            <TextField fx:id="taskSearchField" promptText="🔍 Search tasks..." HBox.hgrow="ALWAYS" style="-fx-padding: 8; -fx-border-radius: 5;"/>
+                            <Button text="" onAction="#clearTaskSearch" style="-fx-padding: 8 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 3;"/>
+                            <Button text=" Add Task" onAction="#handleAddTaskToProject" style="-fx-padding: 8 15; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 3;"/>
+                        </HBox>
+                    </top>
+                    
+                    <center>
+                        <TableView fx:id="tasksTable" style="-fx-font-size: 11px;">
+                            <columns>
+                                <TableColumn fx:id="taskIdColumn" text="ID" prefWidth="50" sortable="true"/>
+                                <TableColumn fx:id="taskTitleColumn" text="Title" prefWidth="150" sortable="true"/>
+                                <TableColumn fx:id="taskStatusColumn" text="Status" prefWidth="100" sortable="true"/>
+                                <TableColumn fx:id="taskPriorityColumn" text="Priority" prefWidth="80" sortable="true"/>
+                                <TableColumn fx:id="taskDueColumn" text="Due Date" prefWidth="120" sortable="true"/>
+                                <TableColumn fx:id="taskAssigneeColumn" text="Assignee" prefWidth="120" sortable="true"/>
+                            </columns>
+                        </TableView>
+                    </center>
+                </BorderPane>
+            </Tab>
+            
+            <!-- Project Info Tab -->
+            <Tab text="ℹInfo" style="-fx-text-fill: #2c3e50;">
+                <BorderPane style="-fx-background-color: #f8f9fa;">
+                    <center>
+                        <VBox spacing="20" style="-fx-padding: 20;">
+                            <!-- Project Stats -->
+                            <VBox style="-fx-border-color: #ecf0f1; -fx-border-width: 1; -fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 8;" spacing="15">
+                                <Label text="Project Statistics" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                                
+                                <HBox spacing="20">
+                                    <VBox spacing="5" style="-fx-padding: 10; -fx-background-color: #e8f5e9; -fx-background-radius: 5;">
+                                        <Label text="Total Tasks" style="-fx-font-size: 11px; -fx-text-fill: #2e7d32; -fx-font-weight: bold;"/>
+                                        <Label fx:id="statTotalTasks" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="5" style="-fx-padding: 10; -fx-background-color: #fff3e0; -fx-background-radius: 5;">
+                                        <Label text="In Progress" style="-fx-font-size: 11px; -fx-text-fill: #e65100; -fx-font-weight: bold;"/>
+                                        <Label fx:id="statInProgress" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f57c00;"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="5" style="-fx-padding: 10; -fx-background-color: #f3e5f5; -fx-background-radius: 5;">
+                                        <Label text="Completed" style="-fx-font-size: 11px; -fx-text-fill: #6a1b9a; -fx-font-weight: bold;"/>
+                                        <Label fx:id="statCompleted" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #9c27b0;"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="5" style="-fx-padding: 10; -fx-background-color: #ffebee; -fx-background-radius: 5;">
+                                        <Label text="To Do" style="-fx-font-size: 11px; -fx-text-fill: #c62828; -fx-font-weight: bold;"/>
+                                        <Label fx:id="statTodo" text="0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f44336;"/>
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                            
+                            <!-- Additional Project Details -->
+                            <VBox style="-fx-border-color: #ecf0f1; -fx-border-width: 1; -fx-background-color: #ffffff; -fx-padding: 20; -fx-background-radius: 8;" spacing="15">
+                                <Label text="Project Details" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                                
+                                <GridPane hgap="15" vgap="10">
+                                    <Label text="Project ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label fx:id="detailProjectId" text="N/A" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 11px;"/>
+                                    
+                                    <Label text="Created By:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label fx:id="detailCreatedBy" text="Unknown" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-size: 11px;"/>
+                                    
+                                    <Label text="Created Date:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label fx:id="detailCreatedAt" text="N/A" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-size: 11px;"/>
+                                    
+                                    <Label text="Description:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label fx:id="detailDescription" text="No description provided" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-font-size: 11px;" wrapText="true"/>
+                                </GridPane>
+                            </VBox>
+                        </VBox>
+                    </center>
+                </BorderPane>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

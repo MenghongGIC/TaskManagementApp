@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.taskmanagement.controller.AdminController"
+            style="-fx-background-color: #f5f7fa;">
+
+    <top>
+        <VBox spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 20;">
+            <Label text="User Management Panel"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" />
+            
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox spacing="5" style="-fx-border-color: #3498db; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
+                    <Label text="Total Users"
+                           style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />
+                    <Label fx:id="totalUsersLabel"
+                           text="0"
+                           style="-fx-text-fill: #3498db; -fx-font-size: 28; -fx-font-weight: bold;" />
+                </VBox>
+
+                <VBox spacing="5" style="-fx-border-color: #e74c3c; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
+                    <Label text="Admins"
+                           style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />
+                    <Label fx:id="adminCountLabel"
+                           text="0"
+                           style="-fx-text-fill: #e74c3c; -fx-font-size: 28; -fx-font-weight: bold;" />
+                </VBox>
+
+                <VBox spacing="5" style="-fx-border-color: #2ecc71; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
+                    <Label text="Users"
+                           style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />
+                    <Label fx:id="userCountLabel"
+                           text="0"
+                           style="-fx-text-fill: #2ecc71; -fx-font-size: 28; -fx-font-weight: bold;" />
+                </VBox>
+
+                <VBox spacing="5" style="-fx-border-color: #f39c12; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 5; -fx-background-color: #34495e; -fx-min-width: 150;">
+                    <Label text="Blocked"
+                           style="-fx-text-fill: #95a5a6; -fx-font-size: 12;" />
+                    <Label fx:id="blockedCountLabel"
+                           text="0"
+                           style="-fx-text-fill: #f39c12; -fx-font-size: 28; -fx-font-weight: bold;" />
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="15" style="-fx-padding: 20;">
+            
+            <HBox spacing="10" style="-fx-padding: 10; -fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-border-radius: 5;">
+                <Label text="Search:"
+                       style="-fx-font-weight: bold;" />
+                <TextField fx:id="searchField"
+                           promptText="Search by username or email..."
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-padding: 8; -fx-font-size: 12;" />
+                <Button fx:id="searchButton"
+                        text="Search"
+                        onAction="#handleSearch"
+                        style="-fx-padding: 8 15; -fx-font-size: 12;" />
+
+                <Separator orientation="VERTICAL" />
+
+                <Label text="Role Filter:"
+                       style="-fx-font-weight: bold;" />
+                <ComboBox fx:id="roleFilterCombo"
+                          onAction="#handleRoleFilter"
+                          style="-fx-padding: 8; -fx-font-size: 12;"
+                          prefWidth="100" />
+
+                <Separator orientation="VERTICAL" />
+
+                <Button fx:id="refreshButton"
+                        text="Refresh"
+                        onAction="#handleRefresh"
+                        style="-fx-padding: 8 15; -fx-font-size: 12;" />
+
+                <Button fx:id="addUserButton"
+                        text="+ Add User"
+                        onAction="#handleAddUser"
+                        style="-fx-padding: 8 15; -fx-font-size: 12; -fx-background-color: #2ecc71; -fx-text-fill: white;" />
+            </HBox>
+
+            <TableView fx:id="usersTable"
+                       VBox.vgrow="ALWAYS"
+                       style="-fx-font-size: 12;">
+                <columns>
+                    <TableColumn fx:id="idColumn"
+                                 text="ID"
+                                 prefWidth="50" />
+                    <TableColumn fx:id="usernameColumn"
+                                 text="Username"
+                                 prefWidth="120" />
+                    <TableColumn fx:id="emailColumn"
+                                 text="Email"
+                                 prefWidth="150" />
+                    <TableColumn fx:id="roleColumn"
+                                 text="Role"
+                                 prefWidth="80" />
+                    <TableColumn fx:id="statusColumn"
+                                 text="Status"
+                                 prefWidth="80" />
+                    <TableColumn fx:id="createdColumn"
+                                 text="Created At"
+                                 prefWidth="150" />
+                    <TableColumn fx:id="actionsColumn"
+                                 text="Actions"
+                                 prefWidth="200" />
+                </columns>
+            </TableView>
+
+            <Label fx:id="messageLabel"
+                   text=""
+                   style="-fx-font-size: 12; -fx-padding: 10; -fx-border-color: #ecf0f1; -fx-border-width: 1; -fx-border-radius: 3;"
+                   minHeight="30" />
+        </VBox>
+    </center>
+</BorderPane>

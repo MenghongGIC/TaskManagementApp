@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.taskmanagement.controller.UserTasksDialogController"
+            style="-fx-background-color: #f8f9fa;">
+    
+    <top>
+        <VBox style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <Label fx:id="dialogTitleLabel" text="User Tasks" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="taskCountLabel" text="(0 tasks)" style="-fx-font-size: 12px; -fx-text-fill: #bdc3c7;"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+            <!-- Tasks Table -->
+            <TableView fx:id="userTasksTable" style="-fx-font-size: 11px;" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="taskIdColumn" text="Task ID" prefWidth="60"/>
+                    <TableColumn fx:id="taskTitleColumn" text="Title" prefWidth="180"/>
+                    <TableColumn fx:id="taskProjectColumn" text="Project" prefWidth="120"/>
+                    <TableColumn fx:id="taskStatusColumn" text="Status" prefWidth="100"/>
+                    <TableColumn fx:id="taskPriorityColumn" text="Priority" prefWidth="100"/>
+                    <TableColumn fx:id="taskDueColumn" text="Due Date" prefWidth="120"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+    
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 15; -fx-background-color: white; -fx-border-color: #ecf0f1; -fx-border-width: 1 0 0 0;">
+            <Label fx:id="messageLabel" text="Ready" style="-fx-font-size: 11px; -fx-text-fill: #27ae60;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="closeButton" text="Close" style="-fx-padding: 10 20; -fx-font-size: 11px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

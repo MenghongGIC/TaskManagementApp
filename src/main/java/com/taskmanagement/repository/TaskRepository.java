@@ -11,13 +11,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.taskmanagement.model.Comment;
 import com.taskmanagement.model.Project;
 import com.taskmanagement.model.Task;
 import com.taskmanagement.model.User;
 
 public class TaskRepository extends BaseRepository {
-    private final CommentRepository commentRepository = new CommentRepository();
 
     public Task save(Task task) {
         String sql = """
@@ -74,13 +72,6 @@ public class TaskRepository extends BaseRepository {
             while (rs.next()) {
                 tasks.add(mapRowToTask(rs));
             }
-            // Load comments and labels for each task using proper methods
-            for (Task task : tasks) {
-                List<Comment> comments = commentRepository.findByTaskId(task.getId());
-                for (Comment comment : comments) {
-                    task.addComment(comment);
-                }
-            }
         } catch (SQLException e) {
             throw new RuntimeException("Error loading all tasks", e);
         }
@@ -111,13 +102,6 @@ public class TaskRepository extends BaseRepository {
                 }
             }
 
-            for (Task task : tasks) {
-                List<Comment> comments = commentRepository.findByTaskId(task.getId());
-                for (Comment comment : comments) {
-                    task.addComment(comment);
-                }
-            }
-
         } catch (SQLException e) {
             throw new RuntimeException("Error loading tasks for project: " + projectId, e);
         }
@@ -143,10 +127,6 @@ public class TaskRepository extends BaseRepository {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Task task = mapRowToTask(rs);
-                    List<Comment> comments = commentRepository.findByTaskId(id);
-                    for (Comment comment : comments) {
-                        task.addComment(comment);
-                    }
                     return task;
                 }
             }
@@ -179,7 +159,7 @@ public class TaskRepository extends BaseRepository {
         String sql = """
             UPDATE Tasks 
             SET title = ?, description = ?, status = ?, priority = ?, due_date = ?,
-                project_id = ?, assignee_id = ?
+                project_id = ?, assignee_id = ?, created_by = ?
             WHERE id = ?
             """;
 
@@ -196,14 +176,105 @@ public class TaskRepository extends BaseRepository {
 
             pstmt.setObject(6, task.getProject() != null ? task.getProject().getId() : null);
             pstmt.setObject(7, task.getAssignee() != null ? task.getAssignee().getId() : null);
-            pstmt.setObject(8, task.getId());  // Use setObject to handle null safely
+            
+            // Set created_by - only set if not null to preserve original creator
+            if (task.getCreatedBy() != null) {
+                pstmt.setLong(8, task.getCreatedBy().getId());
+            } else {
+                pstmt.setNull(8, java.sql.Types.BIGINT);
+            }
+            
+            pstmt.setObject(9, task.getId());
 
-            pstmt.executeUpdate();
+            int rowsUpdated = pstmt.executeUpdate();
+            
+            if (rowsUpdated == 0) {
+                throw new RuntimeException("No task found with ID: " + task.getId());
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error updating task: " + task.getTitle(), e);
         }
         return task;
+    }
+
+    public void updateStatus(Long taskId, String newStatus) {
+        if (taskId == null || newStatus == null) {
+            throw new IllegalArgumentException("Task ID and status are required");
+        }
+
+        String sql = "UPDATE Tasks SET status = ? WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newStatus);
+            pstmt.setLong(2, taskId);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating task status for ID: " + taskId, e);
+        }
+    }
+
+    public List<Task> findByAssigneeId(Long assigneeId) {
+        List<Task> tasks = new ArrayList<>();
+        String sql = """
+            SELECT t.*, p.id AS project_id, p.name AS project_name,
+                   a.id AS assignee_id, a.username AS assignee_name,
+                   c.id AS creator_id, c.username AS creator_name
+            FROM Tasks t
+            LEFT JOIN Projects p ON t.project_id = p.id
+            LEFT JOIN Users a ON t.assignee_id = a.id
+            JOIN Users c ON t.created_by = c.id
+            WHERE t.assignee_id = ?
+            ORDER BY t.created_at DESC
+            """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, assigneeId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    tasks.add(mapRowToTask(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error loading tasks for assignee: " + assigneeId, e);
+        }
+        return tasks;
+    }
+
+    public List<Task> findByCreatorId(Long creatorId) {
+        List<Task> tasks = new ArrayList<>();
+        String sql = """
+            SELECT t.*, p.id AS project_id, p.name AS project_name,
+                   a.id AS assignee_id, a.username AS assignee_name,
+                   c.id AS creator_id, c.username AS creator_name
+            FROM Tasks t
+            LEFT JOIN Projects p ON t.project_id = p.id
+            LEFT JOIN Users a ON t.assignee_id = a.id
+            JOIN Users c ON t.created_by = c.id
+            WHERE t.created_by = ?
+            ORDER BY t.created_at DESC
+            """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, creatorId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    tasks.add(mapRowToTask(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error loading tasks for creator: " + creatorId, e);
+        }
+        return tasks;
     }
 
     public Task mapRowToTask(ResultSet rs) throws SQLException {

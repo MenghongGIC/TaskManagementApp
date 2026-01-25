@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.taskmanagement.model.Project;
-import com.taskmanagement.model.Team;
+import com.taskmanagement.model.Task;
 import com.taskmanagement.model.User;
 
 public class ProjectRepository extends BaseRepository {
@@ -19,8 +19,8 @@ public class ProjectRepository extends BaseRepository {
     
     public Project save(Project project) {
         String sql = """
-            INSERT INTO Projects (name, description, color, created_by, team_id)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO Projects (name, description, color, created_by)
+            VALUES (?, ?, ?, ?)
             """;
 
         try (Connection conn = getConnection();
@@ -30,7 +30,6 @@ public class ProjectRepository extends BaseRepository {
             pstmt.setString(2, project.getDescription());
             pstmt.setString(3, project.getColor());
             pstmt.setLong(4, project.getCreatedBy().getId());
-            pstmt.setObject(5, project.getTeam() != null ? project.getTeam().getId() : null);
 
             pstmt.executeUpdate();
 
@@ -49,11 +48,9 @@ public class ProjectRepository extends BaseRepository {
     public List<Project> findAll() {
         List<Project> projects = new ArrayList<>();
         String sql = """
-            SELECT p.*, u.id AS creator_id, u.username AS creator_name,
-                   t.id AS team_id, t.name AS team_name
+            SELECT p.*, u.id AS creator_id, u.username AS creator_name
             FROM Projects p
             JOIN Users u ON p.created_by = u.id
-            LEFT JOIN Teams t ON p.team_id = t.id
             ORDER BY p.created_at DESC
             """;
 
@@ -67,7 +64,12 @@ public class ProjectRepository extends BaseRepository {
 
             // Load tasks for each project
             for (Project project : projects) {
-                project.getTasks().addAll(taskRepository.findByProjectId(project.getId()));
+                List<Task> projectTasks = taskRepository.findByProjectId(project.getId());
+                if (projectTasks != null && !projectTasks.isEmpty()) {
+                    for (Task task : projectTasks) {
+                        project.addTask(task);
+                    }
+                }
             }
 
         } catch (SQLException e) {
@@ -78,11 +80,9 @@ public class ProjectRepository extends BaseRepository {
 
     public Project findById(Long id) {
         String sql = """
-            SELECT p.*, u.id AS creator_id, u.username AS creator_name,
-                   t.id AS team_id, t.name AS team_name
+            SELECT p.*, u.id AS creator_id, u.username AS creator_name
             FROM Projects p
             JOIN Users u ON p.created_by = u.id
-            LEFT JOIN Teams t ON p.team_id = t.id
             WHERE p.id = ?
             """;
 
@@ -117,6 +117,26 @@ public class ProjectRepository extends BaseRepository {
         }
     }
 
+    public void update(Project project) {
+        String sql = """
+            UPDATE Projects SET name = ?, description = ?, color = ? WHERE id = ?
+            """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, project.getName());
+            pstmt.setString(2, project.getDescription());
+            pstmt.setString(3, project.getColor());
+            pstmt.setLong(4, project.getId());
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating project ID: " + project.getId(), e);
+        }
+    }
+
     private Project mapRowToProject(ResultSet rs) throws SQLException {
         Project project = new Project();
         project.setId(rs.getLong("id"));
@@ -128,14 +148,6 @@ public class ProjectRepository extends BaseRepository {
         creator.setId(rs.getLong("creator_id"));
         creator.setUsername(rs.getString("creator_name"));
         project.setCreatedBy(creator);
-
-        Long teamId = (Long) rs.getObject("team_id");
-        if (teamId != null) {
-            Team team = new Team();
-            team.setId(teamId);
-            team.setName(rs.getString("team_name"));
-            project.setTeam(team);
-        }
 
         Timestamp ts = rs.getTimestamp("created_at");
         if (ts != null) project.setCreatedAt(ts.toLocalDateTime());

@@ -14,7 +14,6 @@ public class Project {
     private String description;
     private String color;
     private User createdBy;
-    private Team team;
     private LocalDateTime createdAt;
     private Set<Task> tasks = new HashSet<>();
 
@@ -44,9 +43,6 @@ public class Project {
     public User getCreatedBy() { return createdBy; }
     public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
 
-    public Team getTeam() { return team; }
-    public void setTeam(Team team) { this.team = team; }
-
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
@@ -74,21 +70,19 @@ public class Project {
         if (!CurrentUser.isLoggedIn()) return false;
         if (CurrentUser.isAdmin()) return true;
         if (createdBy != null && createdBy.getId().equals(CurrentUser.getId())) return true;
-        if (team != null && team.isMemberCurrentUser()) return true;
         return false;
     }
     public boolean canDelete() {
         if (!CurrentUser.isLoggedIn()) return false;
         if (CurrentUser.isAdmin()) return true;
         if (createdBy != null && createdBy.getId().equals(CurrentUser.getId())) return true;
-        if (team != null && team.isMemberCurrentUser()) return true;
         return false;
     }
 
 
     @Override
     public String toString() {
-        return name + (team != null ? " [" + team.getName() + "]" : "") + " (" + getTaskCount() + " tasks)";
+        return name + " (" + getTaskCount() + " tasks)";
     }
 
     @Override

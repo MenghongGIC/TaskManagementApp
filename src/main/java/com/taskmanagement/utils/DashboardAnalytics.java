@@ -136,7 +136,6 @@ public class DashboardAnalytics {
         stats.put("completionRate", getCompletionRate(projectTasks));
         stats.put("tasksByStatus", getTasksByStatus(projectTasks));
         stats.put("tasksByPriority", getTasksByPriority(projectTasks));
-        stats.put("teamMembers", project.getTeam() != null ? project.getTeam().getMemberCount() : 0);
 
         return stats;
     }

@@ -50,11 +50,6 @@ public class ActivityLogService {
         logActivity("TASK_DELETED", "TASK", taskId, taskTitle);
     }
 
-    // log comment added
-    public static void logCommentAdded(Long commentId, Long taskId, String taskTitle) {
-        logActivity("COMMENT_ADDED", "COMMENT", commentId, "Comment on: " + taskTitle, "Task: " + taskId);
-    }
-    // log project created
     public static void logProjectCreated(Long projectId, String projectName) {
         logActivity("PROJECT_CREATED", "PROJECT", projectId, projectName);
     }

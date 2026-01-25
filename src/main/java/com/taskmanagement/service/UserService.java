@@ -51,7 +51,7 @@
             }
             userRepository.updateLastLogin(user);
             user = userRepository.findById(user.getId());
-            CurrentUser .set(user);
+            CurrentUser.set(user);
             CurrentUser.updateLastLogin(user);
             
             return user;

@@ -185,4 +185,20 @@ public class UserRepository {
 
         return user;
     }
+
+    public void delete(Long id) {
+        if (id == null) return;
+
+        String sql = "DELETE FROM Users WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, id);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting user ID: " + id, e);
+        }
+    }
 }

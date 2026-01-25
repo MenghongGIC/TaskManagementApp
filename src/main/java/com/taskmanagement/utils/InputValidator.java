@@ -92,26 +92,6 @@ public class InputValidator {
         return description.trim();
     }
 
-    public static String validateTeamName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Team name is required");
-        }
-        if (!isLengthValid(name, 3, 100)) {
-            throw new IllegalArgumentException("Team name must be between 3 and 100 characters");
-        }
-        return name.trim();
-    }
-
-    public static String validateComment(String message) {
-        if (message == null || message.trim().isEmpty()) {
-            throw new IllegalArgumentException("Comment cannot be empty");
-        }
-        if (!isLengthValid(message, 1, 5000)) {
-            throw new IllegalArgumentException("Comment must not exceed 5000 characters");
-        }
-        return message.trim();
-    }
-
     public static void validatePriority(String priority) {
         if (priority == null) {
             return;

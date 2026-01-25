@@ -21,7 +21,6 @@ public class Task {
     private User assignee;
     private User createdBy;
     private LocalDateTime createdAt = LocalDateTime.now();
-    private Set<Comment> comments = new HashSet<>();
     private Set<Label> labels = new HashSet<>();
 
     public Task() {}
@@ -62,14 +61,6 @@ public class Task {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public Set<Comment> getComments() { return Collections.unmodifiableSet(comments); }
-    public void addComment(Comment comment) {
-        if (comment != null) {
-            comments.add(comment);
-            comment.setTask(this);
-        }
-    }
 
     public Set<Label> getLabels() { return Collections.unmodifiableSet(labels); }
     public void addLabel(Label label) { if (label != null) labels.add(label); }
