@@ -5,10 +5,6 @@ import java.util.List;
 import com.taskmanagement.model.Label;
 import com.taskmanagement.utils.CurrentUser;
 
-/**
- * Service for managing labels and label colors
- * Provides predefined label sets and color validation
- */
 public class LabelService {
 
     // Default Colors
@@ -44,16 +40,6 @@ public class LabelService {
 
     public LabelService() {
     }
-
-    /**
-     * Create a label with specified name and color
-     * 
-     * @param name the label name
-     * @param color the hex color code
-     * @return the created label
-     * @throws SecurityException if user is not logged in
-     * @throws IllegalArgumentException if name is empty
-     */
     public Label createLabel(String name, String color) {
         if (!CurrentUser.isLoggedIn()) {
             throw new SecurityException(ERR_NOT_LOGGED_IN);
@@ -66,21 +52,9 @@ public class LabelService {
         return new Label(name.trim(), color);
     }
 
-    /**
-     * Create a label with default color
-     * 
-     * @param name the label name
-     * @return the created label with default color
-     */
     public Label createLabel(String name) {
         return createLabel(name, DEFAULT_COLOR);
     }
-
-    /**
-     * Get commonly used predefined labels
-     * 
-     * @return list of common labels
-     */
     public List<Label> getCommonLabels() {
         return List.of(
                 new Label(LABEL_BUG, COLOR_RED),
@@ -94,11 +68,6 @@ public class LabelService {
         );
     }
 
-    /**
-     * Get standard color palette with names
-     * 
-     * @return list of color options
-     */
     public List<Label> getColorOptions() {
         return List.of(
                 new Label("Red", COLOR_RED),
@@ -113,12 +82,6 @@ public class LabelService {
         );
     }
 
-    /**
-     * Find a common label by name (case-insensitive)
-     * 
-     * @param name the label name to search for
-     * @return the matching label, or null if not found
-     */
     public Label findLabelByName(String name) {
         if (name == null || name.trim().isEmpty()) {
             return null;
@@ -129,12 +92,6 @@ public class LabelService {
                 .orElse(null);
     }
 
-    /**
-     * Validate if a color string is a valid hex color code
-     * 
-     * @param color the color string to validate
-     * @return true if valid hex color format, false otherwise
-     */
     public boolean isValidColor(String color) {
         return color != null && color.matches(HEX_COLOR_PATTERN);
     }

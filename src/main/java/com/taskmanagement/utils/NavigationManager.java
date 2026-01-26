@@ -9,10 +9,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-/**
- * Centralized navigation manager for JavaFX scenes
- * Handles scene switching, navigation history, and FXML loading
- */
 public final class NavigationManager {
 
     // Resource Paths
@@ -22,9 +18,6 @@ public final class NavigationManager {
     private static final Stack<NavigationHistory> navigationHistory = new Stack<>();
     private static Stage currentStage;
 
-    /**
-     * Internal class for tracking navigation history
-     */
     private static class NavigationHistory {
         String fxmlPath;
         String windowTitle;
@@ -37,20 +30,9 @@ public final class NavigationManager {
         }
     }
 
-    /**
-     * Prevent instantiation of static utility class
-     */
     private NavigationManager() {
     }
 
-    /**
-     * Navigate to a new scene with full control
-     * 
-     * @param stage the stage to navigate from
-     * @param fxmlPath the FXML file path to load
-     * @param windowTitle the window title to display
-     * @param maximized whether to maximize the window
-     */
     public static void navigateTo(Stage stage, String fxmlPath, String windowTitle, boolean maximized) {
         try {
             // Save current navigation to history before navigating
@@ -90,24 +72,10 @@ public final class NavigationManager {
             e.printStackTrace(System.err);
         }
     }
-
-    /**
-     * Navigate to a new scene (maximized by default)
-     * 
-     * @param stage the stage to navigate from
-     * @param fxmlPath the FXML file path to load
-     * @param windowTitle the window title to display
-     */
     public static void navigateTo(Stage stage, String fxmlPath, String windowTitle) {
         navigateTo(stage, fxmlPath, windowTitle, true);
     }
 
-    /**
-     * Navigate to a new scene using the current stage
-     * 
-     * @param fxmlPath the FXML file path to load
-     * @param windowTitle the window title to display
-     */
     public static void navigateTo(String fxmlPath, String windowTitle) {
         if (currentStage != null) {
             navigateTo(currentStage, fxmlPath, windowTitle, true);
@@ -116,39 +84,18 @@ public final class NavigationManager {
         }
     }
 
-    /**
-     * Navigate to dashboard
-     * 
-     * @param stage the stage to navigate from
-     */
     public static void goToDashboard(Stage stage) {
         navigateTo(stage, "/fxml/main/MainDashboard.fxml", "Task Manager - Dashboard", true);
     }
 
-    /**
-     * Navigate to login screen
-     * 
-     * @param stage the stage to navigate from
-     */
     public static void goToLogin(Stage stage) {
         navigateTo(stage, "/fxml/auth/AuthPanel.fxml", "Task Manager - Login", false);
     }
 
-    /**
-     * Navigate to user profile
-     * 
-     * @param stage the stage to navigate from
-     */
     public static void goToProfile(Stage stage) {
         navigateTo(stage, "/fxml/main/Profile.fxml", "Task Manager - Profile", true);
     }
 
-    /**
-     * Navigate to admin panel (admin only)
-     * 
-     * @param stage the stage to navigate from
-     * @throws SecurityException if user is not admin
-     */
     public static void goToAdminPanel(Stage stage) {
         if (!CurrentUser.isAdmin()) {
             throw new SecurityException("Access Denied: Admin privileges required");

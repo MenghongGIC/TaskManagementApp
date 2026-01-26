@@ -3,10 +3,6 @@ package com.taskmanagement.utils;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
-/**
- * Simple icon manager using Unicode symbols
- * Provides basic icon constants without external icon libraries
- */
 public class IconManager {
     
     // Icon Constants (Unicode Symbols)
@@ -25,24 +21,13 @@ public class IconManager {
     public static final String ICON_CHECKMARK = "\u2713";    
     public static final String ICON_CROSSMARK = "\u274C";    
     
-    private IconManager() {
-        // Utility class, no instantiation
-    }    
-    
-    
-
+    private IconManager() { }    
     public static void setButtonIcon(Button button, String icon) {
         button.setText(icon + " " + button.getText());
     }
-    
-    
-
     public static void setLabelIcon(Label label, String icon) {
         label.setText(icon + " " + label.getText());
     }
-    
-    
-
     public static String getIcon(String icon, int fontSize) {
         return icon;
     }

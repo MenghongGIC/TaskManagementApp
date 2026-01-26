@@ -15,20 +15,34 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
 
+    // Status Constants
+    private static final String STATUS_TODO = "To Do";
+    private static final String STATUS_IN_PROGRESS = "In Progress";
+    private static final String STATUS_DONE = "Done";
+
+    // Priority Constants
+    private static final String PRIORITY_LOW = "Low";
+    private static final String PRIORITY_MEDIUM = "Medium";
+    private static final String PRIORITY_HIGH = "High";
+
+    // Error Messages
+    private static final String ERR_NOT_LOGGED_IN = "User must be logged in";
+    private static final String ERR_TASK_REQUIRED = "Task title is required";
+    private static final String ERR_PROJECT_REQUIRED = "Project is required";
+    private static final String ERR_TASK_NOT_FOUND = "Task not found";
+    private static final String ERR_NO_PERMISSION_EDIT = "You don't have permission to edit this task";
+    private static final String ERR_NO_PERMISSION_DELETE = "You don't have permission to delete this task";
+    private static final String ERR_NO_PERMISSION_VIEW = "You don't have permission to view this task";
+    private static final String ERR_NO_PERMISSION_ASSIGN = "You don't have permission to assign tasks";
+
     public TaskService() {
         this.taskRepository = new TaskRepository();
     }
 
     public Task createTask(String title, String description, Project project) {
-        if (!CurrentUser.isLoggedIn()) {
-            throw new SecurityException("User must be logged in");
-        }
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Task title is required");
-        }
-        if (project == null || project.getId() == null) {
-            throw new IllegalArgumentException("Project is required");
-        }
+        validateUserLoggedIn();
+        validateTaskTitle(title);
+        validateProjectExists(project);
 
         User currentUser = CurrentUser.getInstance();
         Task task = new Task(title.trim(), project, currentUser);
@@ -37,109 +51,102 @@ public class TaskService {
     }
 
     public Task updateTask(Task task) {
-        if (!CurrentUser.isLoggedIn()) {
-            throw new SecurityException("User must be logged in");
-        }
-        if (!task.canEdit()) {
-            throw new SecurityException("You don't have permission to edit this task");
-        }
-        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("Task title is required");
-        }
+        validateUserLoggedIn();
+        validateTaskExists(task);
+        validateTaskPermission(task, ERR_NO_PERMISSION_EDIT);
+        validateTaskTitle(task.getTitle());
 
         task.setTitle(task.getTitle().trim());
         return taskRepository.update(task);
     }
 
     public void deleteTask(Long taskId) {
-        if (!CurrentUser.isLoggedIn()) {
-            throw new SecurityException("User must be logged in");
-        }
-        Task task = taskRepository.findById(taskId);
-        if (task == null) {
-            throw new IllegalArgumentException("Task not found");
-        }
-        if (!task.canDelete()) {
-            throw new SecurityException("You don't have permission to delete this task");
-        }
-
+        validateUserLoggedIn();
+        Task task = getTaskOrThrow(taskId);
+        validateTaskPermission(task, ERR_NO_PERMISSION_DELETE);
         taskRepository.delete(taskId);
     }
 
     public Task getTaskById(Long id) {
         Task task = taskRepository.findById(id);
         if (task != null && !canViewTask(task)) {
-            throw new SecurityException("You don't have permission to view this task");
+            throw new SecurityException(ERR_NO_PERMISSION_VIEW);
         }
         return task;
     }
 
     public List<Task> getAllTasks() {
-        List<Task> tasks = taskRepository.findAll();
-        return tasks.stream()
-                .filter(this::canViewTask)
-                .collect(Collectors.toList());
+        return filterVisibleTasks(taskRepository.findAll());
     }
 
     public List<Task> getTasksByProject(Long projectId) {
-        List<Task> tasks = taskRepository.findByProjectId(projectId);
-        return tasks.stream()
-                .filter(this::canViewTask)
-                .collect(Collectors.toList());
+        return filterVisibleTasks(taskRepository.findByProjectId(projectId));
     }
 
     public List<Task> getTasksByAssignee(Long userId) {
-        return getAllTasks().stream()
-                .filter(t -> t.getAssignee() != null && t.getAssignee().getId().equals(userId))
-                .collect(Collectors.toList());
+        return filterVisibleTasks(
+            getAllTasks().stream()
+                .filter(t -> hasAssignee(t, userId))
+                .collect(Collectors.toList())
+        );
     }
 
     public List<Task> getTasksByStatus(String status) {
-        return getAllTasks().stream()
-                .filter(t -> t.getStatus().equalsIgnoreCase(status))
-                .collect(Collectors.toList());
+        return filterVisibleTasks(
+            getAllTasks().stream()
+                .filter(t -> matchesStatus(t, status))
+                .collect(Collectors.toList())
+        );
     }
 
     public List<Task> getTasksByPriority(String priority) {
-        return getAllTasks().stream()
-                .filter(t -> t.getPriority().equalsIgnoreCase(priority))
-                .collect(Collectors.toList());
+        return filterVisibleTasks(
+            getAllTasks().stream()
+                .filter(t -> matchesPriority(t, priority))
+                .collect(Collectors.toList())
+        );
     }
 
     public List<Task> getOverdueTasks() {
-        return getAllTasks().stream()
+        return filterVisibleTasks(
+            getAllTasks().stream()
                 .filter(Task::isOverdue)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
     }
 
     public List<Task> getDueTodayTasks() {
-        return getAllTasks().stream()
+        return filterVisibleTasks(
+            getAllTasks().stream()
                 .filter(Task::isDueToday)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
     }
 
     public List<Task> getCompletedTasks() {
-        return getTasksByStatus("Done");
+        return getTasksByStatus(STATUS_DONE);
     }
 
     public List<Task> getInProgressTasks() {
-        return getTasksByStatus("In Progress");
+        return getTasksByStatus(STATUS_IN_PROGRESS);
     }
 
     public List<Task> getUnassignedTasks() {
-        return getAllTasks().stream()
+        return filterVisibleTasks(
+            getAllTasks().stream()
                 .filter(Task::isUnassigned)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
     }
 
-    public List<Task> filterTasks(String status, String priority, Long assigneeId, Long projectId, LocalDate dueDateFrom, LocalDate dueDateTo) {
+    public List<Task> filterTasks(String status, String priority, Long assigneeId, Long projectId, 
+                                   LocalDate dueDateFrom, LocalDate dueDateTo) {
         return getAllTasks().stream()
-                .filter(t -> status == null || t.getStatus().equalsIgnoreCase(status))
-                .filter(t -> priority == null || t.getPriority().equalsIgnoreCase(priority))
-                .filter(t -> assigneeId == null || (t.getAssignee() != null && t.getAssignee().getId().equals(assigneeId)))
-                .filter(t -> projectId == null || (t.getProject() != null && t.getProject().getId().equals(projectId)))
-                .filter(t -> dueDateFrom == null || (t.getDueDate() != null && !t.getDueDate().isBefore(dueDateFrom)))
-                .filter(t -> dueDateTo == null || (t.getDueDate() != null && !t.getDueDate().isAfter(dueDateTo)))
+                .filter(t -> matchesStatus(t, status))
+                .filter(t -> matchesPriority(t, priority))
+                .filter(t -> matchesAssignee(t, assigneeId))
+                .filter(t -> matchesProject(t, projectId))
+                .filter(t -> matchesDueDateRange(t, dueDateFrom, dueDateTo))
                 .collect(Collectors.toList());
     }
 
@@ -149,8 +156,7 @@ public class TaskService {
         }
         String lowerQuery = query.toLowerCase();
         return getAllTasks().stream()
-                .filter(t -> t.getTitle().toLowerCase().contains(lowerQuery)
-                        || (t.getDescription() != null && t.getDescription().toLowerCase().contains(lowerQuery)))
+                .filter(t -> matchesSearchQuery(t, lowerQuery))
                 .collect(Collectors.toList());
     }
 
@@ -170,19 +176,12 @@ public class TaskService {
     }
 
     public void assignTask(Long taskId, Long userId) {
-        if (!CurrentUser.isLoggedIn()) {
-            throw new SecurityException("User must be logged in");
-        }
-
-        Task task = taskRepository.findById(taskId);
-        if (task == null) {
-            throw new IllegalArgumentException("Task not found");
-        }
-
+        validateUserLoggedIn();
         if (!CurrentUser.canAssignTasks()) {
-            throw new SecurityException("You don't have permission to assign tasks");
+            throw new SecurityException(ERR_NO_PERMISSION_ASSIGN);
         }
 
+        Task task = getTaskOrThrow(taskId);
         User user = new User();
         user.setId(userId);
         task.setAssignee(user);
@@ -190,29 +189,15 @@ public class TaskService {
     }
 
     public void changeTaskStatus(Long taskId, String newStatus) {
-        Task task = taskRepository.findById(taskId);
-        if (task == null) {
-            throw new IllegalArgumentException("Task not found");
-        }
-
-        if (!task.canEdit()) {
-            throw new SecurityException("You don't have permission to edit this task");
-        }
-
+        Task task = getTaskOrThrow(taskId);
+        validateTaskPermission(task, ERR_NO_PERMISSION_EDIT);
         task.setStatus(newStatus);
         taskRepository.update(task);
     }
 
     public void changeTaskPriority(Long taskId, String newPriority) {
-        Task task = taskRepository.findById(taskId);
-        if (task == null) {
-            throw new IllegalArgumentException("Task not found");
-        }
-
-        if (!task.canEdit()) {
-            throw new SecurityException("You don't have permission to edit this task");
-        }
-
+        Task task = getTaskOrThrow(taskId);
+        validateTaskPermission(task, ERR_NO_PERMISSION_EDIT);
         task.setPriority(newPriority);
         taskRepository.update(task);
     }
@@ -237,6 +222,83 @@ public class TaskService {
                 .filter(t -> !t.getDueDate().isBefore(today) && !t.getDueDate().isAfter(endDate))
                 .sorted(Comparator.comparing(Task::getDueDate))
                 .collect(Collectors.toList());
+    }
+
+    private void validateUserLoggedIn() {
+        if (!CurrentUser.isLoggedIn()) {
+            throw new SecurityException(ERR_NOT_LOGGED_IN);
+        }
+    }
+
+    private void validateTaskTitle(String title) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException(ERR_TASK_REQUIRED);
+        }
+    }
+
+    private void validateProjectExists(Project project) {
+        if (project == null || project.getId() == null) {
+            throw new IllegalArgumentException(ERR_PROJECT_REQUIRED);
+        }
+    }
+
+    private void validateTaskExists(Task task) {
+        if (task == null) {
+            throw new IllegalArgumentException(ERR_TASK_NOT_FOUND);
+        }
+    }
+
+    private void validateTaskPermission(Task task, String errorMessage) {
+        boolean hasPermission = task.canEdit() || task.canDelete();
+        if (!hasPermission) {
+            throw new SecurityException(errorMessage);
+        }
+    }
+
+    private Task getTaskOrThrow(Long taskId) {
+        Task task = taskRepository.findById(taskId);
+        if (task == null) {
+            throw new IllegalArgumentException(ERR_TASK_NOT_FOUND);
+        }
+        return task;
+    }
+
+    private List<Task> filterVisibleTasks(List<Task> tasks) {
+        return tasks.stream()
+                .filter(this::canViewTask)
+                .collect(Collectors.toList());
+    }
+
+    private boolean matchesStatus(Task task, String status) {
+        return status == null || task.getStatus().equalsIgnoreCase(status);
+    }
+
+    private boolean matchesPriority(Task task, String priority) {
+        return priority == null || task.getPriority().equalsIgnoreCase(priority);
+    }
+
+    private boolean matchesAssignee(Task task, Long assigneeId) {
+        return assigneeId == null || hasAssignee(task, assigneeId);
+    }
+
+    private boolean matchesProject(Task task, Long projectId) {
+        return projectId == null || (task.getProject() != null && task.getProject().getId().equals(projectId));
+    }
+
+    private boolean matchesDueDateRange(Task task, LocalDate dueDateFrom, LocalDate dueDateTo) {
+        if (task.getDueDate() == null) return dueDateFrom == null && dueDateTo == null;
+        if (dueDateFrom != null && task.getDueDate().isBefore(dueDateFrom)) return false;
+        if (dueDateTo != null && task.getDueDate().isAfter(dueDateTo)) return false;
+        return true;
+    }
+
+    private boolean matchesSearchQuery(Task task, String query) {
+        return task.getTitle().toLowerCase().contains(query) ||
+               (task.getDescription() != null && task.getDescription().toLowerCase().contains(query));
+    }
+
+    private boolean hasAssignee(Task task, Long userId) {
+        return task.getAssignee() != null && task.getAssignee().getId().equals(userId);
     }
 
     private boolean canViewTask(Task task) {

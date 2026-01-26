@@ -7,9 +7,6 @@ import com.taskmanagement.model.User;
 import com.taskmanagement.repository.UserRepository;
 import com.taskmanagement.utils.CurrentUser;
 
-/**
- * Service for managing user operations including registration, login, and profile updates
- */
 public class UserService {
 
     // Error Messages
@@ -37,15 +34,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Register a new user account
-     * 
-     * @param username the username (required, must be unique)
-     * @param email the email address
-     * @param password the password (minimum 8 characters)
-     * @return the newly created user
-     * @throws IllegalArgumentException if validation fails
-     */
     public User register(String username, String email, String password) {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException(ERR_USERNAME_REQUIRED);
@@ -68,15 +56,6 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    /**
-     * Authenticate a user with username and password
-     * Updates last login timestamp and sets as current user
-     * 
-     * @param username the username
-     * @param password the password
-     * @return the authenticated user
-     * @throws IllegalArgumentException if credentials are invalid
-     */
     public User login(String username, String password) {
         if (username == null || username.trim().isEmpty() || password == null) {
             throw new IllegalArgumentException(ERR_USERNAME_PASSWORD_REQUIRED);
@@ -94,20 +73,10 @@ public class UserService {
         return user;
     }
 
-    /**
-     * Logout the current user
-     */
     public void logout() {
         CurrentUser.clear();
     }
 
-    /**
-     * Update user profile information
-     * 
-     * @param updatedUser the user with updated information
-     * @return the updated user
-     * @throws IllegalArgumentException if user data is invalid
-     */
     public User updateProfile(User updatedUser) {
         if (updatedUser == null || updatedUser.getId() == null) {
             throw new IllegalArgumentException(ERR_INVALID_USER_DATA);
@@ -121,14 +90,6 @@ public class UserService {
         return userRepository.save(existing);
     }
 
-    /**
-     * Change password for a user
-     * 
-     * @param user the user whose password to change
-     * @param oldPassword the current password (must match)
-     * @param newPassword the new password (minimum 8 characters)
-     * @throws IllegalArgumentException if passwords don't meet requirements
-     */
     public void changePassword(User user, String oldPassword, String newPassword) {
         if (!oldPassword.equals(user.getPasswordHash())) {
             throw new IllegalArgumentException(ERR_WRONG_PASSWORD);
@@ -139,16 +100,6 @@ public class UserService {
         user.setPasswordHash(newPassword);
         userRepository.save(user);
     }
-
-    /**
-     * Update a user's role (admin only operation)
-     * 
-     * @param userId the ID of the user to update
-     * @param newRole the new role to assign
-     * @return the updated user
-     * @throws SecurityException if not an admin
-     * @throws IllegalArgumentException if user not found
-     */
     public User updateUserRole(Long userId, Role newRole) {
         if (!CurrentUser.isAdmin()) {
             throw new SecurityException(ERR_ADMIN_ONLY);
@@ -161,31 +112,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    /**
-     * Check if a username is already taken
-     * 
-     * @param username the username to check
-     * @return true if username exists, false otherwise
-     */
     public boolean isUsernameTaken(String username) {
         return userRepository.findByUsername(username.trim()) != null;
     }
 
-    /**
-     * Get the currently logged-in user
-     * 
-     * @return the current user, or null if not logged in
-     */
     public User getCurrentUser() {
         return CurrentUser.getInstance();
     }
-
-    /**
-     * Get all users in the system (admin only)
-     * 
-     * @return list of all users
-     * @throws SecurityException if not an admin
-     */
+    
     public java.util.List<User> getAllUsers() {
         if (!CurrentUser.isAdmin()) {
             throw new SecurityException(ERR_ADMIN_VIEW_ONLY);
