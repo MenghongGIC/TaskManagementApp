@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      spacing="4"
+      style="-fx-background-color: white; -fx-padding: 8; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8;">
+    <Label text="Task title" style="-fx-font-weight: bold;"/>
+    <Label text="Priority" style="-fx-text-fill: #64748b;"/>
+    <Label text="Due date" style="-fx-text-fill: #64748b;"/>
+</VBox>

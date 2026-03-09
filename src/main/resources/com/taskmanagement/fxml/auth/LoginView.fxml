@@ -1,98 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Hyperlink?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
+<StackPane alignment="CENTER" styleClass="login-container" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.taskmanagement.controller.AuthController">
 
-<StackPane alignment="CENTER"
-           styleClass="login-container"
-           stylesheets="@../../css/style.css"
-           xmlns="http://javafx.com/javafx/21"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.taskmanagement.controller.LoginController">
-
-    <VBox alignment="TOP_CENTER" 
-          spacing="20.0"
-          prefWidth="400"
-          prefHeight="500"
-          minWidth="400"
-          maxWidth="400"
-          minHeight="500"
-          maxHeight="500"
-          style="-fx-background-color: transparent;">
+    <VBox alignment="TOP_CENTER" prefHeight="470" prefWidth="400" spacing="20" style="-fx-background-color: transparent; -fx-background-color: #2A78C5;">
 
         <padding>
-            <Insets top="40" right="40" bottom="40" left="40" />
+            <Insets bottom="40" left="40" right="40" top="40" />
         </padding>
 
-        <children>
-            <Label text="Task Management System" 
-                   styleClass="login-title" />
+        <Label styleClass="login-title" text="Task Management System" />
+        <Label styleClass="login-subtitle" text="Sign in to continue" />
 
-            <Label text="Sign in to continue" 
-                   styleClass="login-subtitle" />
-
-            <VBox spacing="15" 
-                  styleClass="login-form-card">
-                <children>
-                    <VBox spacing="6">
-                        <Label text="Username" 
-                               styleClass="form-label" />
-                        <TextField fx:id="usernameField" 
-                                   promptText="Enter your username" 
-                                   styleClass="form-input" />
-                    </VBox>
-
-                    <VBox spacing="6">
-                        <Label text="Password" 
-                               styleClass="form-label" />
-                        <StackPane prefHeight="42">
-                            <PasswordField fx:id="passwordField" 
-                                          promptText="Enter your password" 
-                                          styleClass="form-password" />
-                            <TextField fx:id="passwordFieldVisible" 
-                                      promptText="Enter your password" 
-                                      visible="false" 
-                                      styleClass="form-input" />
-                        </StackPane>
-                    </VBox>
-
-                    <CheckBox fx:id="showPasswordCheckBox" 
-                              mnemonicParsing="false" 
-                              onAction="#togglePasswordVisibility" 
-                              text="Show password" 
-                              styleClass="form-checkbox" />
-
-                    <Label fx:id="errorLabel" 
-                           styleClass="error-label"
-                           visible="false"
-                           wrapText="true" />
-
-                    <HBox alignment="CENTER">
-                        <Button text="Login"
-                                onAction="#handleLogin"
-                                prefWidth="300"
-                                prefHeight="42"
-                                styleClass="login-button" />
-                    </HBox>
-                    
-                    <HBox alignment="CENTER" spacing="5">
-                        <Label text="Don't have an account?" 
-                               styleClass="register-text" />
-                        <Hyperlink text="Register here"
-                                   onAction="#handleRegister"
-                                   styleClass="register-hyperlink" />
-                    </HBox>
-                </children>
+        <VBox spacing="14" styleClass="login-form-card">
+            <VBox spacing="6">
+                <Label styleClass="form-label" text="Username" />
+                <TextField fx:id="loginUsernameField" promptText="Enter your username" styleClass="form-input" />
             </VBox>
-        </children>
+
+            <VBox spacing="6">
+                <Label styleClass="form-label" text="Password" />
+                <PasswordField fx:id="loginPasswordField" promptText="Enter your password" styleClass="form-password" />
+            </VBox>
+
+            <Label fx:id="loginErrorLabel" styleClass="error-label" visible="false" wrapText="true" />
+
+            <HBox alignment="CENTER">
+                <Button onAction="#handleLogin" prefHeight="42" prefWidth="300" style="-fx-background-color: #2A78C5;" styleClass="login-button" text="Login" />
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="5">
+                <Label styleClass="register-text" text="Don't have an account?" />
+                <Hyperlink onAction="#goToRegister" styleClass="register-hyperlink" text="Register here" />
+            </HBox>
+        </VBox>
     </VBox>
 </StackPane>

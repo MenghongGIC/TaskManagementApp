@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.taskmanagement.controller.TaskDetailController"
+      spacing="10"
+      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+
+    <Label text="Task Details" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <Label text="Task Title" style="-fx-font-weight: bold;"/>
+    <Label fx:id="titleLabel" wrapText="true"/>
+
+    <Label text="Task Description" style="-fx-font-weight: bold;"/>
+    <Label fx:id="descriptionLabel" wrapText="true"/>
+
+    <HBox spacing="16">
+        <VBox spacing="4">
+            <Label text="Project" style="-fx-font-weight: bold;"/>
+            <Label fx:id="projectLabel"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Status" style="-fx-font-weight: bold;"/>
+            <Label fx:id="statusLabel"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Priority" style="-fx-font-weight: bold;"/>
+            <Label fx:id="priorityLabel"/>
+        </VBox>
+    </HBox>
+
+    <Label text="Assigned Members" style="-fx-font-weight: bold;"/>
+    <Label fx:id="assignedMembersLabel" wrapText="true"/>
+
+    <Label text="Labels" style="-fx-font-weight: bold;"/>
+    <Label fx:id="labelsLabel" wrapText="true"/>
+
+    <Label text="Due Date" style="-fx-font-weight: bold;"/>
+    <Label fx:id="dueDateLabel"/>
+
+    <Separator/>
+    <Label text="Activity Log" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="activityLogList" VBox.vgrow="ALWAYS" prefHeight="160"/>
+
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Label HBox.hgrow="ALWAYS"/>
+        <Button fx:id="editButton" text="Edit Task" onAction="#handleEditTask"/>
+        <Button fx:id="deleteButton" text="Delete Task" onAction="#handleDeleteTask"/>
+        <Button text="Close" onAction="#closeDialog" />
+    </HBox>
+
+</VBox>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.taskmanagement.controller.TeamFormController"
+      spacing="10"
+      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+
+    <Label text="Team Form" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <Label text="Team Name"/>
+    <TextField fx:id="teamNameField" promptText="Team Name"/>
+
+    <Label text="Description"/>
+    <TextArea fx:id="descriptionField" prefRowCount="3" promptText="Description"/>
+
+    <Label text="Team Lead"/>
+    <ComboBox fx:id="teamLeadCombo" prefWidth="320"/>
+
+    <Label text="Add Members"/>
+    <ListView fx:id="membersList" prefHeight="150"/>
+
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Create Team" onAction="#handleCreateTeam"/>
+        <Button text="Update Team" onAction="#handleUpdateTeam"/>
+        <Button text="Cancel" onAction="#handleCancel"/>
+    </HBox>
+</VBox>

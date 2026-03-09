@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.taskmanagement.controller.TaskController"
+      spacing="10"
+      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Search tasks..." prefWidth="260"/>
+        <ComboBox fx:id="statusFilter" prefWidth="160"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Create" onAction="#handleCreate"/>
+        <Button text="Refresh" onAction="#handleRefresh"/>
+    </HBox>
+
+    <TableView fx:id="taskTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
+            <TableColumn fx:id="projectColumn" text="Project" prefWidth="170"/>
+            <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
+            <TableColumn fx:id="priorityColumn" text="Priority" prefWidth="120"/>
+            <TableColumn fx:id="dueDateColumn" text="Due Date" prefWidth="140"/>
+            <TableColumn fx:id="actionColumn" text="Actions" prefWidth="240"/>
+        </columns>
+    </TableView>
+
+    <Label fx:id="statusLabel" text="Ready"/>
+</VBox>

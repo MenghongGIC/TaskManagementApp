@@ -1,4 +1,5 @@
 package com.taskmanagement.model;
+
 public enum Priority {
     CRITICAL("Critical", "critical"),      
     HIGH("High", "high"),                  

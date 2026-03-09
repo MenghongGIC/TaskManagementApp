@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.taskmanagement.controller.MainController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #2A78C5; -fx-padding: 10 14;">
+            <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="TaskFlow" />
+
+            <Button onAction="#showDashboard" text="Dashboard" />
+            <Button onAction="#showTasks" text="Tasks" />
+            <Button onAction="#showKanban" text="Kanban" />
+            <Button onAction="#showProjects" text="Projects" />
+            <Button onAction="#showTeam" text="Team" />
+            <Button onAction="#showWorkspace" text="Workspace" />
+            <Button onAction="#showActivity" text="Activity" />
+
+            <Region HBox.hgrow="ALWAYS" />
+            <Label style="-fx-text-fill: #cbd5e1;" text="User:" />
+            <Label fx:id="usernameLabel" style="-fx-text-fill: white; -fx-font-weight: bold;" />
+            <Button onAction="#logout" text="Logout" />
+        </HBox>
+    </top>
+
+    <center>
+        <StackPane fx:id="contentArea" style="-fx-padding: 14;">
+            <padding>
+                <Insets bottom="14" left="14" right="14" top="14" />
+            </padding>
+        </StackPane>
+    </center>
+</BorderPane>

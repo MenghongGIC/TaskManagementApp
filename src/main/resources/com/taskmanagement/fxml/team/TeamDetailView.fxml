@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.taskmanagement.controller.TeamDetailController"
+      spacing="10"
+      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+
+    <Label text="Team Details" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <Label text="Team Name" style="-fx-font-weight: bold;"/>
+    <Label fx:id="teamNameLabel"/>
+
+    <Label text="Description" style="-fx-font-weight: bold;"/>
+    <Label fx:id="descriptionLabel" wrapText="true"/>
+
+    <HBox spacing="18">
+        <VBox spacing="4">
+            <Label text="Team Lead" style="-fx-font-weight: bold;"/>
+            <Label fx:id="teamLeadLabel"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Created Date" style="-fx-font-weight: bold;"/>
+            <Label fx:id="createdDateLabel"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Members" style="-fx-font-weight: bold;"/>
+            <Label fx:id="memberCountLabel"/>
+        </VBox>
+    </HBox>
+
+    <Label text="Members" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="membersList" prefHeight="180"/>
+
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Button text="Remove Team" onAction="#handleRemoveTeam"/>
+        <Button text="Close" onAction="#closeDialog"/>
+    </HBox>
+
+</VBox>

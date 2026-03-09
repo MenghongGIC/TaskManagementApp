@@ -14,6 +14,7 @@ import com.taskmanagement.model.Task;
 import com.taskmanagement.model.User;
 
 public class ProjectRepository extends BaseRepository {
+    
 
     // SQL Queries
     // Create new project

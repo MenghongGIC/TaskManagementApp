@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.taskmanagement.controller.ProjectDetailController"
+      spacing="10"
+      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+
+    <Label text="Project Details" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <Label text="Project Name" style="-fx-font-weight: bold;"/>
+    <Label fx:id="projectNameLabel"/>
+
+    <Label text="Project Description" style="-fx-font-weight: bold;"/>
+    <Label fx:id="projectDescriptionLabel" wrapText="true"/>
+
+    <HBox spacing="16">
+        <VBox spacing="4">
+            <Label text="Project Owner" style="-fx-font-weight: bold;"/>
+            <Label fx:id="projectOwnerLabel"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Members" style="-fx-font-weight: bold;"/>
+            <Label fx:id="memberCountLabel"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Number of Tasks" style="-fx-font-weight: bold;"/>
+            <Label fx:id="taskCountLabel"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="16">
+        <VBox spacing="4">
+            <Label text="Project Status" style="-fx-font-weight: bold;"/>
+            <Label fx:id="projectStatusLabel"/>
+        </VBox>
+        <VBox spacing="4">
+            <Label text="Created Date" style="-fx-font-weight: bold;"/>
+            <Label fx:id="createdDateLabel"/>
+        </VBox>
+    </HBox>
+
+    <Separator/>
+    <Label text="Project Tasks" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="projectTasksList" prefHeight="110"/>
+
+    <Label text="Project Members" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="projectMembersList" prefHeight="90"/>
+
+    <Label text="Activity Log" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="activityLogList" prefHeight="90"/>
+
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Button text="Edit Project" onAction="#handleEditProject"/>
+        <Button text="Add Member" onAction="#handleAddMember"/>
+        <Button text="Delete Project" onAction="#handleDeleteProject"/>
+        <Button text="Close" onAction="#closeDialog"/>
+    </HBox>
+
+</VBox>

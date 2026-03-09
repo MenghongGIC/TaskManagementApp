@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.taskmanagement.controller.WorkspaceSelectionController"
+           style="-fx-background-color: #f8fafc;">
+
+    <VBox spacing="14" maxWidth="520" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 18;">
+        <Label text="Select Workspace" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+        <Label fx:id="helperLabel" text="Select a workspace to continue"/>
+        <ListView fx:id="workspaceList" prefHeight="260"/>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Logout" onAction="#logout"/>
+            <Button text="Continue" onAction="#continueToDashboard"/>
+        </HBox>
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+    </VBox>
+</StackPane>

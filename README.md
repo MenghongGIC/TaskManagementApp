@@ -2,6 +2,33 @@
 
 A comprehensive JavaFX desktop application for efficiently managing tasks, projects, and teams. Built with Java 21, Maven, and SQL Server, featuring a modern GUI, role-based access control, and robust business logic.
 
+## Refactor Update (2026-03-06)
+
+The UI architecture has been streamlined to a Trello-style controller model with a clean, focused controller set:
+
+- `MainController` (navigation shell)
+- `AuthController` (login/register)
+- `DashboardController` (overview metrics)
+- `TaskController` (task list, filter, actions)
+- `TaskFormController` (create/edit task dialog)
+- `KanbanController` (drag-and-drop board)
+- `ProjectController` (project CRUD)
+- `TeamController` (team list/management view)
+- `ActivityController` (activity log view)
+
+FXML layout is organized under:
+
+- `fxml/auth` (`LoginView.fxml`, `RegisterView.fxml`)
+- `fxml/main` (`MainView.fxml`, `Dashboard.fxml`, `KanbanBoard.fxml`, `ActivityView.fxml`, `WorkspaceView.fxml`)
+- `fxml/task` (`TaskList.fxml`, `TaskDetailView.fxml`, `TaskForm.fxml`)
+- `fxml/project` (`ProjectList.fxml`, `ProjectDetailView.fxml`)
+- `fxml/team` (`TeamListView.fxml`, `TeamDetailView.fxml`, `TeamForm.fxml`)
+- `fxml/workspace` (`WorkspaceDashboard.fxml`, `WorkspaceForm.fxml`)
+- `fxml/dialog` (`TaskForm.fxml`, `ProjectForm.fxml`)
+- `fxml/components` (`TaskCard.fxml`, `KanbanColumn.fxml`)
+
+Legacy/duplicate controllers and stale FXML files were removed to eliminate overlapping responsibilities and dead navigation paths.
+
 ## System Overview
 
 The Task Management System is a professional-grade desktop application designed for teams and organizations to organize, track, and collaborate on projects and tasks. It provides a complete solution for task lifecycle management, from creation to completion, with comprehensive tracking and reporting capabilities.
@@ -129,17 +156,21 @@ TaskManagementSystem/
 ├── src/main/java/com/taskmanagement/
 │   ├── App.java                      # Main application entry point
 │   │
-│   ├── controller/                   # JavaFX UI Controllers (20 classes)
-│   │   ├── LoginController.java      # Authentication UI
-│   │   ├── RegisterController.java   # User registration
-│   │   ├── DashboardController.java  # Dashboard & main interface
-│   │   ├── TaskListController.java   # Task listing and management
-│   │   ├── TaskDetailController.java # Task details and editing
-│   │   ├── ProjectListController.java# Project listing
-│   │   ├── ProjectDetailController.java # Project details
-│   │   ├── AdminController.java      # Admin panel and user management
-│   │   ├── UserController.java       # User profile management
-│   │   └── [9 more specialized controllers]
+│   ├── controller/                   # JavaFX UI Controllers (modular)
+│   │   ├── MainController.java       # Main navigation shell
+│   │   ├── AuthController.java       # Login/register actions
+│   │   ├── DashboardController.java  # Dashboard metrics
+│   │   ├── TaskController.java       # Task list and actions
+│   │   ├── TaskFormController.java   # Create/edit task form
+│   │   ├── TaskDetailController.java # Task detail dialog
+│   │   ├── KanbanController.java     # Kanban board interactions
+│   │   ├── ProjectController.java    # Project list and CRUD
+│   │   ├── ProjectDetailController.java # Project detail dialog
+│   │   ├── TeamController.java       # Team management list
+│   │   ├── TeamFormController.java   # Team create/update form
+│   │   ├── TeamDetailController.java # Team detail dialog
+│   │   ├── WorkspaceController.java  # Workspace dashboard actions
+│   │   └── ActivityController.java   # Activity log view
 │   │
 │   ├── service/                      # Business Logic Layer (6 services)
 │   │   ├── TaskService.java          # Task CRUD and operations
@@ -183,9 +214,13 @@ TaskManagementSystem/
 ├── src/main/resources/com/taskmanagement/
 │   ├── fxml/                         # JavaFX UI Layouts (FXML files)
 │   │   ├── auth/                     # Login and registration screens
-│   │   ├── main/                     # Main application layout
-│   │   ├── admin/                    # Admin panel layouts
-│   │   └── dialog/                   # Dialog windows
+│   │   ├── main/                     # Main shell + dashboard + activity
+│   │   ├── task/                     # Task list/detail/form screens
+│   │   ├── project/                  # Project list/detail screens
+│   │   ├── team/                     # Team list/detail/form screens
+│   │   ├── workspace/                # Workspace dashboard/form screens
+│   │   ├── dialog/                   # Reusable dialogs
+│   │   └── components/               # Reusable FXML components
 │   │
 │   ├── css/                          # Stylesheets
 │   │   └── style.css                 # Application styling
@@ -197,6 +232,7 @@ TaskManagementSystem/
 │
 ├── src/test/java/com/taskmanagement/
 │   ├── service/                      # Service layer tests
+│   ├── ui/                           # FXML/controller wiring smoke tests
 │   └── utils/                        # Utility class tests
 │
 └── target/                           # Build output (Maven)
