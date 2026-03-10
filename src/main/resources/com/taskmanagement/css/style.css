@@ -129,69 +129,64 @@
 }
 
 /* ====================================== */
-/* Kanban Column Styles */
+/* Kanban Board Container Styles */
 /* ====================================== */
 
-.kanban-column-todo {
+.kanban-board-container {
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+    -fx-min-height: 500;
+    -fx-min-width: 300;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+}
+
+.kanban-board-todo {
     -fx-background-color: #f1f3f5;
-    -fx-border-color: #dee2e6;
-    -fx-border-width: 1;
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
-    -fx-padding: 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+    -fx-border-color: #dcdcdc;
 }
 
-.kanban-column-in-progress {
+.kanban-board-in-progress {
     -fx-background-color: #fff3cd;
-    -fx-border-color: #ffe69c;
-    -fx-border-width: 1;
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
-    -fx-padding: 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+    -fx-border-color: #dcdcdc;
 }
 
-.kanban-column-done {
+.kanban-board-done {
     -fx-background-color: #d4edda;
-    -fx-border-color: #b7e4c7;
-    -fx-border-width: 1;
-    -fx-border-radius: 12;
-    -fx-background-radius: 12;
-    -fx-padding: 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+    -fx-border-color: #dcdcdc;
 }
 
-.kanban-column-header {
-    -fx-background-color: transparent;
+.kanban-board-header {
+    -fx-padding: 12 0;
     -fx-border-color: transparent;
+    -fx-background-color: transparent;
+    -fx-alignment: CENTER_LEFT;
 }
 
-.kanban-column-todo .kanban-column-header {
-    -fx-background-color: #dee2e6;
-}
-
-.kanban-column-in-progress .kanban-column-header {
-    -fx-background-color: #ffe69c;
-}
-
-.kanban-column-done .kanban-column-header {
-    -fx-background-color: #b7e4c7;
-}
-
-.kanban-column-title {
+.kanban-board-title {
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-text-fill: #1a1a1a;
 }
 
-.kanban-column-todo .kanban-column-title {
-    -fx-text-fill: #495057;
+.kanban-board-count {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #666666;
+    -fx-background-color: rgba(0, 0, 0, 0.08);
+    -fx-padding: 2 8;
+    -fx-border-radius: 12;
+    -fx-min-width: 28;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
 }
 
-.kanban-column-in-progress .kanban-column-title {
-    -fx-text-fill: #856404;
+/* Task container inside board */
+.kanban-task-container {
+    -fx-padding: 8 0 0 0;
 }
+
 
 .kanban-column-done .kanban-column-title {
     -fx-text-fill: #155724;
@@ -208,12 +203,12 @@
 
 .task-card {
     -fx-background-color: white;
-    -fx-border-color: #dcdcdc;
+    -fx-border-color: #e0e0e0;
     -fx-border-width: 1;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-padding: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.09), 3, 0, 0, 1.5);
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 4, 0, 0, 1);
     -fx-cursor: grab;
 }
 

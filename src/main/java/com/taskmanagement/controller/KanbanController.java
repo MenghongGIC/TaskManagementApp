@@ -25,6 +25,9 @@ public class KanbanController {
     @FXML private VBox todoColumn;
     @FXML private VBox inProgressColumn;
     @FXML private VBox doneColumn;
+    @FXML private Label todoCountLabel;
+    @FXML private Label inProgressCountLabel;
+    @FXML private Label doneCountLabel;
 
     private final TaskService taskService = new TaskService();
 
@@ -55,16 +58,35 @@ public class KanbanController {
             inProgressColumn.getChildren().clear();
             doneColumn.getChildren().clear();
 
+            int todoCount = 0;
+            int inProgressCount = 0;
+            int doneCount = 0;
+
             List<Task> tasks = taskService.getAllTasks();
             for (Task task : tasks) {
                 VBox card = createCard(task);
                 String status = task.getStatus() == null ? "To Do" : task.getStatus();
                 switch (status) {
-                    case "In Progress" -> inProgressColumn.getChildren().add(card);
-                    case "Done" -> doneColumn.getChildren().add(card);
-                    default -> todoColumn.getChildren().add(card);
+                    case "In Progress" -> {
+                        inProgressColumn.getChildren().add(card);
+                        inProgressCount++;
+                    }
+                    case "Done" -> {
+                        doneColumn.getChildren().add(card);
+                        doneCount++;
+                    }
+                    default -> {
+                        todoColumn.getChildren().add(card);
+                        todoCount++;
+                    }
                 }
             }
+
+            // Update count labels
+            if (todoCountLabel != null) todoCountLabel.setText(String.valueOf(todoCount));
+            if (inProgressCountLabel != null) inProgressCountLabel.setText(String.valueOf(inProgressCount));
+            if (doneCountLabel != null) doneCountLabel.setText(String.valueOf(doneCount));
+
         } catch (Exception e) {
             renderInlineError("Failed to load board: " + safeMessage(e));
         }
@@ -155,11 +177,12 @@ public class KanbanController {
         if (priority == null) priority = "MEDIUM";
         
         return switch (priority.toLowerCase()) {
-            case "low" -> Color.web("#22c55e");        // green
-            case "medium" -> Color.web("#3b82f6");     // blue
-            case "urgent" -> Color.web("#f97316");     // orange
-            case "critical" -> Color.web("#ef4444");   // red
-            default -> Color.web("#3b82f6");           // blue (default)
+            case "low" -> Color.web("#28a745");        // green
+            case "medium" -> Color.web("#007bff");     // blue
+            case "high" -> Color.web("#dc3545");       // red
+            case "urgent" -> Color.web("#fd7e14");     // orange
+            case "critical" -> Color.web("#8b0000");   // dark red
+            default -> Color.web("#007bff");           // blue (default)
         };
     }
     
@@ -174,15 +197,17 @@ public class KanbanController {
         if (priority == null) priority = "Medium";
         
         return switch (priority.toLowerCase()) {
-            case "low" -> "-fx-background-color: #d1fae5; -fx-text-fill: #065f46; -fx-padding: 4 8; " +
+            case "low" -> "-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 4 8; " +
                         "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
-            case "medium" -> "-fx-background-color: #dbeafe; -fx-text-fill: #0c4a6e; -fx-padding: 4 8; " +
+            case "medium" -> "-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 4 8; " +
                            "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
-            case "urgent" -> "-fx-background-color: #fed7aa; -fx-text-fill: #92400e; -fx-padding: 4 8; " +
+            case "high" -> "-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 4 8; " +
+                         "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
+            case "urgent" -> "-fx-background-color: #fd7e14; -fx-text-fill: white; -fx-padding: 4 8; " +
                            "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
-            case "critical" -> "-fx-background-color: #fecaca; -fx-text-fill: #7f1d1d; -fx-padding: 4 8; " +
+            case "critical" -> "-fx-background-color: #8b0000; -fx-text-fill: white; -fx-padding: 4 8; " +
                              "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
-            default -> "-fx-background-color: #dbeafe; -fx-text-fill: #0c4a6e; -fx-padding: 4 8; " +
+            default -> "-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 4 8; " +
                       "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
         };
     }

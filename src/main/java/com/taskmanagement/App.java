@@ -19,6 +19,9 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
         scene = new Scene(loadFXML("auth/LoginView"), 1024, 768);
+        scene.getStylesheets().add(
+                getClass().getResource("/com/taskmanagement/css/style.css").toExternalForm()
+        );
         stage.setScene(scene);
         stage.setTitle("Task Management System");
         stage.setResizable(true);
@@ -55,6 +58,8 @@ public class App extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/com/taskmanagement/fxml/" + fxml + ".fxml"));
         return fxmlLoader.load();
     }
+    
+
 
     public static void main(String[] args) {
         try {
@@ -66,7 +71,6 @@ public class App extends Application {
         } catch (Exception e) {
             System.exit(1);
         }
-        
         launch(args);
     }
 }

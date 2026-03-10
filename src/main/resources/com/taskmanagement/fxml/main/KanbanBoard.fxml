@@ -12,68 +12,122 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.taskmanagement.controller.KanbanController"
       spacing="10"
-      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+      style="-fx-background-color: white; -fx-padding: 16;">
 
+    <!-- Header -->
     <HBox alignment="CENTER_LEFT" spacing="8">
-        <Label text="Kanban Board" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+        <Label text="Kanban Board"
+               style="-fx-font-size: 18px; -fx-font-weight: bold;" />
         <Region HBox.hgrow="ALWAYS"/>
         <Button text="Refresh" onAction="#refreshBoard"/>
     </HBox>
 
-    <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-padding: 0;">
+    <!-- Scrollable Board Area -->
+    <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
         <content>
-            <HBox spacing="16" style="-fx-padding: 12; -fx-fill-height: true;">
-                <!-- TO DO Column -->
-                <VBox spacing="0" styleClass="kanban-column-todo" HBox.hgrow="ALWAYS">
+
+            <!-- 3 Boards Container -->
+            <HBox spacing="24"
+                  style="-fx-padding: 16; -fx-alignment: TOP_LEFT;">
+
+                <!-- TO DO BOARD -->
+                <VBox spacing="12"
+                      HBox.hgrow="ALWAYS"
+                      style="
+                      -fx-background-color:#f1f3f5;
+                      -fx-border-color:#dcdcdc;
+                      -fx-border-radius:10;
+                      -fx-background-radius:10;
+                      -fx-padding:16;
+                      -fx-min-width:300;
+                      -fx-pref-width:340;
+                      -fx-effect:dropshadow(gaussian, rgba(0,0,0,0.08),8,0,0,2);">
+
                     <!-- Header -->
-                    <VBox styleClass="kanban-column-header">
-                        <Label text="📋 To Do" styleClass="kanban-column-title" />
-                        <padding>
-                            <Insets top="12" right="12" bottom="12" left="12"/>
-                        </padding>
-                    </VBox>
+                    <HBox spacing="8">
+                        <Label text="📋 To Do"
+                               style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                        <Label fx:id="todoCountLabel"
+                               text="0"
+                               style="
+                               -fx-background-color:#dee2e6;
+                               -fx-padding:2 8;
+                               -fx-background-radius:10;"/>
+                    </HBox>
+
                     <!-- Task Container -->
-                    <VBox fx:id="todoColumn" spacing="10" styleClass="kanban-task-container" VBox.vgrow="ALWAYS">
-                        <padding>
-                            <Insets top="8" right="12" bottom="12" left="12"/>
-                        </padding>
-                    </VBox>
+                    <VBox fx:id="todoColumn"
+                          spacing="12"
+                          VBox.vgrow="ALWAYS"/>
                 </VBox>
 
-                <!-- IN PROGRESS Column -->
-                <VBox spacing="0" styleClass="kanban-column-in-progress" HBox.hgrow="ALWAYS">
+
+                <!-- IN PROGRESS BOARD -->
+                <VBox spacing="12"
+                      HBox.hgrow="ALWAYS"
+                      style="
+                      -fx-background-color:#fff3cd;
+                      -fx-border-color:#dcdcdc;
+                      -fx-border-radius:10;
+                      -fx-background-radius:10;
+                      -fx-padding:16;
+                      -fx-min-width:300;
+                      -fx-pref-width:340;
+                      -fx-effect:dropshadow(gaussian, rgba(0,0,0,0.08),8,0,0,2);">
+
                     <!-- Header -->
-                    <VBox styleClass="kanban-column-header">
-                        <Label text="⚙️ In Progress" styleClass="kanban-column-title" />
-                        <padding>
-                            <Insets top="12" right="12" bottom="12" left="12"/>
-                        </padding>
-                    </VBox>
+                    <HBox spacing="8">
+                        <Label text="⚙️ In Progress"
+                               style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                        <Label fx:id="inProgressCountLabel"
+                               text="0"
+                               style="
+                               -fx-background-color:#ffe69c;
+                               -fx-padding:2 8;
+                               -fx-background-radius:10;"/>
+                    </HBox>
+
                     <!-- Task Container -->
-                    <VBox fx:id="inProgressColumn" spacing="10" styleClass="kanban-task-container" VBox.vgrow="ALWAYS">
-                        <padding>
-                            <Insets top="8" right="12" bottom="12" left="12"/>
-                        </padding>
-                    </VBox>
+                    <VBox fx:id="inProgressColumn"
+                          spacing="12"
+                          VBox.vgrow="ALWAYS"/>
                 </VBox>
 
-                <!-- DONE Column -->
-                <VBox spacing="0" styleClass="kanban-column-done" HBox.hgrow="ALWAYS">
+
+                <!-- DONE BOARD -->
+                <VBox spacing="12"
+                      HBox.hgrow="ALWAYS"
+                      style="
+                      -fx-background-color:#d4edda;
+                      -fx-border-color:#dcdcdc;
+                      -fx-border-radius:10;
+                      -fx-background-radius:10;
+                      -fx-padding:16;
+                      -fx-min-width:300;
+                      -fx-pref-width:340;
+                      -fx-effect:dropshadow(gaussian, rgba(0,0,0,0.08),8,0,0,2);">
+
                     <!-- Header -->
-                    <VBox styleClass="kanban-column-header">
-                        <Label text="✅ Done" styleClass="kanban-column-title" />
-                        <padding>
-                            <Insets top="12" right="12" bottom="12" left="12"/>
-                        </padding>
-                    </VBox>
+                    <HBox spacing="8">
+                        <Label text="✅ Done"
+                               style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                        <Label fx:id="doneCountLabel"
+                               text="0"
+                               style="
+                               -fx-background-color:#b7e4c7;
+                               -fx-padding:2 8;
+                               -fx-background-radius:10;"/>
+                    </HBox>
+
                     <!-- Task Container -->
-                    <VBox fx:id="doneColumn" spacing="10" styleClass="kanban-task-container" VBox.vgrow="ALWAYS">
-                        <padding>
-                            <Insets top="8" right="12" bottom="12" left="12"/>
-                        </padding>
-                    </VBox>
+                    <VBox fx:id="doneColumn"
+                          spacing="12"
+                          VBox.vgrow="ALWAYS"/>
                 </VBox>
+
             </HBox>
+
         </content>
     </ScrollPane>
+
 </VBox>
