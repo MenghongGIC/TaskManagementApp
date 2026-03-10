@@ -11,43 +11,41 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.taskmanagement.model.Project;
 import com.taskmanagement.model.Task;
 import com.taskmanagement.model.User;
 
 public class TaskRepository extends BaseRepository {
 
-    // SQL Queries - Common SELECT with joins for project, assignee, and creator
+    // SQL Queries - SELECT tasks with assignee and creator
     private static final String BASE_SELECT = """
-            SELECT t.*, p.id AS project_id, p.name AS project_name,
+            SELECT t.*,
                    a.id AS assignee_id, a.username AS assignee_name,
                    c.id AS creator_id, c.username AS creator_name
             FROM Tasks t
-            LEFT JOIN Projects p ON t.project_id = p.id
             LEFT JOIN Users a ON t.assignee_id = a.id
             JOIN Users c ON t.created_by = c.id
             """;
     
-    // Insert new task with title, description, status, priority, due date, project, assignee, creator
+    // Insert new task with title, description, status, priority, due date, assignee, creator
     private static final String SQL_INSERT = """
-            INSERT INTO Tasks (title, description, status, priority, due_date, project_id, assignee_id, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Tasks (title, description, status, priority, due_date, assignee_id, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
     
-    // Select all tasks with related project, assignee, and creator info, ordered by most recent
+    // Select all tasks with related assignee and creator info, ordered by most recent
     private static final String SQL_SELECT_ALL = BASE_SELECT + "ORDER BY t.created_at DESC";
     
-    // Select task by ID with related project, assignee, and creator info
+    // Select task by ID with related assignee and creator info
     private static final String SQL_SELECT_BY_ID = BASE_SELECT + "WHERE t.id = ?";
     
     // Delete task by ID
     private static final String SQL_DELETE = "DELETE FROM Tasks WHERE id = ?";
     
-    // Update task with title, description, status, priority, due date, project, assignee, creator
+    // Update task with title, description, status, priority, due date, assignee, creator
     private static final String SQL_UPDATE = """
             UPDATE Tasks 
             SET title = ?, description = ?, status = ?, priority = ?, due_date = ?,
-                project_id = ?, assignee_id = ?, created_by = ?
+                assignee_id = ?, created_by = ?
             WHERE id = ?
             """;
     
@@ -60,8 +58,7 @@ public class TaskRepository extends BaseRepository {
     // Select tasks by creator with related project, assignee, and creator info
     private static final String SQL_SELECT_BY_CREATOR = BASE_SELECT + "WHERE t.created_by = ? ORDER BY t.created_at DESC";
     
-    // Select tasks by project ID with related project, assignee, and creator info
-    private static final String SQL_SELECT_BY_PROJECT_ID = BASE_SELECT + "WHERE t.project_id = ? ORDER BY t.created_at DESC";
+
     
     // Column Names
     private static final String COL_ID = "id";
@@ -70,8 +67,6 @@ public class TaskRepository extends BaseRepository {
     private static final String COL_STATUS = "status";
     private static final String COL_PRIORITY = "priority";
     private static final String COL_DUE_DATE = "due_date";
-    private static final String COL_PROJECT_ID = "project_id";
-    private static final String COL_PROJECT_NAME = "project_name";
     private static final String COL_ASSIGNEE_ID = "assignee_id";
     private static final String COL_ASSIGNEE_NAME = "assignee_name";
     private static final String COL_CREATOR_ID = "creator_id";
@@ -81,7 +76,6 @@ public class TaskRepository extends BaseRepository {
     // Error Messages
     private static final String ERR_SAVE = "Error saving task: ";
     private static final String ERR_LOAD_ALL = "Error loading all tasks";
-    private static final String ERR_FIND_BY_PROJECT = "Error loading tasks for project: ";
     private static final String ERR_FIND_BY_ID = "Error finding task by ID: ";
     private static final String ERR_DELETE = "Error deleting task ID: ";
     private static final String ERR_UPDATE = "Error updating task: ";
@@ -105,9 +99,8 @@ public class TaskRepository extends BaseRepository {
             LocalDate dueDate = task.getDueDate();
             pstmt.setDate(5, dueDate != null ? Date.valueOf(dueDate) : null);
 
-            pstmt.setObject(6, task.getProject() != null ? task.getProject().getId() : null);
-            pstmt.setObject(7, task.getAssignee() != null ? task.getAssignee().getId() : null);
-            pstmt.setLong(8, task.getCreatedBy().getId());
+            pstmt.setObject(6, task.getAssignee() != null ? task.getAssignee().getId() : null);
+            pstmt.setLong(7, task.getCreatedBy().getId());
 
             pstmt.executeUpdate();
 
@@ -135,25 +128,6 @@ public class TaskRepository extends BaseRepository {
             }
         } catch (SQLException e) {
             throw new RuntimeException(ERR_LOAD_ALL, e);
-        }
-        return tasks;
-    }
-
-    public List<Task> findByProjectId(Long projectId) {
-        List<Task> tasks = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(SQL_SELECT_BY_PROJECT_ID)) {
-
-            pstmt.setLong(1, projectId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    tasks.add(mapRowToTask(rs));
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(ERR_FIND_BY_PROJECT + projectId, e);
         }
         return tasks;
     }
@@ -203,17 +177,16 @@ public class TaskRepository extends BaseRepository {
             LocalDate dueDate = task.getDueDate();
             pstmt.setDate(5, dueDate != null ? Date.valueOf(dueDate) : null);
 
-            pstmt.setObject(6, task.getProject() != null ? task.getProject().getId() : null);
-            pstmt.setObject(7, task.getAssignee() != null ? task.getAssignee().getId() : null);
+            pstmt.setObject(6, task.getAssignee() != null ? task.getAssignee().getId() : null);
             
             // Set created_by - only set if not null to preserve original creator
             if (task.getCreatedBy() != null) {
-                pstmt.setLong(8, task.getCreatedBy().getId());
+                pstmt.setLong(7, task.getCreatedBy().getId());
             } else {
-                pstmt.setNull(8, java.sql.Types.BIGINT);
+                pstmt.setNull(7, java.sql.Types.BIGINT);
             }
             
-            pstmt.setObject(9, task.getId());
+            pstmt.setObject(8, task.getId());
 
             int rowsUpdated = pstmt.executeUpdate();
             
@@ -293,15 +266,6 @@ public class TaskRepository extends BaseRepository {
         Date dueSqlDate = rs.getDate(COL_DUE_DATE);
         if (dueSqlDate != null) {
             task.setDueDate(dueSqlDate.toLocalDate());
-        }
-
-        // Project
-        Long projectId = (Long) rs.getObject(COL_PROJECT_ID);
-        if (projectId != null) {
-            Project project = new Project();
-            project.setId(projectId);
-            project.setName(rs.getString(COL_PROJECT_NAME));
-            task.setProject(project);
         }
 
         // Assignee

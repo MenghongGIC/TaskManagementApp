@@ -19,25 +19,65 @@
             <Insets top="8" right="0" bottom="8" left="0"/>
         </padding>
 
-        <VBox spacing="4" style="-fx-background-color: #f8fafc; -fx-padding: 12; -fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="0">
-            <Label text="Total Projects"/>
-            <Label fx:id="totalProjectsLabel" text="0" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-        </VBox>
+        <!-- Total Users -->
+        <Button GridPane.rowIndex="0" GridPane.columnIndex="0" onAction="#navigateToAllUsers" styleClass="dashboard-card-button">
+            <graphic>
+                <VBox spacing="4">
+                    <Label text="👥 Total Users" styleClass="dashboard-card-label-title"/>
+                    <Label fx:id="totalUsersLabel" text="0" styleClass="dashboard-card-label-value"/>
+                </VBox>
+            </graphic>
+        </Button>
 
-        <VBox spacing="4" style="-fx-background-color: #f8fafc; -fx-padding: 12; -fx-background-radius: 8;" GridPane.rowIndex="0" GridPane.columnIndex="1">
-            <Label text="Total Tasks"/>
-            <Label fx:id="totalTasksLabel" text="0" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-        </VBox>
+        <!-- Total Tasks -->
+        <Button GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#navigateToAllTasks" styleClass="dashboard-card-button">
+            <graphic>
+                <VBox spacing="4">
+                    <Label text="📋 Total Tasks" styleClass="dashboard-card-label-title"/>
+                    <Label fx:id="totalTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
+                </VBox>
+            </graphic>
+        </Button>
 
-        <VBox spacing="4" style="-fx-background-color: #f8fafc; -fx-padding: 12; -fx-background-radius: 8;" GridPane.rowIndex="1" GridPane.columnIndex="0">
-            <Label text="Completed Tasks"/>
-            <Label fx:id="completedTasksLabel" text="0" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-        </VBox>
+        <!-- Completed Tasks -->
+        <Button GridPane.rowIndex="0" GridPane.columnIndex="2" onAction="#navigateToCompletedTasks" styleClass="dashboard-card-button">
+            <graphic>
+                <VBox spacing="4">
+                    <Label text="✅ Completed" styleClass="dashboard-card-label-title"/>
+                    <Label fx:id="completedTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
+                </VBox>
+            </graphic>
+        </Button>
 
-        <VBox spacing="4" style="-fx-background-color: #f8fafc; -fx-padding: 12; -fx-background-radius: 8;" GridPane.rowIndex="1" GridPane.columnIndex="1">
-            <Label text="Overdue Tasks"/>
-            <Label fx:id="overdueTasksLabel" text="0" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-        </VBox>
+        <!-- Overdue Tasks -->
+        <Button GridPane.rowIndex="1" GridPane.columnIndex="0" onAction="#navigateToOverdueTasks" styleClass="dashboard-card-button">
+            <graphic>
+                <VBox spacing="4">
+                    <Label text="⏰ Overdue Tasks" styleClass="dashboard-card-label-title"/>
+                    <Label fx:id="overdueTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
+                </VBox>
+            </graphic>
+        </Button>
+
+        <!-- In Progress Tasks -->
+        <Button GridPane.rowIndex="1" GridPane.columnIndex="1" onAction="#navigateToInProgressTasks" styleClass="dashboard-card-button">
+            <graphic>
+                <VBox spacing="4">
+                    <Label text="⚙️ In Progress" styleClass="dashboard-card-label-title"/>
+                    <Label fx:id="inProgressTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
+                </VBox>
+            </graphic>
+        </Button>
+
+        <!-- Pending Tasks -->
+        <Button GridPane.rowIndex="1" GridPane.columnIndex="2" onAction="#navigateToPendingTasks" styleClass="dashboard-card-button">
+            <graphic>
+                <VBox spacing="4">
+                    <Label text="📌 Pending Tasks" styleClass="dashboard-card-label-title"/>
+                    <Label fx:id="pendingTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
+                </VBox>
+            </graphic>
+        </Button>
     </GridPane>
 
     <Button text="Refresh" onAction="#refresh" maxWidth="120"/>

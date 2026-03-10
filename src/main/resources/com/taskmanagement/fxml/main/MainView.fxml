@@ -13,10 +13,7 @@
             <Button onAction="#showDashboard" text="Dashboard" />
             <Button onAction="#showTasks" text="Tasks" />
             <Button onAction="#showKanban" text="Kanban" />
-            <Button onAction="#showProjects" text="Projects" />
-            <Button onAction="#showTeam" text="Team" />
-            <Button onAction="#showWorkspace" text="Workspace" />
-            <Button onAction="#showActivity" text="Activity" />
+            <Button onAction="#showUserManagement" text="Users (Admin)" />
 
             <Region HBox.hgrow="ALWAYS" />
             <Label style="-fx-text-fill: #cbd5e1;" text="User:" />

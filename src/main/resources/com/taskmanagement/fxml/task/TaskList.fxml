@@ -27,7 +27,6 @@
     <TableView fx:id="taskTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
-            <TableColumn fx:id="projectColumn" text="Project" prefWidth="170"/>
             <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
             <TableColumn fx:id="priorityColumn" text="Priority" prefWidth="120"/>
             <TableColumn fx:id="dueDateColumn" text="Due Date" prefWidth="140"/>

@@ -7,7 +7,16 @@ import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.geometry.Insets;
 
 import java.util.List;
 
@@ -48,7 +57,7 @@ public class KanbanController {
 
             List<Task> tasks = taskService.getAllTasks();
             for (Task task : tasks) {
-                Label card = createCard(task);
+                VBox card = createCard(task);
                 String status = task.getStatus() == null ? "To Do" : task.getStatus();
                 switch (status) {
                     case "In Progress" -> inProgressColumn.getChildren().add(card);
@@ -61,11 +70,45 @@ public class KanbanController {
         }
     }
 
-    private Label createCard(Task task) {
-        Label card = new Label(task.getTitle() + "\n" + (task.getPriority() == null ? "" : task.getPriority()));
-        card.setWrapText(true);
-        card.setStyle("-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;");
-
+    private VBox createCard(Task task) {
+        // Main card container with CSS class for styling
+        VBox card = new VBox(8);
+        card.getStyleClass().add("task-card");
+        card.setPadding(new Insets(10));
+        
+        // Apply priority-based left border
+        applyPriorityBorder(card, task.getPriority());
+        
+        // Title
+        Label titleLabel = new Label(task.getTitle() != null ? task.getTitle() : "Untitled");
+        titleLabel.setWrapText(true);
+        titleLabel.getStyleClass().add("task-card-title");
+        
+        // Assignee row
+        HBox assigneeRow = new HBox(4);
+        Label assigneeLabel = new Label(
+            "👤 " + (task.getAssignee() != null ? task.getAssignee().getUsername() : "Unassigned")
+        );
+        assigneeLabel.getStyleClass().add("task-card-assignee");
+        assigneeRow.getChildren().add(assigneeLabel);
+        
+        // Priority badge
+        Label priorityBadge = createPriorityBadge(task.getPriority());
+        
+        // Priority row
+        HBox priorityRow = new HBox(4);
+        priorityRow.getChildren().add(priorityBadge);
+        priorityRow.setHgrow(priorityBadge, Priority.ALWAYS);
+        
+        // Due date
+        Label dueDateLabel = new Label(
+            "📅 " + (task.getDueDate() != null ? task.getDueDate().toString() : "No date")
+        );
+        dueDateLabel.getStyleClass().add("task-card-due-date");
+        
+        card.getChildren().addAll(titleLabel, assigneeRow, priorityRow, dueDateLabel);
+        
+        // Drag detection
         card.setOnDragDetected(event -> {
             Dragboard db = card.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
@@ -73,8 +116,75 @@ public class KanbanController {
             db.setContent(content);
             event.consume();
         });
-
+        
+        // Hover effect (shadow through CSS)
+        card.setOnMouseEntered(event -> {
+            card.getStyleClass().add("task-card-hover");
+        });
+        
+        card.setOnMouseExited(event -> {
+            card.getStyleClass().remove("task-card-hover");
+        });
+        
         return card;
+    }
+    
+    private void applyPriorityBorder(VBox card, String priority) {
+        Color priorityColor = getPriorityBorderColor(priority);
+        Color grayBorder = Color.web("#dcdcdc");
+        
+        // Create a border with priority color on left (4px) and gray on other sides (1px)
+        BorderStroke priorityStroke = new BorderStroke(
+            grayBorder,                          // top paint
+            grayBorder,                          // right paint
+            grayBorder,                          // bottom paint
+            priorityColor,                       // left paint
+            BorderStrokeStyle.SOLID,             // top style
+            BorderStrokeStyle.SOLID,             // right style
+            BorderStrokeStyle.SOLID,             // bottom style
+            BorderStrokeStyle.SOLID,             // left style
+            new CornerRadii(8),
+            new BorderWidths(1, 1, 1, 4),
+            new Insets(0)
+        );
+        
+        card.setBorder(new Border(priorityStroke));
+    }
+    
+    private Color getPriorityBorderColor(String priority) {
+        if (priority == null) priority = "MEDIUM";
+        
+        return switch (priority.toLowerCase()) {
+            case "low" -> Color.web("#22c55e");        // green
+            case "medium" -> Color.web("#3b82f6");     // blue
+            case "urgent" -> Color.web("#f97316");     // orange
+            case "critical" -> Color.web("#ef4444");   // red
+            default -> Color.web("#3b82f6");           // blue (default)
+        };
+    }
+    
+    private Label createPriorityBadge(String priority) {
+        Label badge = new Label(priority != null ? priority.toUpperCase() : "MEDIUM");
+        badge.setPadding(new Insets(4, 8, 4, 8));
+        badge.setStyle(getPriorityBadgeStyle(priority));
+        return badge;
+    }
+    
+    private String getPriorityBadgeStyle(String priority) {
+        if (priority == null) priority = "Medium";
+        
+        return switch (priority.toLowerCase()) {
+            case "low" -> "-fx-background-color: #d1fae5; -fx-text-fill: #065f46; -fx-padding: 4 8; " +
+                        "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
+            case "medium" -> "-fx-background-color: #dbeafe; -fx-text-fill: #0c4a6e; -fx-padding: 4 8; " +
+                           "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
+            case "urgent" -> "-fx-background-color: #fed7aa; -fx-text-fill: #92400e; -fx-padding: 4 8; " +
+                           "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
+            case "critical" -> "-fx-background-color: #fecaca; -fx-text-fill: #7f1d1d; -fx-padding: 4 8; " +
+                             "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
+            default -> "-fx-background-color: #dbeafe; -fx-text-fill: #0c4a6e; -fx-padding: 4 8; " +
+                      "-fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;";
+        };
     }
 
     private void setupDropTarget(VBox column, String status) {

@@ -23,20 +23,17 @@
         <Label text="Title" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <TextField fx:id="titleField" promptText="Task title" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-        <Label text="Project" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="projectCombo" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Label text="Status" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="statusCombo" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <Label text="Status" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="statusCombo" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Label text="Priority" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="priorityCombo" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-        <Label text="Priority" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="priorityCombo" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Label text="Assignee" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="assigneeCombo" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <Label text="Assignee" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="assigneeCombo" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-
-        <Label text="Due Date" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <DatePicker fx:id="dueDatePicker" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <Label text="Due Date" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="dueDatePicker" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
     </GridPane>
 
     <Label text="Description"/>

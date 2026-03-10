@@ -43,9 +43,6 @@
     <Label text="Due Date"/>
     <DatePicker fx:id="dueDatePicker"/>
 
-    <Label text="Project"/>
-    <ComboBox fx:id="projectCombo"/>
-
     <Label text="Assignee"/>
     <ComboBox fx:id="assigneeCombo"/>
 

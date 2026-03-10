@@ -14,9 +14,12 @@ public class MainController {
 
     @FXML private Label usernameLabel;
     @FXML private StackPane contentArea;
+    
+    private static MainController instance;
 
     @FXML
     public void initialize() {
+        instance = this;
         if (usernameLabel != null) {
             String username = CurrentUser.getUsername();
             usernameLabel.setText(username == null ? "Guest" : username);
@@ -26,37 +29,28 @@ public class MainController {
 
     @FXML
     private void showDashboard() {
-        loadView("/com/taskmanagement/fxml/main/Dashboard.fxml");
+        loadView("/com/taskmanagement/fxml/main/Dashboard.fxml", null);
     }
 
     @FXML
     private void showTasks() {
-        loadView("/com/taskmanagement/fxml/task/TaskList.fxml");
+        loadView("/com/taskmanagement/fxml/task/TaskList.fxml", null);
     }
 
     @FXML
     private void showKanban() {
-        loadView("/com/taskmanagement/fxml/main/KanbanBoard.fxml");
+        loadView("/com/taskmanagement/fxml/main/KanbanBoard.fxml", null);
     }
 
     @FXML
-    private void showProjects() {
-        loadView("/com/taskmanagement/fxml/project/ProjectList.fxml");
-    }
-
-    @FXML
-    private void showTeam() {
-        loadView("/com/taskmanagement/fxml/team/TeamListView.fxml");
-    }
-
-    @FXML
-    private void showActivity() {
-        loadView("/com/taskmanagement/fxml/main/ActivityView.fxml");
-    }
-
-    @FXML
-    private void showWorkspace() {
-        loadView("/com/taskmanagement/fxml/main/WorkspaceView.fxml");
+    private void showUserManagement() {
+        if (!CurrentUser.isAdmin()) {
+            Label error = new Label("Access Denied: Admin privileges required");
+            error.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
+            contentArea.getChildren().setAll(error);
+            return;
+        }
+        loadView("/com/taskmanagement/fxml/main/UserManagement.fxml", null);
     }
 
     @FXML
@@ -69,10 +63,17 @@ public class MainController {
         }
     }
 
-    private void loadView(String path) {
+    private void loadView(String path, String filter) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
             Parent view = loader.load();
+
+            // Pass filter to TaskController if it's a task list
+            if (path.contains("TaskList.fxml") && filter != null) {
+                TaskController controller = loader.getController();
+                controller.applyFilter(filter);
+            }
+
             contentArea.getChildren().setAll(view);
         } catch (Exception e) {
             String details = buildErrorDetails(e);
@@ -81,6 +82,18 @@ public class MainController {
             contentArea.getChildren().setAll(error);
             e.printStackTrace();
         }
+    }
+
+    public void loadViewWithFilter(String path, String filter) {
+        loadView(path, filter);
+    }
+
+    public static MainController getInstance() {
+        return instance;
+    }
+
+    public StackPane getContentArea() {
+        return contentArea;
     }
 
     private String buildErrorDetails(Throwable throwable) {

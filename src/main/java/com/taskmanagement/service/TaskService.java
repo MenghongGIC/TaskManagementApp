@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.taskmanagement.model.Project;
 import com.taskmanagement.model.Task;
 import com.taskmanagement.model.User;
 import com.taskmanagement.repository.TaskRepository;
@@ -28,7 +27,6 @@ public class TaskService {
     // Error Messages
     private static final String ERR_NOT_LOGGED_IN = "User must be logged in";
     private static final String ERR_TASK_REQUIRED = "Task title is required";
-    private static final String ERR_PROJECT_REQUIRED = "Project is required";
     private static final String ERR_TASK_NOT_FOUND = "Task not found";
     private static final String ERR_NO_PERMISSION_EDIT = "You don't have permission to edit this task";
     private static final String ERR_NO_PERMISSION_DELETE = "You don't have permission to delete this task";
@@ -39,13 +37,12 @@ public class TaskService {
         this.taskRepository = new TaskRepository();
     }
 
-    public Task createTask(String title, String description, Project project) {
+    public Task createTask(String title, String description) {
         validateUserLoggedIn();
         validateTaskTitle(title);
-        validateProjectExists(project);
 
         User currentUser = CurrentUser.getInstance();
-        Task task = new Task(title.trim(), project, currentUser);
+        Task task = new Task(title.trim(), currentUser);
         task.setDescription(description);
         return taskRepository.save(task);
     }
@@ -77,10 +74,6 @@ public class TaskService {
 
     public List<Task> getAllTasks() {
         return filterVisibleTasks(taskRepository.findAll());
-    }
-
-    public List<Task> getTasksByProject(Long projectId) {
-        return filterVisibleTasks(taskRepository.findByProjectId(projectId));
     }
 
     public List<Task> getTasksByAssignee(Long userId) {
@@ -139,13 +132,12 @@ public class TaskService {
         );
     }
 
-    public List<Task> filterTasks(String status, String priority, Long assigneeId, Long projectId, 
+    public List<Task> filterTasks(String status, String priority, Long assigneeId,
                                    LocalDate dueDateFrom, LocalDate dueDateTo) {
         return getAllTasks().stream()
                 .filter(t -> matchesStatus(t, status))
                 .filter(t -> matchesPriority(t, priority))
                 .filter(t -> matchesAssignee(t, assigneeId))
-                .filter(t -> matchesProject(t, projectId))
                 .filter(t -> matchesDueDateRange(t, dueDateFrom, dueDateTo))
                 .collect(Collectors.toList());
     }
@@ -202,14 +194,6 @@ public class TaskService {
         taskRepository.update(task);
     }
 
-    public int getCompletionRate(Long projectId) {
-        List<Task> projectTasks = getTasksByProject(projectId);
-        if (projectTasks.isEmpty()) return 0;
-
-        long completed = projectTasks.stream().filter(Task::isCompleted).count();
-        return (int) ((completed * 100) / projectTasks.size());
-    }
-
     public int getOverdueCount() {
         return (int) getAllTasks().stream().filter(Task::isOverdue).count();
     }
@@ -233,12 +217,6 @@ public class TaskService {
     private void validateTaskTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException(ERR_TASK_REQUIRED);
-        }
-    }
-
-    private void validateProjectExists(Project project) {
-        if (project == null || project.getId() == null) {
-            throw new IllegalArgumentException(ERR_PROJECT_REQUIRED);
         }
     }
 
@@ -281,10 +259,6 @@ public class TaskService {
         return assigneeId == null || hasAssignee(task, assigneeId);
     }
 
-    private boolean matchesProject(Task task, Long projectId) {
-        return projectId == null || (task.getProject() != null && task.getProject().getId().equals(projectId));
-    }
-
     private boolean matchesDueDateRange(Task task, LocalDate dueDateFrom, LocalDate dueDateTo) {
         if (task.getDueDate() == null) return dueDateFrom == null && dueDateTo == null;
         if (dueDateFrom != null && task.getDueDate().isBefore(dueDateFrom)) return false;
@@ -311,9 +285,6 @@ public class TaskService {
         // Can view own tasks
         if (task.getCreatedBy() != null && task.getCreatedBy().getId().equals(current.getId())) return true;
         if (task.getAssignee() != null && task.getAssignee().getId().equals(current.getId())) return true;
-
-        // Can view project tasks if in project
-        if (task.getProject() != null && task.getProject().canEdit()) return true;
 
         return false;
     }

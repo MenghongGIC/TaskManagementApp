@@ -23,6 +23,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.time.LocalDate;
+
 public class TaskController {
 
     @FXML private TextField searchField;
@@ -30,7 +32,6 @@ public class TaskController {
     @FXML private Label statusLabel;
     @FXML private TableView<Task> taskTable;
     @FXML private TableColumn<Task, String> titleColumn;
-    @FXML private TableColumn<Task, String> projectColumn;
     @FXML private TableColumn<Task, String> statusColumn;
     @FXML private TableColumn<Task, String> priorityColumn;
     @FXML private TableColumn<Task, String> dueDateColumn;
@@ -38,6 +39,7 @@ public class TaskController {
 
     private final TaskService taskService = new TaskService();
     private FilteredList<Task> filtered;
+    private String currentFilter = null;
 
     @FXML
     public void initialize() {
@@ -45,9 +47,6 @@ public class TaskController {
         statusFilter.setValue("All");
 
         titleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
-        projectColumn.setCellValueFactory(data -> new SimpleStringProperty(
-            data.getValue().getProject() == null ? "-" : data.getValue().getProject().getName()
-        ));
         statusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus()));
         priorityColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPriority()));
         dueDateColumn.setCellValueFactory(data -> new SimpleStringProperty(
@@ -69,6 +68,23 @@ public class TaskController {
     @FXML
     private void handleRefresh() {
         loadTasks();
+    }
+
+    public void applyFilter(String filter) {
+        currentFilter = filter;
+        loadTasks();
+        
+        // Apply filter to statusFilter combobox based on the passed filter type
+        if ("completed".equalsIgnoreCase(filter)) {
+            statusFilter.setValue("Done");
+        } else if ("in-progress".equalsIgnoreCase(filter)) {
+            statusFilter.setValue("In Progress");
+        } else if ("pending".equalsIgnoreCase(filter)) {
+            statusFilter.setValue("To Do");
+        } else if ("all".equalsIgnoreCase(filter) || filter == null) {
+            statusFilter.setValue("All");
+            currentFilter = null;
+        }
     }
 
     private void setupActionColumn() {
@@ -197,6 +213,7 @@ public class TaskController {
 
         String query = searchField.getText() == null ? "" : searchField.getText().toLowerCase().trim();
         String selectedStatus = statusFilter.getValue();
+        String filter = currentFilter;
 
         filtered.setPredicate(task -> {
             boolean matchesQuery = query.isEmpty()
@@ -206,6 +223,14 @@ public class TaskController {
             boolean matchesStatus = selectedStatus == null
                 || "All".equals(selectedStatus)
                 || selectedStatus.equalsIgnoreCase(task.getStatus());
+
+            // Special handling for overdue filter
+            if ("overdue".equalsIgnoreCase(filter)) {
+                boolean isOverdue = task.getDueDate() != null 
+                    && task.getDueDate().isBefore(LocalDate.now())
+                    && !"Done".equalsIgnoreCase(task.getStatus());
+                return matchesQuery && isOverdue;
+            }
 
             return matchesQuery && matchesStatus;
         });

@@ -24,10 +24,6 @@
 
     <HBox spacing="16">
         <VBox spacing="4">
-            <Label text="Project" style="-fx-font-weight: bold;"/>
-            <Label fx:id="projectLabel"/>
-        </VBox>
-        <VBox spacing="4">
             <Label text="Status" style="-fx-font-weight: bold;"/>
             <Label fx:id="statusLabel"/>
         </VBox>

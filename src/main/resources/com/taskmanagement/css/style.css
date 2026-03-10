@@ -88,3 +88,187 @@
     -fx-padding: 8;
     -fx-background-radius: 6;
 }
+/* ====================================== */
+/* Priority Badge Colors */
+/* ====================================== */
+
+.priority-low {
+    -fx-background-color: #d1fae5;
+    -fx-text-fill: #065f46;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.priority-medium {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #0c4a6e;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.priority-urgent {
+    -fx-background-color: #fed7aa;
+    -fx-text-fill: #92400e;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.priority-critical {
+    -fx-background-color: #fecaca;
+    -fx-text-fill: #7f1d1d;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ====================================== */
+/* Kanban Column Styles */
+/* ====================================== */
+
+.kanban-column-todo {
+    -fx-background-color: #f1f3f5;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+}
+
+.kanban-column-in-progress {
+    -fx-background-color: #fff3cd;
+    -fx-border-color: #ffe69c;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+}
+
+.kanban-column-done {
+    -fx-background-color: #d4edda;
+    -fx-border-color: #b7e4c7;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+}
+
+.kanban-column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.kanban-column-todo .kanban-column-header {
+    -fx-background-color: #dee2e6;
+}
+
+.kanban-column-in-progress .kanban-column-header {
+    -fx-background-color: #ffe69c;
+}
+
+.kanban-column-done .kanban-column-header {
+    -fx-background-color: #b7e4c7;
+}
+
+.kanban-column-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1a1a1a;
+}
+
+.kanban-column-todo .kanban-column-title {
+    -fx-text-fill: #495057;
+}
+
+.kanban-column-in-progress .kanban-column-title {
+    -fx-text-fill: #856404;
+}
+
+.kanban-column-done .kanban-column-title {
+    -fx-text-fill: #155724;
+}
+
+.kanban-task-container {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* ====================================== */
+/* Task Card Styles */
+/* ====================================== */
+
+.task-card {
+    -fx-background-color: white;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.09), 3, 0, 0, 1.5);
+    -fx-cursor: grab;
+}
+
+.task-card-hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 4);
+    -fx-border-color: #a8a8a8;
+}
+
+.task-card-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: #0f172a;
+}
+
+.task-card-assignee {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748b;
+}
+
+.task-card-due-date {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94a3b8;
+}
+
+/* ====================================== */
+/* Dashboard Card Styles */
+/* ====================================== */
+
+.dashboard-card-button {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 4, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.dashboard-card-button:hover {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 8, 0, 0, 4);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.dashboard-card-label-title {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: 500;
+}
+
+.dashboard-card-label-value {
+    -fx-font-size: 24px;
+    -fx-text-fill: #0f172a;
+    -fx-font-weight: bold;
+}

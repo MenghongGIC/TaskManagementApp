@@ -17,7 +17,6 @@ public class Task {
     private String status = "To Do";
     private String priority = "Medium";
     private LocalDate dueDate;
-    private Project project;
     private User assignee;
     private User createdBy;
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -25,9 +24,8 @@ public class Task {
 
     public Task() {}
 
-    public Task(String title, Project project, User createdBy) {
+    public Task(String title, User createdBy) {
         this.title = title;
-        this.project = project;
         this.createdBy = createdBy;
     }
     
@@ -48,9 +46,6 @@ public class Task {
 
     public LocalDate getDueDate() { return dueDate; }
     public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
-
-    public Project getProject() { return project; }
-    public void setProject(Project project) { this.project = project; }
 
     public User getAssignee() { return assignee; }
     public void setAssignee(User assignee) { this.assignee = assignee; }

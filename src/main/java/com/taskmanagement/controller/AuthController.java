@@ -3,8 +3,6 @@ package com.taskmanagement.controller;
 import com.taskmanagement.App;
 import com.taskmanagement.model.User;
 import com.taskmanagement.service.UserService;
-import com.taskmanagement.service.WorkspaceService;
-import com.taskmanagement.utils.CurrentWorkspace;
 import com.taskmanagement.utils.UIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -27,7 +25,6 @@ public class AuthController {
     @FXML private Label registerSuccessLabel;
 
     private final UserService userService = new UserService();
-    private final WorkspaceService workspaceService = new WorkspaceService();
 
     @FXML
     private void handleLogin() {
@@ -45,15 +42,7 @@ public class AuthController {
 
         try {
             User user = userService.login(username, password);
-            var userWorkspaces = workspaceService.getWorkspacesForUser(user.getId());
-
-            if (userWorkspaces.size() > 1) {
-                CurrentWorkspace.clear();
-                App.setRoot("workspace/WorkspaceSelectionView");
-            } else {
-                CurrentWorkspace.set(userWorkspaces.isEmpty() ? null : userWorkspaces.getFirst());
-                App.setRoot("main/WorkspaceDashboard");
-            }
+            App.setRoot("main/MainView");
         } catch (Exception e) {
             setLoginError(e.getMessage());
         }

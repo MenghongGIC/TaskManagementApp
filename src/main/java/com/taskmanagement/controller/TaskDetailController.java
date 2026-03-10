@@ -22,7 +22,6 @@ public class TaskDetailController {
 
     @FXML private Label titleLabel;
     @FXML private Label descriptionLabel;
-    @FXML private Label projectLabel;
     @FXML private Label statusLabel;
     @FXML private Label priorityLabel;
     @FXML private Label assignedMembersLabel;
@@ -53,7 +52,6 @@ public class TaskDetailController {
 
         titleLabel.setText(nullSafe(task.getTitle()));
         descriptionLabel.setText(nullSafe(task.getDescription()));
-        projectLabel.setText(task.getProject() != null ? nullSafe(task.getProject().getName()) : "-");
         statusLabel.setText(nullSafe(task.getStatus()));
         priorityLabel.setText(nullSafe(task.getPriority()));
         assignedMembersLabel.setText(task.getAssignee() != null ? task.getAssignee().getUsername() : "Unassigned");
