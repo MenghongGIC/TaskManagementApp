@@ -28,7 +28,7 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button onAction="#refresh" styleClass="btn-primary" style="-fx-padding: 8 16; -fx-content-display: LEFT;">
                     <graphic>
-                        <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #FFFFFF;" />
+                        <FontIcon style="-fx-icon-color: #FFFFFF;" iconLiteral="fas-sync-alt" iconSize="14" />
                     </graphic>
                     <text>Refresh</text>
                 </Button>
@@ -47,7 +47,7 @@
             <VBox GridPane.rowIndex="0" GridPane.columnIndex="0" 
                   style="-fx-background-color: #FFFFFF; -fx-border-color: #3B82F6 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
                   spacing="12">
-                <FontIcon iconLiteral="fas-users" iconSize="28" style="-fx-icon-color: #3B82F6;" />
+                <FontIcon style="-fx-icon-color: #3B82F6;" iconLiteral="fas-users" iconSize="28" />
                 <Label text="Total Users" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
                 <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #3B82F6; -fx-font-weight: bold;"/>
                 <Button text="View All" onAction="#navigateToAllUsers" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
@@ -57,7 +57,7 @@
             <VBox GridPane.rowIndex="0" GridPane.columnIndex="1"
                   style="-fx-background-color: #FFFFFF; -fx-border-color: #6366F1 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
                   spacing="12">
-                <FontIcon iconLiteral="fas-tasks" iconSize="28" style="-fx-icon-color: #6366F1;" />
+                <FontIcon style="-fx-icon-color: #6366F1;" iconLiteral="fas-tasks" iconSize="28" />
                 <Label text="Total Tasks" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
                 <Label fx:id="totalTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #6366F1; -fx-font-weight: bold;"/>
                 <Button text="View All" onAction="#navigateToAllTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
@@ -67,7 +67,7 @@
             <VBox GridPane.rowIndex="0" GridPane.columnIndex="2"
                   style="-fx-background-color: #FFFFFF; -fx-border-color: #22C55E #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
                   spacing="12">
-                <FontIcon iconLiteral="fas-check-circle" iconSize="28" style="-fx-icon-color: #22C55E;" />
+                <FontIcon style="-fx-icon-color: #22C55E;" iconLiteral="fas-check-circle" iconSize="28" />
                 <Label text="Completed" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
                 <Label fx:id="completedTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #22C55E; -fx-font-weight: bold;"/>
                 <Button text="View All" onAction="#navigateToCompletedTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
@@ -77,7 +77,7 @@
             <VBox GridPane.rowIndex="1" GridPane.columnIndex="0"
                   style="-fx-background-color: #FFFFFF; -fx-border-color: #F59E0B #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
                   spacing="12">
-                <FontIcon iconLiteral="fas-clock" iconSize="28" style="-fx-icon-color: #F59E0B;" />
+                <FontIcon style="-fx-icon-color: #F59E0B;" iconLiteral="fas-clock" iconSize="28" />
                 <Label text="Pending" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
                 <Label fx:id="pendingTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #F59E0B; -fx-font-weight: bold;"/>
                 <Button text="View All" onAction="#navigateToPendingTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
@@ -87,7 +87,7 @@
             <VBox GridPane.rowIndex="1" GridPane.columnIndex="1"
                   style="-fx-background-color: #FFFFFF; -fx-border-color: #8B5CF6 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
                   spacing="12">
-                <FontIcon iconLiteral="fas-cog" iconSize="28" style="-fx-icon-color: #8B5CF6;" />
+                <FontIcon style="-fx-icon-color: #8B5CF6;" iconLiteral="fas-cog" iconSize="28" />
                 <Label text="In Progress" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
                 <Label fx:id="inProgressTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #8B5CF6; -fx-font-weight: bold;"/>
                 <Button text="View All" onAction="#navigateToInProgressTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
@@ -97,7 +97,7 @@
             <VBox GridPane.rowIndex="1" GridPane.columnIndex="2"
                   style="-fx-background-color: #FFFFFF; -fx-border-color: #EF4444 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
                   spacing="12">
-                <FontIcon iconLiteral="fas-exclamation-triangle" iconSize="28" style="-fx-icon-color: #EF4444;" />
+                <FontIcon style="-fx-icon-color: #EF4444;" iconLiteral="fas-exclamation-triangle" iconSize="28" />
                 <Label text="Overdue" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
                 <Label fx:id="overdueTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #EF4444; -fx-font-weight: bold;"/>
                 <Button text="View All" onAction="#navigateToOverdueTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>

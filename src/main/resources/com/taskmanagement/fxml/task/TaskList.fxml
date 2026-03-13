@@ -29,13 +29,13 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Button styleClass="btn-primary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#handleCreate">
                 <graphic>
-                    <FontIcon iconLiteral="fas-plus" iconSize="14" style="-fx-icon-color: #FFFFFF;" />
+                    <FontIcon style="-fx-icon-color: #FFFFFF;" iconLiteral="fas-plus" iconSize="14" />
                 </graphic>
                 <text>Create Task</text>
             </Button>
             <Button styleClass="btn-secondary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#handleRefresh">
                 <graphic>
-                    <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #111827;" />
+                    <FontIcon style="-fx-icon-color: #111827;" iconLiteral="fas-sync-alt" iconSize="14" />
                 </graphic>
                 <text>Refresh</text>
             </Button>

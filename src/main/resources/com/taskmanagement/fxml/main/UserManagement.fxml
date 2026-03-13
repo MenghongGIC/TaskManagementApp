@@ -27,7 +27,7 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Button styleClass="btn-secondary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#handleRefresh">
                 <graphic>
-                    <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #111827;" />
+                    <FontIcon style="-fx-icon-color: #111827;" iconLiteral="fas-sync-alt" iconSize="14" />
                 </graphic>
                 <text>Refresh</text>
             </Button>

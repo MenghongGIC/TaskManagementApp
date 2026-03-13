@@ -74,10 +74,7 @@ public class App extends Application {
         for (String path : fontPaths) {
             java.net.URL url = FontAwesomeSolid.class.getResource(path);
             if (url != null) {
-                Font font = Font.loadFont(url.toExternalForm(), 16);
-                System.out.println("[Ikonli] " + (font != null ? "Loaded: " + font.getFamily() : "FAILED to load") + " from " + path);
-            } else {
-                System.err.println("[Ikonli] URL null for: " + path);
+                Font.loadFont(url.toExternalForm(), 16);
             }
         }
     }

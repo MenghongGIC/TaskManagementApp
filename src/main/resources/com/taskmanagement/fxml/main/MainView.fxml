@@ -28,7 +28,7 @@
                 <Button fx:id="dashboardBtn" onAction="#showDashboard" styleClass="sidebar-menu-item" 
                         style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
                     <graphic>
-                        <FontIcon iconLiteral="fas-chart-line" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                        <FontIcon style="-fx-icon-color: #E5E7EB;" iconLiteral="fas-chart-line" iconSize="18" />
                     </graphic>
                     <text>Dashboard</text>
                     <tooltip>
@@ -40,7 +40,7 @@
                 <Button fx:id="tasksBtn" onAction="#showTasks" styleClass="sidebar-menu-item" 
                         style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
                     <graphic>
-                        <FontIcon iconLiteral="fas-tasks" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                        <FontIcon style="-fx-icon-color: #E5E7EB;" iconLiteral="fas-tasks" iconSize="18" />
                     </graphic>
                     <text>Tasks</text>
                     <tooltip>
@@ -52,7 +52,7 @@
                 <Button fx:id="kanbanBtn" onAction="#showKanban" styleClass="sidebar-menu-item" 
                         style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
                     <graphic>
-                        <FontIcon iconLiteral="fas-columns" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                        <FontIcon style="-fx-icon-color: #E5E7EB;" iconLiteral="fas-columns" iconSize="18" />
                     </graphic>
                     <text>Kanban</text>
                     <tooltip>
@@ -64,7 +64,7 @@
                 <Button fx:id="activityBtn" onAction="#showActivityLog" styleClass="sidebar-menu-item" 
                         style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
                     <graphic>
-                        <FontIcon iconLiteral="fas-history" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                        <FontIcon style="-fx-icon-color: #E5E7EB;" iconLiteral="fas-history" iconSize="18" />
                     </graphic>
                     <text>Activity Log</text>
                     <tooltip>
@@ -76,7 +76,7 @@
                 <Button fx:id="usersBtn" onAction="#showUserManagement" styleClass="sidebar-menu-item" 
                         style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
                     <graphic>
-                        <FontIcon iconLiteral="fas-users" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                        <FontIcon style="-fx-icon-color: #E5E7EB;" iconLiteral="fas-users" iconSize="18" />
                     </graphic>
                     <text>Users (Admin)</text>
                     <tooltip>
@@ -95,7 +95,7 @@
                 <Button onAction="#logout" styleClass="sidebar-logout-btn" 
                         style="-fx-padding: 8 16; -fx-margin-top: 12; -fx-content-display: LEFT;" wrapText="false">
                     <graphic>
-                        <FontIcon iconLiteral="fas-sign-out-alt" iconSize="14" style="-fx-icon-color: #E5E7EB;" />
+                        <FontIcon style="-fx-icon-color: #E5E7EB;" iconLiteral="fas-sign-out-alt" iconSize="14" />
                     </graphic>
                     <text>Logout</text>
                 </Button>

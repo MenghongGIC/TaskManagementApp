@@ -22,13 +22,13 @@
         <Region HBox.hgrow="ALWAYS"/>
         <Button styleClass="btn-primary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#refreshActivities">
             <graphic>
-                <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #FFFFFF;" />
+                <FontIcon style="-fx-icon-color: #FFFFFF;" iconLiteral="fas-sync-alt" iconSize="14" />
             </graphic>
             <text>Refresh</text>
         </Button>
         <Button styleClass="btn-danger" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#clearAllActivities">
             <graphic>
-                <FontIcon iconLiteral="fas-trash" iconSize="14" style="-fx-icon-color: #FFFFFF;" />
+                <FontIcon style="-fx-icon-color: #FFFFFF;" iconLiteral="fas-trash" iconSize="14" />
             </graphic>
             <text>Clear All</text>
         </Button>

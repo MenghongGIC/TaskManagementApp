@@ -24,7 +24,7 @@
         <Region HBox.hgrow="ALWAYS"/>
         <Button styleClass="btn-primary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#refreshBoard">
             <graphic>
-                <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #FFFFFF;" />
+                <FontIcon style="-fx-icon-color: #FFFFFF;" iconLiteral="fas-sync-alt" iconSize="14" />
             </graphic>
             <text>Refresh Board</text>
         </Button>
@@ -54,7 +54,7 @@
 
                     <!-- Header -->
                     <HBox spacing="8" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fas-tasks" iconSize="16" style="-fx-icon-color: #6B7280;" />
+                        <FontIcon style="-fx-icon-color: #6B7280;" iconLiteral="fas-tasks" iconSize="16" />
                         <Label text="To Do"
                                style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
                         <Label fx:id="todoCountLabel"
@@ -92,7 +92,7 @@
 
                     <!-- Header -->
                     <HBox spacing="8" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fas-cog" iconSize="16" style="-fx-icon-color: #8B5CF6;" />
+                        <FontIcon style="-fx-icon-color: #8B5CF6;" iconLiteral="fas-cog" iconSize="16" />
                         <Label text="In Progress"
                                style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
                         <Label fx:id="inProgressCountLabel"
@@ -130,7 +130,7 @@
 
                     <!-- Header -->
                     <HBox spacing="8" alignment="CENTER_LEFT">
-                        <FontIcon iconLiteral="fas-check-circle" iconSize="16" style="-fx-icon-color: #22C55E;" />
+                        <FontIcon style="-fx-icon-color: #22C55E;" iconLiteral="fas-check-circle" iconSize="16" />
                         <Label text="Done"
                                style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
                         <Label fx:id="doneCountLabel"
