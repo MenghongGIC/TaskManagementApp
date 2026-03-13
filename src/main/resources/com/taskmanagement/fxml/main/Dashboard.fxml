@@ -3,82 +3,109 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.taskmanagement.controller.DashboardController"
-      spacing="16"
-      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.taskmanagement.controller.DashboardController"
+            style="-fx-background-color: #F8FAFC; -fx-border-color: transparent;"
+            fitToWidth="true">
 
-    <Label text="Dashboard" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <VBox spacing="24" style="-fx-padding: 20;">
+        
+        <!-- Page Title -->
+        <Label text="Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
 
-    <GridPane hgap="12" vgap="12">
-        <padding>
-            <Insets top="8" right="0" bottom="8" left="0"/>
-        </padding>
+        <!-- Header Section -->
+        <VBox spacing="20" style="-fx-padding: 0; -fx-background-color: transparent;">
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Label text="Statistics Overview" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button onAction="#refresh" styleClass="btn-primary" style="-fx-padding: 8 16; -fx-content-display: LEFT;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #FFFFFF;" />
+                    </graphic>
+                    <text>Refresh</text>
+                </Button>
+            </HBox>
+        </VBox>
 
-        <!-- Total Users -->
-        <Button GridPane.rowIndex="0" GridPane.columnIndex="0" onAction="#navigateToAllUsers" styleClass="dashboard-card-button">
-            <graphic>
-                <VBox spacing="4">
-                    <Label text="👥 Total Users" styleClass="dashboard-card-label-title"/>
-                    <Label fx:id="totalUsersLabel" text="0" styleClass="dashboard-card-label-value"/>
-                </VBox>
-            </graphic>
-        </Button>
+        <!-- Statistics Cards Grid (6 Cards) -->
+        <GridPane hgap="16" vgap="16" style="-fx-padding: 0;">
+            <columnConstraints>
+                <javafx.scene.layout.ColumnConstraints percentWidth="33.33" />
+                <javafx.scene.layout.ColumnConstraints percentWidth="33.33" />
+                <javafx.scene.layout.ColumnConstraints percentWidth="33.34" />
+            </columnConstraints>
 
-        <!-- Total Tasks -->
-        <Button GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#navigateToAllTasks" styleClass="dashboard-card-button">
-            <graphic>
-                <VBox spacing="4">
-                    <Label text="📋 Total Tasks" styleClass="dashboard-card-label-title"/>
-                    <Label fx:id="totalTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
-                </VBox>
-            </graphic>
-        </Button>
+            <!-- Total Users Card - Blue -->
+            <VBox GridPane.rowIndex="0" GridPane.columnIndex="0" 
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #3B82F6 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
+                  spacing="12">
+                <FontIcon iconLiteral="fas-users" iconSize="28" style="-fx-icon-color: #3B82F6;" />
+                <Label text="Total Users" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
+                <Label fx:id="totalUsersLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #3B82F6; -fx-font-weight: bold;"/>
+                <Button text="View All" onAction="#navigateToAllUsers" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
+            </VBox>
 
-        <!-- Completed Tasks -->
-        <Button GridPane.rowIndex="0" GridPane.columnIndex="2" onAction="#navigateToCompletedTasks" styleClass="dashboard-card-button">
-            <graphic>
-                <VBox spacing="4">
-                    <Label text="✅ Completed" styleClass="dashboard-card-label-title"/>
-                    <Label fx:id="completedTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
-                </VBox>
-            </graphic>
-        </Button>
+            <!-- Total Tasks Card - Indigo -->
+            <VBox GridPane.rowIndex="0" GridPane.columnIndex="1"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #6366F1 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
+                  spacing="12">
+                <FontIcon iconLiteral="fas-tasks" iconSize="28" style="-fx-icon-color: #6366F1;" />
+                <Label text="Total Tasks" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
+                <Label fx:id="totalTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #6366F1; -fx-font-weight: bold;"/>
+                <Button text="View All" onAction="#navigateToAllTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
+            </VBox>
 
-        <!-- Overdue Tasks -->
-        <Button GridPane.rowIndex="1" GridPane.columnIndex="0" onAction="#navigateToOverdueTasks" styleClass="dashboard-card-button">
-            <graphic>
-                <VBox spacing="4">
-                    <Label text="⏰ Overdue Tasks" styleClass="dashboard-card-label-title"/>
-                    <Label fx:id="overdueTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
-                </VBox>
-            </graphic>
-        </Button>
+            <!-- Completed Tasks Card - Green -->
+            <VBox GridPane.rowIndex="0" GridPane.columnIndex="2"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #22C55E #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
+                  spacing="12">
+                <FontIcon iconLiteral="fas-check-circle" iconSize="28" style="-fx-icon-color: #22C55E;" />
+                <Label text="Completed" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
+                <Label fx:id="completedTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #22C55E; -fx-font-weight: bold;"/>
+                <Button text="View All" onAction="#navigateToCompletedTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
+            </VBox>
 
-        <!-- In Progress Tasks -->
-        <Button GridPane.rowIndex="1" GridPane.columnIndex="1" onAction="#navigateToInProgressTasks" styleClass="dashboard-card-button">
-            <graphic>
-                <VBox spacing="4">
-                    <Label text="⚙️ In Progress" styleClass="dashboard-card-label-title"/>
-                    <Label fx:id="inProgressTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
-                </VBox>
-            </graphic>
-        </Button>
+            <!-- Pending Tasks Card - Orange -->
+            <VBox GridPane.rowIndex="1" GridPane.columnIndex="0"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #F59E0B #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
+                  spacing="12">
+                <FontIcon iconLiteral="fas-clock" iconSize="28" style="-fx-icon-color: #F59E0B;" />
+                <Label text="Pending" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
+                <Label fx:id="pendingTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #F59E0B; -fx-font-weight: bold;"/>
+                <Button text="View All" onAction="#navigateToPendingTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
+            </VBox>
 
-        <!-- Pending Tasks -->
-        <Button GridPane.rowIndex="1" GridPane.columnIndex="2" onAction="#navigateToPendingTasks" styleClass="dashboard-card-button">
-            <graphic>
-                <VBox spacing="4">
-                    <Label text="📌 Pending Tasks" styleClass="dashboard-card-label-title"/>
-                    <Label fx:id="pendingTasksLabel" text="0" styleClass="dashboard-card-label-value"/>
-                </VBox>
-            </graphic>
-        </Button>
-    </GridPane>
+            <!-- In Progress Tasks Card - Purple -->
+            <VBox GridPane.rowIndex="1" GridPane.columnIndex="1"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #8B5CF6 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
+                  spacing="12">
+                <FontIcon iconLiteral="fas-cog" iconSize="28" style="-fx-icon-color: #8B5CF6;" />
+                <Label text="In Progress" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
+                <Label fx:id="inProgressTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #8B5CF6; -fx-font-weight: bold;"/>
+                <Button text="View All" onAction="#navigateToInProgressTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
+            </VBox>
 
-    <Button text="Refresh" onAction="#refresh" maxWidth="120"/>
-</VBox>
+            <!-- Overdue Tasks Card - Red -->
+            <VBox GridPane.rowIndex="1" GridPane.columnIndex="2"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #EF4444 #E5E7EB #E5E7EB #E5E7EB; -fx-border-width: 0 0 0 4; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);"
+                  spacing="12">
+                <FontIcon iconLiteral="fas-exclamation-triangle" iconSize="28" style="-fx-icon-color: #EF4444;" />
+                <Label text="Overdue" style="-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;"/>
+                <Label fx:id="overdueTasksLabel" text="0" style="-fx-font-size: 32px; -fx-text-fill: #EF4444; -fx-font-weight: bold;"/>
+                <Button text="View All" onAction="#navigateToOverdueTasks" styleClass="btn-secondary" style="-fx-padding: 8 12; -fx-font-size: 11px;"/>
+            </VBox>
+        </GridPane>
+
+        <!-- Spacer -->
+        <Region style="-fx-pref-height: 20;"/>
+
+    </VBox>
+</ScrollPane>

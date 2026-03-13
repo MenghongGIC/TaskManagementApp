@@ -3,7 +3,6 @@ package com.taskmanagement.utils;
 public class ColorValidator {
     private static final String HEX_COLOR_PATTERN = "^#[0-9A-Fa-f]{6}$";
     
-    // Default Colors
     private static final String DEFAULT_LABEL_COLOR = "#007BFF";
     private static final String DEFAULT_PROJECT_COLOR = "#6C757D";
     

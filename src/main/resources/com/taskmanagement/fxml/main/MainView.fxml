@@ -1,31 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.taskmanagement.controller.MainController">
+<BorderPane style="-fx-background-color: #F8FAFC;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.taskmanagement.controller.MainController">
 
-    <top>
-        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-background-color: #2A78C5; -fx-padding: 10 14;">
-            <Label style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="TaskFlow" />
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox style="-fx-background-color: #1F2937; -fx-padding: 0; -fx-spacing: 0;" prefWidth="220">
+            <!-- Logo/Branding -->
+            <VBox style="-fx-padding: 20 16; -fx-border-color: #374151; -fx-border-width: 0 0 1 0; -fx-alignment: CENTER;">
+                <Label text="TaskFlow" style="-fx-text-fill: #E5E7EB; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+            </VBox>
 
-            <Button onAction="#showDashboard" text="Dashboard" />
-            <Button onAction="#showTasks" text="Tasks" />
-            <Button onAction="#showKanban" text="Kanban" />
-            <Button onAction="#showUserManagement" text="Users (Admin)" />
+            <!-- Navigation Menu Items -->
+            <VBox spacing="4" style="-fx-padding: 16;">
 
-            <Region HBox.hgrow="ALWAYS" />
-            <Label style="-fx-text-fill: #cbd5e1;" text="User:" />
-            <Label fx:id="usernameLabel" style="-fx-text-fill: white; -fx-font-weight: bold;" />
-            <Button onAction="#logout" text="Logout" />
-        </HBox>
-    </top>
+                <!-- Dashboard -->
+                <Button fx:id="dashboardBtn" onAction="#showDashboard" styleClass="sidebar-menu-item" 
+                        style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-chart-line" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                    </graphic>
+                    <text>Dashboard</text>
+                    <tooltip>
+                        <Tooltip text="View dashboard overview"/>
+                    </tooltip>
+                </Button>
 
+                <!-- Tasks -->
+                <Button fx:id="tasksBtn" onAction="#showTasks" styleClass="sidebar-menu-item" 
+                        style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-tasks" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                    </graphic>
+                    <text>Tasks</text>
+                    <tooltip>
+                        <Tooltip text="Manage all tasks"/>
+                    </tooltip>
+                </Button>
+
+                <!-- Kanban -->
+                <Button fx:id="kanbanBtn" onAction="#showKanban" styleClass="sidebar-menu-item" 
+                        style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-columns" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                    </graphic>
+                    <text>Kanban</text>
+                    <tooltip>
+                        <Tooltip text="Kanban board view"/>
+                    </tooltip>
+                </Button>
+
+                <!-- Activity Log -->
+                <Button fx:id="activityBtn" onAction="#showActivityLog" styleClass="sidebar-menu-item" 
+                        style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-history" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                    </graphic>
+                    <text>Activity Log</text>
+                    <tooltip>
+                        <Tooltip text="View activity history"/>
+                    </tooltip>
+                </Button>
+
+                <!-- Users (Admin Only) -->
+                <Button fx:id="usersBtn" onAction="#showUserManagement" styleClass="sidebar-menu-item" 
+                        style="-fx-padding: 12 16; -fx-content-display: LEFT; -fx-text-alignment: LEFT;">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-users" iconSize="18" style="-fx-icon-color: #E5E7EB;" />
+                    </graphic>
+                    <text>Users (Admin)</text>
+                    <tooltip>
+                        <Tooltip text="Manage users"/>
+                    </tooltip>
+                </Button>
+            </VBox>
+
+            <!-- Spacer -->
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- User Section -->
+            <VBox style="-fx-padding: 16; -fx-border-color: #374151; -fx-border-width: 1 0 0 0;">
+                <Label text="User:" style="-fx-text-fill: #9CA3AF; -fx-font-size: 11px;"/>
+                <Label fx:id="usernameLabel" text="Guest" style="-fx-text-fill: #E5E7EB; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <Button onAction="#logout" styleClass="sidebar-logout-btn" 
+                        style="-fx-padding: 8 16; -fx-margin-top: 12; -fx-content-display: LEFT;" wrapText="false">
+                    <graphic>
+                        <FontIcon iconLiteral="fas-sign-out-alt" iconSize="14" style="-fx-icon-color: #E5E7EB;" />
+                    </graphic>
+                    <text>Logout</text>
+                </Button>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN CONTENT -->
     <center>
-        <StackPane fx:id="contentArea" style="-fx-padding: 14;">
+        <StackPane fx:id="contentArea" style="-fx-background-color: #F8FAFC;">
             <padding>
-                <Insets bottom="14" left="14" right="14" top="14" />
+                <Insets bottom="20" left="20" right="20" top="20" />
             </padding>
         </StackPane>
     </center>

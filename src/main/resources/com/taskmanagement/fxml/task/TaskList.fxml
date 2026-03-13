@@ -9,30 +9,59 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.taskmanagement.controller.TaskController"
-      spacing="10"
-      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+      spacing="16"
+      style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
 
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="Search tasks..." prefWidth="260"/>
-        <ComboBox fx:id="statusFilter" prefWidth="160"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button text="Create" onAction="#handleCreate"/>
-        <Button text="Refresh" onAction="#handleRefresh"/>
-    </HBox>
+    <!-- Page Title -->
+    <Label text="Tasks" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
 
-    <TableView fx:id="taskTable" VBox.vgrow="ALWAYS">
+    <!-- Header Section -->
+    <VBox spacing="16" style="-fx-padding: 0; -fx-background-color: #F8FAFC;">
+        
+        <!-- Title and Actions -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="All Tasks" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button styleClass="btn-primary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#handleCreate">
+                <graphic>
+                    <FontIcon iconLiteral="fas-plus" iconSize="14" style="-fx-icon-color: #FFFFFF;" />
+                </graphic>
+                <text>Create Task</text>
+            </Button>
+            <Button styleClass="btn-secondary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#handleRefresh">
+                <graphic>
+                    <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #111827;" />
+                </graphic>
+                <text>Refresh</text>
+            </Button>
+        </HBox>
+
+        <!-- Filters Section -->
+        <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-background-color: #FFFFFF; -fx-padding: 12 16; -fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);">
+            <TextField fx:id="searchField" promptText="Search tasks by title or description..." prefWidth="300"
+                       style="-fx-padding: 10 12; -fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-border-radius: 6; -fx-background-radius: 6;"/>
+            <Label text="Filter by:" style="-fx-text-fill: #6B7280; -fx-font-size: 12px;"/>
+            <ComboBox fx:id="statusFilter" prefWidth="140" promptText="All Statuses"
+                      style="-fx-padding: 8 12; -fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-border-radius: 6;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="Ready" style="-fx-text-fill: #6B7280; -fx-font-size: 11px;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Table Section -->
+    <TableView fx:id="taskTable" VBox.vgrow="ALWAYS" style="-fx-background-color: #FFFFFF; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
         <columns>
-            <TableColumn fx:id="titleColumn" text="Title" prefWidth="220"/>
+            <TableColumn fx:id="titleColumn" text="Title" prefWidth="240"/>
             <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
             <TableColumn fx:id="priorityColumn" text="Priority" prefWidth="120"/>
             <TableColumn fx:id="dueDateColumn" text="Due Date" prefWidth="140"/>
-            <TableColumn fx:id="actionColumn" text="Actions" prefWidth="240"/>
+            <TableColumn fx:id="actionColumn" text="Actions" prefWidth="260" sortable="false"/>
         </columns>
     </TableView>
 
-    <Label fx:id="statusLabel" text="Ready"/>
 </VBox>

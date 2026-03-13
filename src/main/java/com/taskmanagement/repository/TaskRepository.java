@@ -111,6 +111,11 @@ public class TaskRepository extends BaseRepository {
             }
 
         } catch (SQLException e) {
+            System.err.println("Task Save Error - Title: " + task.getTitle() + ", Status: " + task.getStatus() + 
+                             ", Priority: " + task.getPriority() + ", Assignee ID: " + 
+                             (task.getAssignee() != null ? task.getAssignee().getId() : "null"));
+            System.err.println("SQL Exception: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException(ERR_SAVE + task.getTitle(), e);
         }
         return task;

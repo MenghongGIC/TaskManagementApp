@@ -8,7 +8,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 public class App extends Application {
 
@@ -17,10 +19,13 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        preloadIkonliFonts();
+
         primaryStage = stage;
         scene = new Scene(loadFXML("auth/LoginView"), 1024, 768);
-        scene.getStylesheets().add(
-                getClass().getResource("/com/taskmanagement/css/style.css").toExternalForm()
+        scene.getStylesheets().addAll(
+                getClass().getResource("/com/taskmanagement/css/style.css").toExternalForm(),
+                getClass().getResource("/com/taskmanagement/css/style_enhancements.css").toExternalForm()
         );
         stage.setScene(scene);
         stage.setTitle("Task Management System");
@@ -54,12 +59,28 @@ public class App extends Application {
     public static Stage getPrimaryStage() {
         return primaryStage;
     }
+    
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/com/taskmanagement/fxml/" + fxml + ".fxml"));
         return fxmlLoader.load();
     }
-    
 
+    private static void preloadIkonliFonts() {
+        String[] fontPaths = {
+            "/META-INF/resources/fontawesome5/5.15.3/fonts/fa-solid-900.ttf",
+            "/META-INF/resources/fontawesome5/5.15.3/fonts/fa-regular-400.ttf",
+            "/META-INF/resources/fontawesome5/5.15.3/fonts/fa-brands-400.ttf"
+        };
+        for (String path : fontPaths) {
+            java.net.URL url = FontAwesomeSolid.class.getResource(path);
+            if (url != null) {
+                Font font = Font.loadFont(url.toExternalForm(), 16);
+                System.out.println("[Ikonli] " + (font != null ? "Loaded: " + font.getFamily() : "FAILED to load") + " from " + path);
+            } else {
+                System.err.println("[Ikonli] URL null for: " + path);
+            }
+        }
+    }
 
     public static void main(String[] args) {
         try {

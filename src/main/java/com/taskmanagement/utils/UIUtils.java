@@ -51,8 +51,13 @@ public class UIUtils {
         showAlert(AlertType.WARNING, title, message);
     }
 
-    public static void showConfirmation(String title, String message) {
-        showAlert(AlertType.CONFIRMATION, title, message);
+    public static boolean showConfirmation(String title, String message) {
+        Alert confirmDialog = new Alert(AlertType.CONFIRMATION);
+        confirmDialog.setTitle(title);
+        confirmDialog.setHeaderText(null);
+        confirmDialog.setContentText(message);
+        Optional<ButtonType> result = confirmDialog.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     private static void showAlert(AlertType type, String title, String message) {
@@ -146,6 +151,7 @@ public class UIUtils {
     }
 
     public static String getPriorityTextColor(String priority) {
+        if (priority == null) return "-fx-text-fill: #95a5a6;";
         return switch (priority) {
             case AppConstants.PRIORITY_LOW -> "-fx-text-fill: #27ae60;";
             case AppConstants.PRIORITY_MEDIUM -> "-fx-text-fill: #f39c12;";
@@ -155,6 +161,7 @@ public class UIUtils {
     }
 
     public static String getPriorityBackground(String priority) {
+        if (priority == null) return "-fx-background-color: #ecf0f1;";
         return switch (priority) {
             case AppConstants.PRIORITY_LOW -> "-fx-background-color: #d5f4e6; -fx-text-fill: #27ae60;";
             case AppConstants.PRIORITY_MEDIUM -> "-fx-background-color: #fdebd0; -fx-text-fill: #f39c12;";
@@ -178,8 +185,9 @@ public class UIUtils {
     }
 
     public static void applyHoverEffect(Node node) {
-        node.setOnMouseEntered(e -> node.setStyle("-fx-opacity: 0.8;"));
-        node.setOnMouseExited(e -> node.setStyle("-fx-opacity: 1.0;"));
+        String originalStyle = node.getStyle();
+        node.setOnMouseEntered(e -> node.setStyle(originalStyle + "; -fx-opacity: 0.8;"));
+        node.setOnMouseExited(e -> node.setStyle(originalStyle));
     }
     public static boolean isFieldEmpty(String field) {
         return field == null || field.trim().isEmpty();

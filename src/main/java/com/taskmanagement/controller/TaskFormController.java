@@ -38,8 +38,10 @@ public class TaskFormController {
 
     @FXML
     public void initialize() {
-        statusCombo.getItems().addAll("To Do", "In Progress", "Done");
-        priorityCombo.getItems().addAll("Low", "Medium", "High", "Critical");
+        // Status values must match database constraint: 'Backlog', 'To Do', 'In Progress', 'Blocked', 'Done'
+        statusCombo.getItems().addAll("Backlog", "To Do", "In Progress", "Blocked", "Done");
+        // Priority values must match database constraint: 'Critical', 'High', 'Medium', 'Low', 'None'
+        priorityCombo.getItems().addAll("None", "Low", "Medium", "High", "Critical");
         statusCombo.setValue("To Do");
         priorityCombo.setValue("Medium");
         dueDatePicker.setValue(LocalDate.now().plusDays(7));
@@ -98,6 +100,19 @@ public class TaskFormController {
             return;
         }
 
+        // Validate status and priority are selected
+        if (statusCombo.getValue() == null || statusCombo.getValue().isEmpty()) {
+            UIUtils.setErrorStyle(messageLabel, "Please select a task status");
+            messageLabel.setVisible(true);
+            return;
+        }
+
+        if (priorityCombo.getValue() == null || priorityCombo.getValue().isEmpty()) {
+            UIUtils.setErrorStyle(messageLabel, "Please select a task priority");
+            messageLabel.setVisible(true);
+            return;
+        }
+
         try {
             if (task == null) {
                 Task created = taskService.createTask(title, descriptionField.getText());
@@ -106,7 +121,9 @@ public class TaskFormController {
                 created.setDueDate(dueDatePicker.getValue());
                 created.setAssignee(assigneeCombo.getValue());
                 taskService.updateTask(created);
-                ActivityLogService.logTaskCreated(created.getId(), created.getTitle());
+                Long assigneeId = created.getAssignee() != null ? created.getAssignee().getId() : null;
+                ActivityLogService.logTaskCreated(created.getId(), created.getTitle(), 
+                    created.getPriority().toString(), assigneeId);
             } else {
                 task.setTitle(title);
                 task.setDescription(descriptionField.getText());

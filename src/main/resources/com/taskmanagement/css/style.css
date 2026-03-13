@@ -1,4 +1,66 @@
-/* Shared auth styles */
+/* ====================================== */
+/* GLOBAL COLOR THEME */
+/* ====================================== */
+/* 
+  App background: #F8FAFC
+  Cards / Panels: #FFFFFF
+  Borders: #E5E7EB
+  Primary text: #111827
+  Secondary text: #6B7280
+  
+  Primary Color: #3B82F6 (Blue)
+  Success Color: #22C55E (Green)
+  Warning Color: #F59E0B (Orange)
+  Danger Color: #EF4444 (Red)
+*/
+
+/* ====================================== */
+/* SIDEBAR NAVIGATION STYLES */
+/* ====================================== */
+
+.sidebar-menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #E5E7EB;
+    -fx-font-size: 13px;
+    -fx-padding: 12 16;
+    -fx-border-radius: 6;
+    -fx-text-alignment: LEFT;
+    -fx-content-display: LEFT;
+    -fx-graphic-text-gap: 10;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+}
+
+.sidebar-menu-item:hover {
+    -fx-background-color: #374151;
+}
+
+.sidebar-menu-item-active {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.sidebar-logout-btn {
+    -fx-background-color: #374151;
+    -fx-text-fill: #E5E7EB;
+    -fx-font-size: 12px;
+    -fx-padding: 8 16;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-text-alignment: CENTER;
+    -fx-width: 100%;
+}
+
+.sidebar-logout-btn:hover {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* ====================================== */
+/* SHARED AUTH STYLES */
+/* ====================================== */
 .login-container {
     -fx-background-color: linear-gradient(to bottom right, #0f172a, #1e293b);
 }
@@ -266,4 +328,457 @@
     -fx-font-size: 24px;
     -fx-text-fill: #0f172a;
     -fx-font-weight: bold;
+}
+
+/* ====================================== */
+/* BUTTON COLOR SYSTEM */
+/* ====================================== */
+
+/* Primary Button - Blue */
+.btn-primary {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2563EB;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.3), 8, 0, 0, 4);
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #1D4ED8;
+}
+
+/* Success Button - Green */
+.btn-success {
+    -fx-background-color: #22C55E;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-success:hover {
+    -fx-background-color: #16A34A;
+    -fx-effect: dropshadow(gaussian, rgba(34, 197, 94, 0.3), 8, 0, 0, 4);
+}
+
+/* Warning Button - Orange */
+.btn-warning {
+    -fx-background-color: #F59E0B;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-warning:hover {
+    -fx-background-color: #D97706;
+    -fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.3), 8, 0, 0, 4);
+}
+
+/* Danger Button - Red */
+.btn-danger {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #DC2626;
+    -fx-effect: dropshadow(gaussian, rgba(239, 68, 68, 0.3), 8, 0, 0, 4);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #111827;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 16;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #F3F4F6;
+    -fx-border-color: #D1D5DB;
+}
+
+/* ====================================== */
+/* TABLE DESIGN */
+/* ====================================== */
+
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 6, 0, 0, 2);
+}
+
+.table-view:focused {
+    -fx-border-color: #3B82F6;
+}
+
+.table-view .table-header-background {
+    -fx-background-color: #F1F5F9;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 0 0 2 0;
+}
+
+.table-view .table-header-background .label {
+    -fx-text-fill: #111827;
+    -fx-font-weight: 600;
+    -fx-font-size: 12px;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-padding: 0;
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: #EFF6FF;
+    -fx-text-fill: #111827;
+}
+
+.table-view .table-row-cell:filled:hover {
+    -fx-background-color: #F8FAFC;
+    -fx-text-fill: #111827;
+}
+
+.table-view .table-cell {
+    -fx-padding: 12;
+    -fx-text-fill: #111827;
+    -fx-font-size: 12px;
+    -fx-border-color: transparent;
+}
+
+/* ====================================== */
+/* PRIORITY COLOR BADGES (Updated) */
+/* ====================================== */
+
+.priority-high {
+    -fx-background-color: #FED7AA;
+    -fx-text-fill: #92400E;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.priority-critical {
+    -fx-background-color: #FECACA;
+    -fx-text-fill: #991B1B;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.priority-low {
+    -fx-background-color: #DCFCE7;
+    -fx-text-fill: #166534;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.priority-medium {
+    -fx-background-color: #DBEAFE;
+    -fx-text-fill: #0C4A6E;
+    -fx-padding: 4 8;
+    -fx-background-radius: 4;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ====================================== */
+/* IMPROVED KANBAN BOARD STYLES */
+/* ====================================== */
+
+.kanban-board-container {
+    -fx-border-width: 0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 16;
+    -fx-min-height: 500;
+    -fx-min-width: 320;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 6, 0, 0, 2);
+}
+
+.kanban-board-todo {
+    -fx-background-color: #F3F4F6;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+}
+
+.kanban-board-in-progress {
+    -fx-background-color: #FEF3C7;
+    -fx-border-color: #FCD34D;
+    -fx-border-width: 1;
+}
+
+.kanban-board-done {
+    -fx-background-color: #DCFCE7;
+    -fx-border-color: #86EFAC;
+    -fx-border-width: 1;
+}
+
+.kanban-board-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-text-fill: #111827;
+}
+
+.kanban-board-count {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: #666666;
+    -fx-background-color: rgba(0, 0, 0, 0.08);
+    -fx-padding: 2 8;
+    -fx-border-radius: 12;
+    -fx-min-width: 28;
+    -fx-alignment: CENTER;
+}
+
+/* ====================================== */
+/* TASK CARD STYLES (Updated) */
+/* ====================================== */
+
+.task-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 4, 0, 0, 2);
+    -fx-cursor: grab;
+}
+
+.task-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 8, 0, 0, 4);
+    -fx-border-color: #3B82F6;
+    -fx-border-width: 1;
+}
+
+.task-card-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #111827;
+}
+
+.task-card-assignee {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6B7280;
+}
+
+.task-card-due-date {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9CA3AF;
+}
+
+/* ====================================== */
+/* FORM ELEMENTS & INPUT FIELDS */
+/* ====================================== */
+
+.text-field,
+.text-area,
+.combo-box {
+    -fx-padding: 10 12;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #111827;
+    -fx-font-size: 12px;
+}
+
+.text-field:focused,
+.text-area:focused,
+.combo-box:focused {
+    -fx-border-color: #3B82F6;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.2), 6, 0, 0, 2);
+}
+
+.text-field:disabled,
+.text-area:disabled,
+.combo-box:disabled {
+    -fx-background-color: #F3F4F6;
+    -fx-text-fill: #9CA3AF;
+}
+
+.label {
+    -fx-text-fill: #111827;
+    -fx-font-size: 12px;
+}
+
+/* ====================================== */
+/* COMBO BOX STYLING */
+/* ====================================== */
+
+.combo-box-popup > .list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background-color: #EFF6FF;
+    -fx-text-fill: #111827;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background-color: #F3F4F6;
+}
+
+/* ====================================== */
+/* CONTEXT MENU STYLING */
+/* ====================================== */
+
+.context-menu {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 4);
+}
+
+.menu-item > .label {
+    -fx-text-fill: #111827;
+    -fx-font-size: 12px;
+}
+
+.menu-item:focused {
+    -fx-background-color: #EFF6FF;
+}
+
+/* ====================================== */
+/* SCROLL BAR STYLING */
+/* ====================================== */
+
+.scroll-bar {
+    -fx-background-color: #F8FAFC;
+    -fx-opacity: 0.8;
+}
+
+.scroll-bar:vertical > .increment-button,
+.scroll-bar:vertical > .decrement-button {
+    -fx-padding: 0;
+}
+
+.scroll-bar:vertical > .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar:vertical > .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+
+/* ====================================== */
+/* TOOLTIP STYLING */
+/* ====================================== */
+
+.tooltip {
+    -fx-background-color: #111827;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 11px;
+    -fx-padding: 8;
+    -fx-background-radius: 6;
+}
+
+/* ====================================== */
+/* DIALOG & ALERT STYLING */
+/* ====================================== */
+
+.dialog-pane {
+    -fx-background-color: #FFFFFF;
+}
+
+.dialog-pane > .header-panel {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 0 0 1 0;
+}
+
+.dialog-pane > .content.label {
+    -fx-text-fill: #111827;
+    -fx-padding: 16;
+}
+
+/* ====================================== */
+/* CHECKBOX & RADIO BUTTON */
+/* ====================================== */
+
+.check-box,
+.radio-button {
+    -fx-text-fill: #111827;
+    -fx-font-size: 12px;
+}
+
+.check-box > .box,
+.radio-button > .radio {
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1;
+    -fx-padding: 3;
+}
+
+.check-box:selected > .box,
+.radio-button:selected > .radio {
+    -fx-background-color: #3B82F6;
+    -fx-border-color: #3B82F6;
+}
+
+/* ====================================== */
+/* PROGRESS INDICATOR */
+/* ====================================== */
+
+.progress-bar {
+    -fx-accent: #3B82F6;
+}
+
+.progress-indicator {
+    -fx-progress-color: #3B82F6;
+}
+
+/* ====================================== */
+/* HEADER & TITLE STYLING */
+/* ====================================== */
+
+.section-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.section-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6B7280;
 }

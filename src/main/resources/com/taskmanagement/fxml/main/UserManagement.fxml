@@ -8,28 +8,49 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.taskmanagement.controller.UserManagementController"
-      spacing="10"
-      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+      spacing="16"
+      style="-fx-background-color: #F8FAFC; -fx-padding: 20;">
 
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="Search by username or email..." prefWidth="300"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button text="Refresh" onAction="#handleRefresh" style="-fx-padding: 8px 16px;"/>
-    </HBox>
+    <!-- Page Title -->
+    <Label text="User Management" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
 
-    <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
+    <!-- Header Section -->
+    <VBox spacing="16" style="-fx-padding: 0; -fx-background-color: #F8FAFC;">
+        
+        <!-- Title -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button styleClass="btn-secondary" style="-fx-padding: 8 16; -fx-content-display: LEFT;" onAction="#handleRefresh">
+                <graphic>
+                    <FontIcon iconLiteral="fas-sync-alt" iconSize="14" style="-fx-icon-color: #111827;" />
+                </graphic>
+                <text>Refresh</text>
+            </Button>
+        </HBox>
+
+        <!-- Search Section -->
+        <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-background-color: #FFFFFF; -fx-padding: 12 16; -fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);">
+            <TextField fx:id="searchField" promptText="Search users by username or email..." prefWidth="350"
+                       style="-fx-padding: 10 12; -fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-border-radius: 6; -fx-background-radius: 6;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="Loading users..." style="-fx-text-fill: #6B7280; -fx-font-size: 11px;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Table Section -->
+    <TableView fx:id="userTable" VBox.vgrow="ALWAYS" style="-fx-background-color: #FFFFFF; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 6, 0, 0, 2);">
         <columns>
-            <TableColumn fx:id="usernameColumn" text="Username" prefWidth="140"/>
-            <TableColumn fx:id="emailColumn" text="Email" prefWidth="220"/>
+            <TableColumn fx:id="usernameColumn" text="Username" prefWidth="160"/>
+            <TableColumn fx:id="emailColumn" text="Email" prefWidth="240"/>
             <TableColumn fx:id="roleColumn" text="Role" prefWidth="100"/>
             <TableColumn fx:id="createdAtColumn" text="Created At" prefWidth="180"/>
-            <TableColumn fx:id="actionColumn" text="Actions" prefWidth="120"/>
+            <TableColumn fx:id="actionColumn" text="Actions" prefWidth="140" sortable="false"/>
         </columns>
     </TableView>
 
-    <Label fx:id="statusLabel" text="Loading users..." style="-fx-padding: 8px;"/>
 </VBox>

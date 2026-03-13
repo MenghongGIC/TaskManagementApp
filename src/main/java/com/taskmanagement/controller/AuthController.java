@@ -54,9 +54,7 @@ public class AuthController {
             return;
         }
 
-        String email = registerEmailField != null && registerEmailField.getText() != null
-            ? registerEmailField.getText().trim()
-            : "";
+        String email = registerEmailField != null && registerEmailField.getText() != null ? registerEmailField.getText().trim(): "";
         String username = registerUsernameField.getText() == null ? "" : registerUsernameField.getText().trim();
         String password = registerPasswordField.getText() == null ? "" : registerPasswordField.getText();
         String confirm = registerConfirmPasswordField.getText() == null ? "" : registerConfirmPasswordField.getText();

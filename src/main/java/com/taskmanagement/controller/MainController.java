@@ -5,6 +5,7 @@ import com.taskmanagement.utils.CurrentUser;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
@@ -15,7 +16,14 @@ public class MainController {
     @FXML private Label usernameLabel;
     @FXML private StackPane contentArea;
     
+    @FXML private Button dashboardBtn;
+    @FXML private Button tasksBtn;
+    @FXML private Button kanbanBtn;
+    @FXML private Button activityBtn;
+    @FXML private Button usersBtn;
+    
     private static MainController instance;
+    private Button activeMenuBtn;
 
     @FXML
     public void initialize() {
@@ -24,22 +32,38 @@ public class MainController {
             String username = CurrentUser.getUsername();
             usernameLabel.setText(username == null ? "Guest" : username);
         }
+        
+        // Hide admin menu if not admin
+        if (!CurrentUser.isAdmin()) {
+            usersBtn.setVisible(false);
+            usersBtn.setManaged(false);
+        }
+        
         showDashboard();
     }
 
     @FXML
     private void showDashboard() {
+        setActiveMenuButton(dashboardBtn);
         loadView("/com/taskmanagement/fxml/main/Dashboard.fxml", null);
     }
 
     @FXML
     private void showTasks() {
+        setActiveMenuButton(tasksBtn);
         loadView("/com/taskmanagement/fxml/task/TaskList.fxml", null);
     }
 
     @FXML
     private void showKanban() {
+        setActiveMenuButton(kanbanBtn);
         loadView("/com/taskmanagement/fxml/main/KanbanBoard.fxml", null);
+    }
+
+    @FXML
+    private void showActivityLog() {
+        setActiveMenuButton(activityBtn);
+        loadView("/com/taskmanagement/fxml/main/ActivityLog.fxml", null);
     }
 
     @FXML
@@ -50,6 +74,7 @@ public class MainController {
             contentArea.getChildren().setAll(error);
             return;
         }
+        setActiveMenuButton(usersBtn);
         loadView("/com/taskmanagement/fxml/main/UserManagement.fxml", null);
     }
 
@@ -61,6 +86,18 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setActiveMenuButton(Button btn) {
+        // Remove active style from previous button
+        if (activeMenuBtn != null) {
+            activeMenuBtn.getStyleClass().remove("sidebar-menu-item-active");
+            activeMenuBtn.getStyleClass().add("sidebar-menu-item");
+        }
+        // Add active style to new button
+        activeMenuBtn = btn;
+        activeMenuBtn.getStyleClass().remove("sidebar-menu-item");
+        activeMenuBtn.getStyleClass().add("sidebar-menu-item-active");
     }
 
     private void loadView(String path, String filter) {
